@@ -1,0 +1,253 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block title %}搜索结果 - 比格电影{% endblock %}
+{% block description %}搜索结果：{{movie_counts}}部电影，{{tv_counts}}部电视剧，{{anime_counts}}部动漫，{{show_counts}}部综艺{% endblock %}
+{% block keywords %}{{u_sv_str}},电影,电视剧,动漫,综艺{% endblock %}
+    
+{% block css_own %}
+<link rel="stylesheet" href="/static/css/movie/movie_base.css">
+<link rel="stylesheet" href="/static/css/movie/movie_index.css">
+<!-- <link rel="stylesheet" href="/static/css/plugs/HoverEffect/style.css"> -->
+<script type="text/javascript" src="/static/js/plugs/HoverEffect/modernizr.custom.97074.js"></script>
+<noscript><link rel="stylesheet" type="text/css" href="/static/css/plugs/HoverEffect/noJS.css"/></noscript>
+    <!--[if IE]>
+  		<script src="/static/js/html5.js"></script>
+	<![endif]-->
+{% endblock %}
+
+{% block nav_search_val %}{{u_sv_str}}{% endblock %}
+
+{% block main_content %}
+  
+  <div class="container">
+    <div class="row hidden-sm hidden-xs">
+        <section>
+        <div class="breadcrumb col-lg-12 col-md-12">
+          <a class="btn btn-info btn-arrow-right" href="/">主页</a>
+          <a class="btn btn-primary btn-arrow-right" href="/search/">搜索</a>
+          <h1><a class="btn btn-default btn-arrow-right" href="{{cur_url}}">{% if u_sv_str|length > 8 %}{{u_sv_str|slice:'8'}}...{% else %}{{u_sv_str}}{% endif %}</a></h1>
+        </div>
+        </section>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-9">
+        <section>
+          <div class="msg-wrap mb-20" id="filter-wrap">
+            <ul class="list-inline" id="filter-switch">
+              <li>筛选结果：<b class="douban-color" id="result-counts">{{all_counts}}</b> 部相关影片</li>
+              {% block switch %}
+              <li class="display-thumb" id="t1"><a class="fui-list-small-thumbnails active" role="button" title="图片模式"></a></li>
+              <li class="display-thumb" id="t2"><a class="fui-list-thumbnailed" role="button" title="图文模式"></a></li>
+              <li class="display-thumb" id="t3"><a class="fui-list-columned" role="button" title="列表模式"></a></li>
+              {% endblock %}
+            </ul>
+            
+            <ul class="list-inline" id="focus-bar">
+		      <li><a href="javascript:;" id="af">综合排序</a></li>
+              <li><a href="javascript:;" id="guonei">国内上映</a></li>
+              <li><a href="javascript:;" id="guowai">国外上映</a></li>
+              <li><a href="javascript:;" id="gaofen">豆瓣高分</a></li>
+              <li><a href="javascript:;" id="gengxin">最近更新</a></li>
+              <li><a href="javascript:;" id="not_released">尚未上映</a></li>
+              <li><a id="more-filters" role="button">更多筛选&nbsp;<i class="fa fa-chevron-down"></i></a></li>
+    	    </ul>
+  		    <ul class="list-inline hide" id="region-bar">
+              <li><a href="javascript:;" id="ar">全部地区</a></li>
+              <li><a href="javascript:;" id="mainland">大陆</a></li>
+	          <li><a href="javascript:;" id="hongkong">香港</a></li>
+              <li><a href="javascript:;" id="america">美国</a></li>
+              <li><a href="javascript:;" id="uk">英国</a></li>
+              <li><a href="javascript:;" id="korea">韩国</a></li>
+              <li><a href="javascript:;" id="japan">日本</a></li>  
+              <li><a href="javascript:;" id="taiwan">台湾</a></li>
+              <li><a href="javascript:;" id="french">法国</a></li>
+              <li><a href="javascript:;" id="thailand">泰国</a></li>
+              <li><a href="javascript:;" id="india">印度</a></li>
+              <li><a href="javascript:;" id="otherregion">其他</a></li>
+		    </ul>
+		    <ul class="list-inline hide" id="type-bar">
+              <li><a href="javascript:;" id="at">全部类型</a></li>
+              <li><a href="javascript:;" id="juqing">剧情</a></li>
+              <li><a href="javascript:;" id="xiju">喜剧</a></li>
+              <li><a href="javascript:;" id="aiqing">爱情</a></li>
+              <li><a href="javascript:;" id="qihuan">奇幻</a></li>
+              {% if not u_cate == 'show' %}
+              <li><a href="javascript:;" id="guzhuang">古装</a></li>
+              <li><a href="javascript:;" id="dongzuo">动作</a></li>
+              <li><a href="javascript:;" id="maoxian">冒险</a></li>
+              <li><a href="javascript:;" id="kehuan">科幻</a></li>
+              <li><a href="javascript:;" id="xuanyi">悬疑</a></li>
+              <li><a href="javascript:;" id="jingsong">惊悚</a></li>
+              <li><a href="javascript:;" id="kongbu">恐怖</a></li>
+              <li><a href="javascript:;" id="fanzui">犯罪</a></li>
+              {% endif %}
+              <li><a href="javascript:;" id="zhanzheng">战争</a></li>
+              {% if u_cate == 'movie' %}
+              <li><a href="javascript:;" id="donghua">动画</a></li>
+              <li><a href="javascript:;" id="duanpian">短片</a></li>
+              {% endif %}
+              <li><a href="javascript:;" id="ertong">儿童</a></li>		
+              <li><a href="javascript:;" id="jiating">家庭</a></li>
+              <li><a href="javascript:;" id="tongxing">同性</a></li>
+              <!--<li><a href="javascript:;" id="qingse">情色</a></li>-->
+              {% if u_cate == 'show' %}
+              <li><a href="javascript:;" id="yinyue">音乐</a></li>
+              <li><a href="javascript:;" id="gewu">歌舞</a></li>
+              <li><a href="javascript:;" id="xiqu">戏曲</a></li>
+              {% endif %}
+              <li><a href="javascript:;" id="lishi">历史</a></li>
+              <li><a href="javascript:;" id="yundong">运动</a></li>
+              <li><a href="javascript:;" id="zhuanji">传记</a></li>
+              <li><a href="javascript:;" id="jilupian">纪录片</a></li>
+              
+     	    </ul>
+     	    <ul class="list-inline" id="category-bar">
+              <li><a href="javascript:;" id="all">全部分类 ({{all_counts}})</a></li>
+              <li><a href="javascript:;" id="movie">电影 ({{movie_counts}})</a></li>
+              <li><a href="javascript:;" id="tv">电视剧({{tv_counts}})</a></li>
+              <li><a href="javascript:;" id="anime">动漫({{anime_counts}})</a></li>
+              <li><a href="javascript:;" id="show">综艺({{show_counts}})</a></li>
+              
+            </ul>
+
+     	  </div>
+     	</section>
+
+		<section>
+        <div class="movie-container">
+          <section>
+			{% if show %}
+			
+			  {% block main_part %}
+			  <div class="list-group-item">
+			    <ul class="list-inline da-thumbs" id="da-thumbs">
+                {% for item in show %}
+                  <li class="col-xs-3 col-sm-3 col-md-24">
+                    <a href="/{{item.cate}}/{{item.id}}/">
+                      {% if item.cate == 'movie' %}
+                        {% ifnotequal item.video '无视频' %}
+                    	<span class="item-info">
+					    {% ifequal item.video_type '预告片' %}预告{% else %}在线{% endifequal %}
+					    {% ifnotequal item.down_url '无下载' %}|下载{% endifnotequal %}
+					    </span>
+					    {% else %}
+					    <span class="item-info">
+					    {% ifnotequal item.down_url '无下载' %}下载{% endifnotequal %}
+					    </span>
+					    {% endifnotequal %}
+                      {% else %}
+                        {% if item.updated_eps %}
+                        <span class="item-info">
+				        {% if item.updated_eps >= item.eps %}完结{% else %}更新至{{item.updated_eps}}{% endif %}
+				        </span>
+				        {% endif %}
+                      {% endif %}
+                   	  
+
+                      <img src="{{item.poster}}" alt="{{item.ch_name}}海报">
+                      <div><span>
+                        {{item.types}}<br>{{item.region}}<hr>
+                        {% if item.intro|length > 50 %}
+                          {{item.intro|slice:"50"|safe}}……
+                        {% else %}
+                          {{item.intro}}
+                        {% endif %}
+                       </span></div>
+                    </a>
+                    
+                    <span><h4><a href="/{{item.cate}}/{{item.id}}/"> 
+                      {% if item.ch_name|length > 18 %} {{item.ch_name|slice:"18"|safe}}……
+                      {% else %} {{item.ch_name}} {% endif %}</a></h4>
+                      
+                    {% ifnotequal item.score 0 %}
+					&nbsp;&nbsp;<span class="douban-color">{{item.score}}</span>
+					{% else %}
+					&nbsp;&nbsp;<span class="label qq-not-release">尚未上映</span>
+					{% endifnotequal %}</span>
+					
+                  </li> 
+                {% endfor %}
+                <div class="clearfix"></div>
+                </ul>
+              </div>
+              {% endblock %}
+			  {% else %}
+			  <div class="list-group-item p-20 text-center">
+			    <div class="ccs-tip ccs-tip-sorry"></div>
+			    <div class="ccs-desc">此次筛选无结果</div>
+			  </div>
+              {% endif %}
+            </section>
+			
+			{% if show %}
+			<div class="text-center"><ul class="pagination">{{ page_list }}</ul></div>
+			<div>
+				共&nbsp;{{ pages }}&nbsp;页，每页显示：
+				<select id="s1" class="selectpicker">
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="30">30</option>
+					<option value="50">50</option>
+				</select>
+			</div>
+			{% endif %}
+		</div> <!-- movie-container -->
+	    </section>
+			
+
+	  </div> <!-- col-left -->
+    
+
+
+  <div class="col-md-3 hidden-xs hidden-sm" id="right-part">
+    <aside>
+	      <div class="panel-group info-block" id="recommend">
+	        <h2 class="top10">影片推荐</h2>
+	        <ul class="list-unstyled panel-body">
+	          {% for item in rec_result %}
+              <li class="media">
+                <div class="media-left">
+                  <a href="/{{item.cate}}/{{item.id}}/" target="_blank"><img class="media-object" src="{{item.poster}}" alt="{{item.ch_name}}海报"></a> 
+                </div>
+                <div class="media-body">
+                  <div class="media-heading">
+                    <a class="mr-5" href="/{{item.cate}}/{{item.id}}/" target="_blank">{{item.ch_name}}</a>
+                    <span class="text-smaller text-lighter">({{item.year}})</span>&nbsp;
+                    <span class="text-smaller douban-color">{{item.score}}</span>
+                  </div>
+                  <div class="media-content">
+                    {% if item.director %}<p><span class="text-lighter">导演:</span> {{item.director|my_slice:1}}</p>{% endif %}
+                    {% if item.actor %}<p><span class="text-lighter">主演:</span> {{item.actor|my_slice:3}}</p>{% endif %}
+                    {% if not item.director and not item.actor %}<p>{{item.intro|slice:'40'}}...</p>{% endif %}
+                  </div>
+                </div>
+               </li>
+               {% endfor %}
+             </ul>
+	        
+	      </div> <!-- panel-group -->
+	      <!-- 
+	      <div class="panel info-block">
+	        <div class="panel-heading tags-cloud"><h2>标签云</h2></div>
+	        <div class="panel-body">
+	          <div id="tagscloud"></div>
+	        </div>
+	      </div>
+	       -->
+	    </aside>
+  </div>
+      
+      
+    </div> <!-- row -->
+  </div> <!-- container -->
+  
+  
+
+{% endblock %}
+
+{% block js_own %}
+<script type="text/javascript" src="/static/js/search/search_result.js"></script>
+<script type="text/javascript" src="/static/js/movie/movie_base.js"></script>
+<script type="text/javascript" src="/static/js/plugs/HoverEffect/jquery.hoverdir.js"></script>
+
+{% endblock %}

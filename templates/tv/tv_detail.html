@@ -1,0 +1,375 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block title %}{{detail.ch_name}} - 比格电影{% endblock %}
+{% block description %}电视剧{{detail.ch_name}}的简介和剧情介绍、{{detail.ch_name}}的剧照和截图、预告片、论坛。{{detail.ch_name}}{% if detail.foreign_name %}({{detail.foreign_name}}){% endif %}是{{detail.year}}年由{{detail.actor|my_slice:3}}等主演的{% if not detail.types == '未知' %}{{detail.types|my_slice:1}}{% endif %}电视剧。{% endblock %}
+{% block keywords %}{{detail.ch_name}},{{detail.foreign_name}},剧情,图片,预告片,{{detail.ch_name}}下载{% endblock %}
+{% block meta_own %}{% endblock %}
+    
+{% block css_own %}
+<link rel='stylesheet' href='/static/css/movie/movie_base.css'>
+<link rel='stylesheet' href='/static/css/movie/movie_detail.css?v=161204.1'>
+<link href="/static/css/plugs/sinaEmotion/jquery.sinaEmotion.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block main_content %}
+  <div class="modal" id="editCancelModal" tabindex="-1" role="dialog" aria-labelledby="editCancelModal">
+    <div class="modal-dialog modal-sm" role="editCancel">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">确认放弃编辑</h4>
+        </div>
+        <div class="modal-body text-center">
+          <div class="media">
+            <div class="media-left"><div class="ccs-tip ccs-tip-query"></div></div>
+            <div class="media-body media-middle">
+              <div class="ccs-desc">确定放弃正在编辑的内容吗？</div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-default-outline mr-10" id="cancel-ce">取消</button>
+          <button class="btn btn-sm btn-danger" id="confirm-ce">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="blur-wrap">
+      <div class="blur" style="background-image:url({{detail.poster}});"></div>
+      <div class="clearfix"></div>
+    </div>
+    
+    <article>
+    <div class="row">
+      <div class="col-lg-12">
+      <section>
+        <div class="panel-body" id="info">
+          <div class="media">
+            <div class="media-left">
+              <img class="media-object" src="{{detail.poster}}" alt="{{detail.ch_name}}海报">
+            </div>
+            <div class="media-body">
+              <div class="info-title">
+                <h1>{{detail.ch_name}}</h1>
+                {% if detail.foreign_name %}<span>{{detail.foreign_name}}</span>{% endif %}
+                <span>({{detail.year}})</span>
+                {% if collected %}
+                <button class="btn btn-sm btn-collected" data-id="{{tid}}"><i class="fa fa-check"></i> 已藏</button>
+                {% else %}
+                <button class="btn btn-sm btn-collect" data-id="{{tid}}"><i class="fa fa-star-o"></i> 收藏</button>
+                {% endif %}
+              </div>
+
+              {% if not detail.types == '未知' %}<p>类型：{{detail.types}}</p>{% endif %}
+              {% if detail.score %}<p>豆瓣评分：{{detail.score}}</p>{% else %}<p>豆瓣评分：暂无</p>{% endif %}
+              <p>国家地区：{{detail.region}}</p>
+              {% if detail.release_date_show %}<p>上映日期：{{detail.release_date_show}}</p>{% endif %}
+              {% if detail.director %}<p>导演：{{detail.director}}</p>{% endif %}
+              {% if detail.screenwriter %}<p>编剧：{{detail.screenwriter}}</p>{% endif %}
+              {% if detail.actor %}<p>主演：{{detail.actor|my_slice:18}}</p>{% endif %}
+              {% if not detail.eps == 999 %}<p>集数：{{detail.eps}}</p>{% endif %}
+              {% if detail.running_time %}<p>单集片长：{{detail.running_time}}</p>{% endif %}
+              {% if detail.other_name %}<p>又名：{{detail.other_name}}</p>{% endif %}
+            </div>
+          </div>
+        </div> <!-- info -->
+        </section>
+        </div>
+    </div>
+    <div class="row wrap">
+      <div class="col-md-9 col-lg-9" id="left-part">  
+        <section>
+        <div class="panel info-block" id="summary">
+          <div class="panel-heading"><h2>{{detail.ch_name}}的剧情简介</h2></div>
+          <div class="panel-body">{{detail.intro|safe|linebreaks}}</div>
+        </div>
+        </section>
+        
+        {% if detail.ss1 or detail.ss2 or detail.ss3 or detail.ss4 %}
+        <section>
+        <div class="panel info-block" id="screenshoot">
+          <div class="panel-heading"><h2>{{detail.ch_name}}的剧照截图</h2></div>
+          <div class="panel-body">
+            {% if detail.ss1 %}<img class="img-responsive col-lg-6 col-md-6" src="{{detail.ss1}}" alt="{{detail.ch_name}}截图">{% endif %}
+            {% if detail.ss2 %}<img class="img-responsive col-lg-6 col-md-6" src="{{detail.ss2}}" alt="{{detail.ch_name}}截图">{% endif %}
+            {% if detail.ss3 %}<img class="img-responsive col-lg-6 col-md-6" src="{{detail.ss3}}" alt="{{detail.ch_name}}截图">{% endif %}
+            {% if detail.ss4 %}<img class="img-responsive col-lg-6 col-md-6" src="{{detail.ss4}}" alt="{{detail.ch_name}}截图">{% endif %}
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        </section>
+        {% endif %}
+        
+        {% if urls %}
+        <section>
+        <div class="panel info-block" id="download">
+          <div class="panel-heading"><h2>{{detail.ch_name}}的下载地址</h2></div>
+          <div class="panel-body text-content">
+            {% for item in urls %}
+            <div>
+              <a href="{{item.1}}">{{item.0}}</a>&nbsp;&nbsp;
+              <input class="typeahead-only input-sm" id="input1" type="text" spellcheck="false" value="{{item.1}}">&nbsp;&nbsp;
+              <button class="btn btn-primary btn-sm clip-btn" id="clip-btn-1" type="button" data-toggle="tooltip" data-trigger="click" title="复制成功" data-clipboard-target="input-1">复制</button>
+            </div>
+            {% endfor %}
+          </div>
+          
+        </div>
+		</section>
+		{% endif %}
+        
+        <section>
+          <div class="panel info-block" id="comment">
+            <div class="panel-heading"><h2>{{detail.ch_name}}的评论</h2>(<span>{{reply_counts}}</span>)</div>
+            <div class="panel-body">
+              <ul class="list-group" id="comment-list">
+              {% if reply %}
+              {% for r in reply %}
+                <li class="list-group-item">
+                  <div class="media-left">
+                    <a href="/user/profile/{{r.user.id}}/{{r.user.username}}/" target="_blank"><img class="media-object img-circle avatar-s" src="{{r.user.thumb_s}}"></a>
+                  </div>
+                  <div class="media-body">
+                    <div class="media-heading">
+                      <a href="/user/profile/{{r.user.id}}/{{r.user.username}}/">{{r.user.username}}</a>
+                      <span class="rr-btn-group" data-rid="{{r.id}}">
+                        <button class="btn btn-xs btn-thumbs-up"><i class="fa fa-thumbs-o-up"></i>&nbsp;{{r.tv_r_like.all|length}}&nbsp;</button>
+                        <!-- <button class="btn btn-xs btn-thumbs-down"><i class="fa fa-thumbs-o-down"></i>&nbsp;0&nbsp;</button> -->
+                        <button class="btn btn-xs btn-display-rr">回复</button>
+                      </span>
+                      &nbsp;&nbsp;
+                      {% if r.rating %}
+                      <div class="rating-container theme-krajee-fa rating-xxs" title="{{r.rating}}分">
+                        <div class="rating">
+                          <span class="empty-stars"><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span></span>
+                          <span class="filled-stars" style="width: {{r.rating}}0%;"><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span></span>
+                        </div>
+                      </div>&nbsp;&nbsp;
+                      {% endif %}
+                      <time>{{r.create_date|my_datetrans}}</time>
+                      {% if r.tv_rr.all|length >= 5 or r.tv_r_like.all|length >= 10 %}&nbsp;&nbsp;<span class="label label-danger">HOT</span>{% endif %}
+                    </div>
+                    
+                    <div class="r-content text-content">{{r.content|safe}}</div>
+                    
+                    {% if r.tv_rr.all|length %}
+                      <ul class="media-list rr-wrap">
+                      {% for rr in r.tv_rr.all|dictsortreversed:'create_date'|slice:'5' %}
+                        <li class="media" data-rrid="{{rr.id}}">
+                          <div class="media-left">
+                            <a href="/user/home/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank"><img class="media-object img-circle avatar-xs" src="{{rr.user.thumb_s}}"></a>
+                          </div>
+	                      <div class="media-body">
+	                        <div class="media-heading">
+	                          <a href="/user/home/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank">{{rr.user.username}}</a>&nbsp;&nbsp;
+	                          <time>{{rr.create_date|my_datetrans}}</time>
+	                        </div>
+	                        <div class="rr-content text-content">{{rr.content|safe}}</div>
+	                      </div>
+	                    </li>
+	                  {% endfor %}
+	                  </ul>
+	                {% endif %}
+	                
+	                {% if r.tv_rr.all|length > 5 %}
+	                <a class="dmr text-smaller pull-left" data-remainder="{{r.tv_rr.all|length|add:'-5'}}" data-rid="{{r.id}}" role="button">还有{{r.tv_rr.all|length|add:'-5'}}条回复&nbsp;&nbsp;<i class="fa fa-angle-down"></i></a>
+	                <div class="clearfix"></div>
+	                {% endif %}
+                  </div>
+                </li>
+              {% endfor %}
+              {% else %}
+              <div class="text-center">
+                <div class="ccs-tip ccs-tip-comeon"></div>
+                <div class="ccs-desc">暂无评论，快来抢沙发~</div>
+              </div>
+              {% endif %} {# if reply #}
+            </ul>
+            {% if reply_counts > 10 %}
+            <div class="text-center mb-30" id="dmc"><button class="btn btn-primary btn-xs" data-xid="{{detail.id}}" data-remainder="{{reply_counts|add:'-10'}}">还有{{reply_counts|add:'-10'}}条评论&nbsp;&nbsp;<i class="fa fa-angle-down"></i></button></div>
+            {% endif %}
+              <div class="form-group publish-area submit-area">
+                <div class="input-group">
+                  <textarea class="form-control text-wrapper" placeholder="快来发表你的看法" rows="6" maxlength="500"></textarea>
+                </div>
+                <div class="submit-btn-group">
+                  <span class="emotion-icon" role="button"><i class="fa fa-smile-o"></i></span>
+                  {% if logined %}
+                    {% if not has_rated %}
+                    <input id="kv-fa" name="start-rating" type="number">
+                    {% else %}
+                    <div class="rating-container theme-krajee-fa rating-xxs">
+                      <div class="rating" data-toggle="tooltip" data-placement="top" title="你已经评过分啦">
+                        <span class="empty-stars"><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span></span>
+                        <span class="filled-stars" style="width: {{cur_user_rating}}0%;"><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span></span>
+                      </div>
+                      <div class="caption"><span class="label label-default">{{cur_user_rating}}分</span></div>
+                    </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="rating-container theme-krajee-fa rating-xxs">
+                      <div class="rating">
+                        <span class="empty-stars"><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span><span class="star"><i class="fa fa-star"></i></span></span>
+                      </div>
+                    </div>
+                  {% endif %}
+                  <div class="btn-group">
+	                <button class="btn btn-primary btn-sm btn-submit btn-publish" data-xid='{{detail.id}}'>发表</button>
+                  </div>
+                </div>					
+              </div>
+            </div>
+            
+          </div> <!-- comment -->
+        </section>
+        <section>
+          <div class="panel info-block hidden-xs" id="recommend">
+            <div class="panel-heading"><h2>喜欢{{detail.ch_name}}的人也喜欢</h2></div>
+            <div class="panel-body">
+              <ul class="list-inline">
+                {% for item in related %}
+                <li class="col-lg-2 col-md-2 col-sm-2">
+                  <div><a href="/tv/{{item.id}}/"><img style="width:100%" src="{{item.poster}}" alt="{{item.ch_name}}海报"></a></div>
+                  <div class="text-center" style="padding-top: 5px;"><h3><a href="/tv/{{item.id}}/">{{item.ch_name}}</a></h3>&nbsp;&nbsp;<span class="douban-color">{{item.score}}</span></div>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div> <!-- left-part -->
+      
+      <div class="col-md-3 col-lg-3 hidden-xs hidden-sm" id="right-part">
+	    <aside>
+	      <div class="panel-group info-block" id="accordion1" role="tablist" aria-multiselectable="true">
+	        <div class="top10"><h2>本周电视剧 TOP10</h2></div>
+	        <div class="panel">
+	          <div class="panel-heading" role="tab" id="heading0">
+	            <div class="panel-title">
+	              <a role="button" data-toggle="collapse" data-parent="#accordion1" href="#collapse0" aria-expanded="true" aria-controls="collapse0">
+		            {{billboard1.ch_name}} <span class="douban-color">{{billboard1.score}}</span>
+	              </a>
+	            </div>
+		      </div> <!-- panel-heading -->
+	          <div id="collapse0" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading0">
+	            <div class="panel-body">
+	              <div class='row'>
+		            <div class="col-lg-6"><a href="/tv/{{billboard1.id}}/"><img src="{{billboard1.poster}}"></a></div>
+		            <div class="col-lg-6">
+		              <h4><a href="/tv/{{billboard1.id}}/">{{billboard1.ch_name}}</a></h4>
+		              <p>{{billboard1.types}}</p>
+		              <p>{{billboard1.region}}</p>
+		              <p>{{billboard1.release_date}}</p>
+		              <p><span class="douban-color">{{billboard1.score}}</span></p>
+		              <p>{% ifnotequal item.video '无视频' %}
+					    {% ifequal item.video_type '预告片' %}
+					      <span class="label label-default">预告</span>
+					      {% else %}
+					      <span class="label label-success">在线</span>
+					      {% endifequal %}
+					      {% ifnotequal item.down_url '无下载' %}
+					      <span class="label label-primary" style="left:40px;">下载</span>
+					      {% endifnotequal %}
+					    {% else %}
+					      {% ifequal item.video_type '预告片' %}
+					      <span class="label label-default">预告</span>
+					      {% else %}
+					      <span class="label label-success">在线</span>
+					      {% endifequal %}
+					      {% ifnotequal item.down_url '无下载' %}
+					      <span class="label label-primary">下载</span>
+					      {% endifnotequal %}
+					    {% endifnotequal %}
+	                  </p>
+		            </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	        {% for item in billboard2 %}
+	        <div class="panel">
+	          <div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
+	            <div class="panel-title">
+	              <a role="button" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{forloop.counter}}" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
+		            {{ item.ch_name }} <span class="douban-color">{{item.score}}</span>
+	              </a>
+	            </div>
+		      </div> <!-- panel-heading -->
+	          <div id="collapse{{forloop.counter}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+	            <div class="panel-body">
+		          <div class='row'>
+		            <div class="col-lg-6"><a href="/tv/{{item.id}}/"><img src="{{item.poster}}"></a></div>
+		            <div class="col-lg-6">
+		              <h4><a href="/tv/{{item.id}}/">{{item.ch_name}}</a></h4>
+		              <p>{{item.types}}</p>
+		              <p>{{item.region}}</p>
+		              <p>{{item.release_date}}</p>
+		              <p><span class="douban-color">{{item.score}}</span></p>
+		              <p>{% ifnotequal item.video '无视频' %}
+					    {% ifequal item.video_type '预告片' %}
+					      <span class="label label-default">预告</span>
+					      {% else %}
+					      <span class="label label-success">在线</span>
+					      {% endifequal %}
+					      {% ifnotequal item.down_url '无下载' %}
+					      <span class="label label-primary" style="left:40px;">下载</span>
+					      {% endifnotequal %}
+					    {% else %}
+					      {% ifequal item.video_type '预告片' %}
+					      <span class="label label-default">预告</span>
+					      {% else %}
+					      <span class="label label-success">在线</span>
+					      {% endifequal %}
+					      {% ifnotequal item.down_url '无下载' %}
+					      <span class="label label-primary">下载</span>
+					      {% endifnotequal %}
+					    {% endifnotequal %}
+	                  </p>
+		            </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	        {% endfor %}
+	      </div> <!-- panel-group -->
+	      
+	      <div class="panel info-block">
+	        <div class="panel-heading tags-cloud"><h2>标签云</h2></div>
+	        <div class="panel-body">
+	          <div id="tagscloud"></div>
+	        </div>
+	      </div>
+	      
+	    </aside>
+      </div> <!-- right-part -->
+      
+    </div> <!-- row -->
+    </article>
+  </div> <!-- container -->
+  
+  
+
+{% endblock %}
+
+{% block js_own %}
+<script>
+
+$(function() {
+	var daDict = {{da_dict|safe}};
+	var mnList = {{mn_list|safe}};
+	var word_array = []
+	$.each(daDict, function(k,v) {
+		word_array.push({text: k, weight: v, link: '/?tag='+k, html: {title: k}})
+	});
+	$.each(mnList, function(i) {
+		word_array.push(mnList[i])
+	})
+    $("#tagscloud").jQCloud(word_array);
+});
+</script>
+<script type="text/javascript" src='/static/js/movie/movie_base.js'></script>
+<script type="text/javascript" src='/static/js/movie/movie_detail.js'></script>
+<script src="//cdn.bootcss.com/zeroclipboard/2.2.0/ZeroClipboard.min.js"></script>
+<script src="/static/js/plugs/sinaEmotion/jquery.sinaEmotion.js" type="text/javascript"></script>
+<script src="//cdn.bootcss.com/bootstrap-maxlength/1.7.0/bootstrap-maxlength.min.js"></script>
+{% endblock %}

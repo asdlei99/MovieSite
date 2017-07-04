@@ -1,0 +1,145 @@
+@CHARSET "UTF-8";
+
+body {
+  /*background: #293a4a;*/
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding-top: 0;
+    background-color: #4686a0;
+    background-attachment: fixed, fixed;
+    background-image: url(/static/images/common/bg/overlay.svg), linear-gradient(45deg, #4361c2, #4fa49a 50%, #9dc66b 95%);
+    background-position: center center, center center;
+    background-size: cover, cover;
+    /*color: #45b29a;*/
+    overflow: hidden;
+}
+.navbar {
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: rgba(0,0,0,0.1) 0 1px 2px;
+}
+.navbar-inverse .navbar-nav>.dropdown>a .caret {
+    border-top-color: #fff;
+    border-bottom-color: #fff;
+}
+.navbar-inverse .navbar-nav>.open>.dropdown-menu {
+      background: rgba(0, 0, 0, 0.45);
+}
+.navbar-inverse #search-form .form-control {
+    border-color: #fff;
+    color: #fff;
+    border-right: 0;
+    background: transparent;
+}
+.navbar-inverse .navbar-form .input-group-btn .btn {
+    color: #ddd;
+    border-color: #ddd;
+    background: transparent;
+}
+.navbar-inverse #search-form .form-control:focus {
+  border-color: #1abc9c;
+}
+.navbar-inverse .navbar-form .input-group-btn .btn {
+  color: #ddd;
+  border-color: #ddd;
+  background: transparent;
+}
+#main-nav .login-form .form-group input {
+  background: rgba(0,0,0,.3);
+}
+.navbar-inverse .navbar-form .form-control::-moz-placeholder,
+.navbar-inverse .navbar-form .select2-search input[type="text"]::-moz-placeholder {
+  color: #ddd;
+  opacity: 1;
+}
+.navbar-inverse .navbar-form .form-control:-ms-input-placeholder,
+.navbar-inverse .navbar-form .select2-search input[type="text"]:-ms-input-placeholder {
+  color: #ddd;
+}
+.navbar-inverse .navbar-form .form-control::-webkit-input-placeholder,
+.navbar-inverse .navbar-form .select2-search input[type="text"]::-webkit-input-placeholder {
+  color: #ddd;
+}
+.navbar-inverse .navbar-form .form-control:focus,
+.navbar-inverse .navbar-form .select2-search input[type="text"]:focus {
+  border-color: #ddd;
+  color: #ddd;
+}
+.navbar-inverse .search-wrap {
+  background: rgba(0, 0, 0, 0.45);
+}
+.navbar .container {
+  padding: inherit;
+}
+#main-nav .login-form {
+    background: transparent;
+}
+.particles-js-canvas-el {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.container {
+  padding-top: 50px;
+  padding-bottom: 80px;
+}
+
+#forget-pwd-change-form button {
+  margin-bottom: 40px;
+}
+#mm-0 {
+  height: 100%;
+}
+.form-wrap {
+  float: none;
+  padding: 0;
+  margin: 0 auto;
+  margin-top: 5%;
+}
+.form-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+.alert-danger {
+  background: transparent;
+  border: none;
+}
+.form-wrap .login-form {
+  min-height: 211px;
+  background-image: url('/static/images/common/bg/marvel_bottom_bg_sm.png');
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-color: rgba(255,255,255,.65);
+}
+.form-wrap .login-form .login-link {
+  margin-bottom: 30px;
+}
+#reg-form .login-link {
+  width: 100%;
+}
+
+.login-link {
+  color: #999;
+}
+
+
+/*  注册  */
+
+.code-wrap input {
+  float: left;
+  width: 30%;
+}
+.code-wrap img {
+  margin-left: 20px;
+  height: 40px;
+  cursor: pointer;
+}
+.alert-dismissible {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 2px;
+  margin-bottom: 5px;
+}

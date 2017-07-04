@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %}验证失败 - 重置密码 - 比格电影{% endblock %}
+
+{% block css_own %}
+<link href='/static/css/userinfo/pwd/login.css' rel='stylesheet' type='text/css'/>
+{% endblock %}
+
+{% block main_content %}
+	{% block quick_login %} {% endblock %}
+	{% block part1 %} {% endblock %}
+	{% block part2 %} {% endblock %}
+
+<div class="container">
+      <div class="form-wrap row col-xs-12 col-sm-8 col-md-6 col-lg-4">
+        <div class="login-form">
+          <p><i class="fa fa-exclamation-circle text-danger"></i>&nbsp;&nbsp;对不起，密码修改请求验证失败。</p>
+          <p>如有任何问题请致信比格电影。</p>
+          <p>电子邮箱：<a href="mailto:bigedianying@gmail.com">bigedianying@gmail.com</a></p>
+          <p><a href="/user/login/">登录</a><a href="/" style="float: right;">返回主页</a></p>
+        </div>
+      </div>
+	</div>
+
+{% endblock %}
+
+{% block footer %} {% endblock %}
+{% block js_own %}
+{% endblock %}

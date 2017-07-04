@@ -1,0 +1,168 @@
+{% extends 'bbs/bbs_base.html' %}
+{% load my_tags %}
+{% block title %}{{post.title}} - {{board|my_boardName}} - 比格电影{% endblock %}
+{% block css_bbs_own %}{% endblock %}
+
+  {% block modals %}
+  <div class="modal fade" id="sendMsgModal" tabindex="-1" role="dialog" aria-labelledby="sendMsgModal" data-backdrop="static">
+    <div class="modal-dialog" role="sendMsg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">发送私信</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group send-msg-area submit-area">
+            <div class="input-group">
+              <textarea class="form-control text-wrapper" placeholder="输入私信内容" rows="4" maxlength="500"></textarea>
+            </div>
+            <div class="submit-btn-group">
+              <span class="emotion-icon" role="button"><i class="fa fa-smile-o"></i></span>
+              <div class="btn-group">
+                <button class="btn btn-primary btn-sm btn-submit">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModal">
+    <div class="modal-dialog modal-sm" role="deleteConfirm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="loginModalLabel">确定删除？</h4>
+        </div>
+        <div class="modal-body text-center">
+          <button class="btn btn-sm btn-default-outline mr-10" id="cancel-delete">取消</button>
+          <button class="btn btn-sm btn-danger" id="confirm-delete">确定</button>
+          <!-- <div class="clearfix"></div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="editCancelModal" tabindex="-1" role="dialog" aria-labelledby="editCancelModal">
+    <div class="modal-dialog modal-sm" role="editCancel">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">确认放弃编辑</h4>
+        </div>
+        <div class="modal-body text-center">
+          <div class="media">
+            <div class="media-left"><div class="ccs-tip ccs-tip-query"></div></div>
+            <div class="media-body media-middle">
+              <div class="ccs-desc">确定放弃正在编辑的内容吗？</div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-default-outline mr-10" id="cancel-ce">取消</button>
+          <button class="btn btn-sm btn-danger" id="confirm-ce">确定</button>
+          <!-- <div class="clearfix"></div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+    {% block breadcrumb_content %}
+    <a class="btn btn-primary btn-arrow-right" href="/bbs/">社区</a>
+    <a class="btn btn-warning btn-arrow-right" href="/bbs/board/?b={{board}}">{{board|my_boardName}}</a>
+    <h1><a class="btn btn-default btn-arrow-right" href="/bbs/post/{{post.id}}/">{% if post.title|length > 6 %}{{post.title|slice:"6"}}...{% else %}{{post.title}}{% endif %}</a></h1>
+    {% endblock %}
+	{% block left_part_content %}
+        <section>
+        <div class="panel info-block">
+          <div class="panel-heading" id="post-title"><h1>{{post.title}}</h1></div>
+            {% if cur_page == 1 or not cur_page %}
+            <div class="media msg-wrap" id="op">
+              <div class="media-left">
+                
+                <a href="/user/profile/{{post.user.id}}/{{post.user.username}}/" data-uname="{{post.user.username}}" data-uid="{{post.user.id}}" data-ulevel="{{post.user.exp|my_getUserLevel}}" data-posted-counts="{{post.user.id|my_getPostedCounts}}" data-fans-counts="{{post.user.id|my_getFansCounts}}" data-usign="{{post.user.mysign}}" data-focused="{% if post.user.id == user_info.id %}2{% else %}{% if post.user.id|my_focused:focused_user_list %}1{% else %}0{% endif %}{% endif %}" data-bg="{% if post.user.usercard_bg %}{{post.user.usercard_bg}}{% endif %}" data-avatar="{{post.user.thumb_l}}" data-toggle="popover" data-placement="right"><img class="media-object img-thumbnail avatar-l" src="{{post.user.thumb_l}}" alt="avatar"></a>
+                <div class="text-center"><a class="username" href="/user/profile/{{post.user.id}}/{{post.user.username}}/" >{{post.user.username}}</a></div>
+                <div class="user-icons-wrap">{% if post.user.privilege == 6 %}<img class="icon-s" title="管理员" src="/static/images/common/bige_logo.png">{% endif %}</div>
+              </div>
+			  <div class="media-body">
+			    <div class="layer-content text-content">{{post.content|safe}}</div>
+                <div class="layer-bottom">{% if post.user.id == user_info.id or user_info.privilege == 6 or user_info.privilege == 8 %}<a class="btn-del del-post" role="button" data-pid="{{post.id}}">删除</a>&nbsp;&nbsp;{% endif %}<span>1楼</span>&nbsp;&nbsp;<time>{{post.create_date|my_datetrans}}</time>&nbsp;&nbsp;<a class="btn-r" role="button">回复</a></div>
+              </div>
+            </div>
+          {% else %}
+          
+          {% endif %}
+          {% if post_replies|length > 0 %}
+          
+          <div class="panel-body" id="layer-list">
+            <ul class="row media-list">
+              {% for reply in post_replies %}
+              <li class="media msg-wrap">
+                <div class="media-left">
+                  <a href="/user/profile/{{reply.user.id}}/{{reply.user.username}}/" data-uname="{{reply.user.username}}" data-uid="{{reply.user.id}}" data-ulevel="{{reply.user.exp|my_getUserLevel}}" data-posted-counts="{{reply.user.id|my_getPostedCounts}}" data-fans-counts="{{reply.user.id|my_getFansCounts}}" data-usign="{{reply.user.mysign}}" data-focused="{% if reply.user.id == user_info.id %}2{% else %}{% if reply.user.id|my_focused:focused_user_list %}1{% else %}0{% endif %}{% endif %}" data-bg="{% if reply.user.usercard_bg %}{{reply.user.usercard_bg}}{% endif %}" data-avatar="{{reply.user.thumb_l}}" data-toggle="popover" data-placement="right"><img class="media-object img-thumbnail avatar-l" src="{{reply.user.thumb_l}}" alt=""></a>
+                  <div class="text-center"><a class="username" href="/user/profile/{{reply.user.id}}/{{reply.user.username}}/" >{{reply.user.username}}</a></div>
+                  <div class="user-icons-wrap">{% if reply.user.privilege == 6 %}<img class="icon-s" title="管理员" src="/static/images/common/bige_logo.png">{% endif %}</div>
+                </div>
+ 
+                <div class="media-body">
+                  <div class="layer-content text-content">
+					{{reply.content|safe}}
+                  </div>
+                  
+                  <div class="layer-bottom" data-uid="{{reply.user.id}}" data-prid="{{reply.id}}">{% if reply.user.id == user_info.id or user_info.privilege == 6 or user_info.privilege == 8 %}<a class="btn-del del-r" role="button">删除</a>&nbsp;&nbsp;{% endif %}<span>{% if cur_page == 1 %}{{ forloop.counter|add:"1" }}{% else %}{{ layer_start|add:forloop.counter0 }}{% endif %}楼</span>&nbsp;&nbsp;<time>{{reply.create_date|my_datetrans}}</time>&nbsp;&nbsp;<a class="btn-pr" role="button">回复</a></div>
+                  
+                  {% if reply.post_layer_reply.all|length %}
+                  <div class="layer-reply-wrap panel-body">
+                    {% for rr in reply.post_layer_reply.all|slice:'5' %}
+					<div class="media">
+                      <div class="media-left">
+                        <a class="username" href="/user/profile/{{rr.user.id}}/{{rr.user.username}}/" data-uname="{{rr.user.username}}" data-uid="{{rr.user.id}}" data-ulevel="{{rr.user.exp|my_getUserLevel}}" data-posted-counts="{{rr.user.id|my_getPostedCounts}}" data-fans-counts="{{rr.user.id|my_getFansCounts}}" data-usign="{{rr.user.mysign}}" data-focused="{% if rr.user.id == user_info.id %}2{% else %}{% if rr.user.id|my_focused:focused_user_list %}1{% else %}0{% endif %}{% endif %}" data-bg="{% if rr.user.usercard_bg %}{{rr.user.usercard_bg}}{% endif %}" data-avatar="{{rr.user.thumb_l}}" data-toggle="popover" data-placement="top"><img class="media-object avatar-xs" src="{{rr.user.thumb_s}}" alt="avatar"></a>
+                      </div>
+                      <div class="media-body">
+                        <div class="media-heading lr-content">
+                          {% if not rr.target_user.id == rr.user.id %}
+                          <a class="username" href="/user/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank">{{rr.user.username}}</a>&nbsp;回复&nbsp;
+                          <a class="username" href="/user/profile/{{rr.target_user.id}}/{{rr.target_user.username}}/" target="_blank">{{rr.target_user.username}}</a>&nbsp;:&nbsp;{{rr.content|safe}}
+                          {% else %}
+                          <a class="username" href="/user/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank">{{rr.user.username}}</a>&nbsp;:&nbsp;{{rr.content|safe}}
+                          {% endif %}
+                        </div>
+                        <div class="rr-bottom" data-prid="{{reply.id}}" data-uid="{{rr.user.id}}" data-lrid="{{rr.id}}">{% if rr.user.id == user_info.id or user_info.privilege == 6 or user_info.privilege == 8 %}<a class="btn-del del-lr" role="button">删除</a>&nbsp;&nbsp;{% endif %}<time>{{rr.create_date|my_datetrans}}</time>{% if not rr.user.id == user_info.id %}&nbsp;&nbsp;<a class="btn-lr" role="button">回复</a>{% endif %}</div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="layer-pagination" data-len="{{reply.post_layer_reply.all|length}}" data-prid="{{reply.id}}"></div>
+                    
+                  </div>
+                  {% endif %}
+                  
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          {% if reply.post_layer_reply.all|length > 9%}<ul class="pagination-plain text-center">{{page_list}}</ul>{% endif %}
+           
+           <div id="publish-reply">
+             <div id="summernote"></div>
+             <div class="text-right">
+               <button class="btn btn-primary btn-sm btn-publish" id="p{{post.id}}">发表</button>
+             </div>
+           </div>
+           
+           
+        </div>
+        </section>
+    {% endblock %}
+
+{% block js_bbs_own %}
+<script src="//cdn.bootcss.com/twbs-pagination/1.3.1/jquery.twbsPagination.min.js"></script>
+<script>
+$(function() {
+	
+	
+});
+
+
+</script>
+
+{% endblock %}

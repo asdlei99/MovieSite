@@ -1,0 +1,70 @@
+{% extends 'bbs/bbs_base.html' %}
+{% load my_tags %}
+  {% block title %}社区 - {{board|my_boardName}} - 比格电影{% endblock %}
+    {% block breadcrumb_content %}
+    <a class="btn btn-primary btn-arrow-right" href="/bbs/">社区</a>
+    <h1><a class="btn btn-warning btn-arrow-right" href="/bbs/board/?b={{board}}">{{board|my_boardName}}</a></h1>
+    {% endblock %}
+	{% block left_part_content %}
+    <section>
+      <div class="panel">
+        <div class="list-group" id="post-list-heading">
+          <div class="list-group-item">
+            <div class="col-lg-7 col-md-5 col-sm-7 col-xs-8">主题</div>
+            <div class="col-lg-2 col-md-3 hidden-sm hidden-xs">作者</div>
+            <div class="col-lg-1 col-md-1 col-sm-1 hidden-xs col-reply">回复/阅读</div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-xs-4">最后发表</div>
+          </div>
+        </div>
+        <ul class="list-group" id="post-list">
+          {% for post in posts %}
+          <li class="list-group-item">
+            <div class="col-lg-7 col-md-5 col-sm-7 col-xs-8"><a href="/bbs/post/{{post.id}}/">{%if post.title|length > 30 %}{{post.title}}...{% else %}{{post.title}}{% endif %}{% if post.post_reply.all|length >= 10 %}&nbsp;&nbsp;<span class="label label-danger">HOT</span>{% endif %}</a></div>
+            <div class="col-lg-2 col-md-3 hidden-sm hidden-xs media text-lighter">
+              <div class="media-left">
+                <a href="/user/profile/{{post.user.id}}/{{post.user.username}}/" target="_blank"><img class="img-circle avatar-xs" src="{{post.user.thumb_s}}"></a>
+              </div>
+              <div class="media-body">
+                <div class="media-heading"><a href="/user/profile/{{post.user.id}}/{{post.user.username}}/" target="_blank">{{post.user.username}}</a></div>
+                <time>{{post.create_date|my_datetrans}}</time>
+              </div>
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1 hidden-xs text-smaller text-lighter">{{post.post_reply.all|length}} / {{post.visit_counts}}</div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-xs-4 media text-lighter">
+              <div class="media-left">
+                <a href="/user/profile/{{post.last_replied_user.id}}/{{post.last_replied_user.username}}/" target="_blank"><img class="img-circle avatar-xs" src="{{post.last_replied_user.thumb_s}}"></a>
+              </div>
+              <div class="media-body">
+                <div class="media-heading"><a href="/user/profile/{{post.last_replied_user.id}}/{{post.last_replied_user.username}}/">{{post.last_replied_user.username}}</a></div>
+                <time>{{post.last_replied_date|my_datetrans}}</time>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+          {% if post_counts == 0 %}
+          <li class="list-group-item"><div class="text-center btn-block">还没有任何主题……<img style="height:40px;" src="/static/images/common/bbs_zhongcai.png"></div></li>
+          {% endif %}
+        </ul>
+        
+        
+        <ul class="pagination-plain text-center">{% if post_counts > 10 %}{{page_list}}{% endif %}</ul>
+
+        </div>
+        
+        
+        <div id="publish-post">
+          <div class="panel-heading"><h3>发布新主题</h3></div>
+          <div class="newpost-title-wrap">
+            <div class="newpost-title-placeholder">标题</div>
+            <input class="form-control mb-20" id="newpost-title" type="text" maxlength="128">
+          </div>
+          <div id="summernote-board"></div>
+            <div class="text-right">
+              <button class="btn btn-primary btn-sm btn-publish" id="p{{post.id}}">发布</button>
+            </div>
+        </div>
+    </section>
+
+    {% endblock %}
+
+{% block js_bbs_own %} {% endblock %}

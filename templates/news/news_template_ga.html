@@ -1,0 +1,63 @@
+{% extends 'news/news_template_base.html' %}
+  {% block title_news %}{{news.title|safe}} - 比格电影{% endblock %}
+  {% block description_news %}{{news.title|safe}}，{{news.subtitle|safe}}{% endblock %}
+  {% block keywords_news %}{% for keyword in keywords %}{{keyword}},{% endfor %}影视资讯{% endblock %}
+  {% block css_news_template_own %}
+  <link href="//cdn.bootcss.com/galleria/1.4.5/themes/classic/galleria.classic.min.css" rel="stylesheet">
+  {% endblock %}
+
+  {% block breadcrumb_content %}<a class="btn btn-default btn-arrow-right" href="/news/{{news.id}}/">{% if news.title|length > 8 %}{{news.title|slice:"8"}}{% else %}{{news.title}}{% endif %}...</a>{% endblock %}
+  
+  {% block news_gallery %}
+  <div class='row'>
+    <div class="col-lg-12">
+    {{news.ga_content|safe}}
+    </div>
+  </div>
+
+  {% endblock %}
+  {% block news_content %}
+      <div class="list-group-item news_content">
+        <section>{{news.news_content|safe}}</section>
+        <section>
+          <ul class="list-inline keywords_list">
+            关键词：
+            {% for item in keywords_a %}
+            <li>{{item|safe}}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      
+      </div>
+      <div class="clearfix"></div>
+
+  {% endblock %}
+  
+
+
+
+
+
+  {% block js_news_own %} 
+  <script src="//cdn.bootcss.com/galleria/1.4.5/galleria.min.js"></script>
+  <script src="/static/js/plugs/galleria/galleria.twelve.min.js"></script>
+  <script src="//cdn.bootcss.com/galleria/1.4.5/themes/classic/galleria.classic.min.js"></script>
+  <script>
+  Galleria.run("#galleria", {
+      height: 0.5625,
+      imageCrop: false,
+      thumbCrop: false,
+	  _locale: {
+          show_thumbnails: "显示缩略图",
+          hide_thumbnails: "隐藏缩略图",
+          play: "播放幻灯片",
+          pause: "暂停幻灯片",
+          enter_fullscreen: "进入全屏模式",
+          exit_fullscreen: "退出全屏模式",
+          popout_image: "弹出图片",
+          showing_image: "当前图片 %s 共  %s"
+	  },
+	    
+  });
+  </script>
+  {% endblock %}

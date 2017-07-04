@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block title %}订阅内容 - 比格电影{% endblock %}
+{% block meta_own %} {% endblock %}
+
+{% block css_own %}
+<link href="/static/css/others/about_us.css" rel="stylesheet">
+{% endblock %}
+
+
+{% block main_content %}
+  {% block modals_own %}{% endblock %}
+  {% block login_modal %}{% endblock %}
+  <div class="jumbotron">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 hidden-xs hidden-sm">
+        <div class="info-block mb-30 list-group list-menu">
+          <a href="/" class="list-group-item">
+            <i class="fa fa-fw fa-home mr-10"></i>
+            <span class="badge"><i class="fa fa-angle-right"></i></span>返回主页
+          </a>
+          <a href="/about_us/" class="list-group-item">
+            <i class="fa fa-fw fa-info mr-10"></i>
+            <span class="badge"><i class="fa fa-angle-right"></i></span>关于我们
+          </a>
+          <a href="/nav/" class="list-group-item">
+            <i class="fa fa-fw fa-paper-plane mr-10"></i>
+            <span class="badge"><i class="fa fa-angle-right"></i></span>站内导航
+          </a>
+          <a href="/rss/" class="list-group-item active">
+            <i class="fa fa-fw fa-rss mr-10"></i>
+            <span class="badge"><i class="fa fa-angle-right"></i></span>订阅内容
+          </a>
+        </div> <!-- left-menu -->
+      </div>
+      <div class="col-lg-9">
+        <div class="list-group">
+          <div class="list-group-item active">
+            <h2 class="item-heading text-bigger">订阅内容</h2>
+            <div class="panel-body blockquote">
+              <p><abbr title="Really Simple Syndication">RSS</abbr>是站点用来和其他站点之间共享内容的一种简易方式（也叫聚合内容），通常被用于新闻和其他按顺序排列的网站，例如Blog。一段项目的介绍可能包含新闻的全部介绍等。或者仅仅是额外的内容或者简短的介绍。这些项目的链接通常都能链接到全部的内容。</p>
+              <p>网络用户可以在客户端借助于支持RSS的新闻聚合工具软件，在不打开网站内容页面的情况下阅读支持RSS输出的网站内容。网站提供RSS输出，有利于让用户发现网站内容的更新。</p>
+              <p>敬请期待。</p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  
+  </div>
+  </div>
+<p class="hidden"><script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260763987'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1260763987' type='text/javascript'%3E%3C/script%3E"));</script></p>
+{% endblock %}
+
+{% block js_own %} 
+<!-- <script src="/static/js/xxx.js" type="text/javascript"></script> -->
+{% endblock %}

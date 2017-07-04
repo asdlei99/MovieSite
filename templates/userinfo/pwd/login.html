@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+{% block title %}用户登录 - 比格电影{% endblock %}
+{% block css_own %}
+	<!-- <link href='/static/css/layout_new.css' rel='stylesheet' type='text/css'/> -->
+<link href='/static/css/userinfo/pwd/login.css' rel='stylesheet' type='text/css' />
+
+{% endblock %}
+
+{% block outer %}
+<div id="particles-js"></div>
+{% endblock %}
+
+{% block main_content %}
+	{% block quick_login %} {% endblock %}
+	{% block part1 %} {% endblock %}
+	{% block part2 %} {% endblock %}
+
+    <div class="container" id="particles-js">
+      <div class="form-wrap row col-xs-12 col-sm-8 col-md-6 col-lg-4">
+        <form class="login-form" id="login-form">
+          {% csrf_token %}
+          <div class="form-group">
+            <input class="form-control login-field" id="login-name" type="text" value="" placeholder="电子邮箱" spellcheck="false" autofocus>
+            <label class="login-field-icon fui-user" for="login-name" role="button"></label>
+          </div>
+
+          <div class="form-group">
+            <input class="form-control login-field" id="login-pass" type="password" value="" placeholder="密码">
+            <label class="login-field-icon fui-lock" for="login-pass" role="button"></label>
+          </div>
+		  <div class="checkbox">
+            <label>
+              <input class="custom-checkbox" type="checkbox" data-toggle="radio">下次自动登录
+            </label>
+          </div>
+          <button class="btn btn-primary btn-block">登录</button>
+          <div class="login-link-wrap">
+            <a class="login-link" href="/user/forget_pwd/">忘记密码？</a>
+            <a class="login-link" href="/user/register/">去注册</a>
+          </div>
+          
+        </form>
+      </div>
+	</div>
+			
+
+{% endblock %}
+{% block footer %} {% endblock %}
+{% block js_own %}
+<script src="/static/js/userinfo/pwd/register.js" type="text/javascript"></script>
+<script src="//cdn.bootcss.com/particles.js/2.0.0/particles.min.js"></script>
+<script>
+particlesJS.load('particles-js', '/static/js/assets/particles.json', function() {
+  console.log('callback - particles.js config loaded');
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,188 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block title %}{% block title_news %}{% endblock %}{% endblock %}
+{% block description %}{% block description_news %}{% endblock %}{% endblock %}
+{% block keywords %}{% block keywords_news %}{% endblock %}{% endblock %}
+{% block meta_own %}{% endblock %}
+
+{% block css_own %}
+<link href="/static/css/news/news_template.css" rel="stylesheet">
+<link href="/static/css/plugs/sinaEmotion/jquery.sinaEmotion.css" rel="stylesheet">
+<link href="//cdn.bootcss.com/ekko-lightbox/4.0.1/ekko-lightbox.min.css" rel="stylesheet">
+  {% block css_news_template_own %} {% endblock %}
+{% endblock %}
+
+{% block main_content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 breadcrumb hidden-xs hidden-sm">
+        <a class="btn btn-info btn-arrow-right" href="/">主页</a>
+        <a class="btn btn-primary btn-arrow-right" href="/news/">新闻</a>
+        {% block breadcrumb_content %}<a class="btn btn-default btn-arrow-right" href="/news/{{news.id}}/">{% if news.title|length > 8 %}{{news.title|slice:"8"}}{% else %}{{news.title}}{% endif %}...</a>{% endblock %}
+      </div>
+    </div>
+  
+    <article>
+    
+    {% block news_title %}
+    <div class="row">
+      <div class="col-lg-12">
+        <section class="news_title_wrap">
+          <hgroup>
+            <h1>{{news.title}}</h1>
+            <h2>{{news.subtitle}}</h2>
+          </hgroup>
+          <p><time><i class="fa fa-clock-o"></i> {{news.create_date}}</time><span class="news_source">来源：{{news.source}}</span></p>
+        </section>
+      </div>
+    </div>
+    {% endblock %}
+  
+  
+    {% block news_gallery %} {% endblock %}
+    
+    <div class="row">
+      <div class="col-lg-9">
+      {% block news_content %} {% endblock %}
+      {% block news_comment %}
+        <section>
+          <div class="panel info-block" id="comment">
+            <div class="panel-heading"><h3>评论</h3>(<span>{{reply_counts}}</span>)</div>
+            <div class="panel-body">
+              <ul class="list-group" id="comment-list">
+              {% if reply %}
+              {% for r in reply %}
+                <li class="list-group-item">
+                  <div class="media-left">
+                    <a href="/user/profile/{{r.user.id}}/{{r.user.username}}/" target="_blank"><img class="media-object img-circle avatar-s" src="{{r.user.thumb_s}}"></a>
+                  </div>
+                  <div class="media-body">
+                    <div class="media-heading">
+                      <a href="/user/profile/{{r.user.id}}/{{r.user.username}}/">{{r.user.username}}</a>
+                      <span class="rr-btn-group" data-rid="{{r.id}}">
+                        <button class="btn btn-xs btn-thumbs-up"><i class="fa fa-thumbs-o-up"></i>&nbsp;{{r.news_r_like.all|length}}&nbsp;</button>
+                        <button class="btn btn-xs btn-display-rr">回复</button>
+                      </span>
+                      &nbsp;&nbsp;
+                      <time>{{r.create_date|my_datetrans}}</time>
+                      {% if r.news_rr.all|length >= 5 or r.news_r_like.all|length >= 10 %}&nbsp;&nbsp;<span class="label label-danger">HOT</span>{% endif %}
+                    </div>
+                    
+                    <div class="r-content text-content">{{r.content|safe}}</div>
+                    
+                    {% if r.news_rr.all|length %}
+                      <ul class="media-list rr-wrap">
+                      {% for rr in r.news_rr.all|dictsortreversed:'create_date'|slice:'5' %}
+                        <li class="media" data-rrid="{{rr.id}}">
+                          <div class="media-left">
+                            <a href="/user/home/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank"><img class="media-object img-circle avatar-xs" src="{{rr.user.thumb_s}}"></a>
+                          </div>
+	                      <div class="media-body">
+	                        <div class="media-heading">
+	                          <a href="/user/home/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank">{{rr.user.username}}</a>&nbsp;&nbsp;
+	                          <time>{{rr.create_date|my_datetrans}}</time>
+	                        </div>
+	                        <div class="rr-content text-content">{{rr.content|safe}}</div>
+	                      </div>
+	                    </li>
+	                  {% endfor %}
+	                  </ul>
+	                {% endif %}
+	                
+	                {% if r.news_rr.all|length > 5 %}
+	                <a class="dmr text-smaller pull-left" data-remainder="{{r.news_rr.all|length|add:'-5'}}" data-rid="{{r.id}}" role="button">还有{{r.news_rr.all|length|add:'-5'}}条回复&nbsp;&nbsp;<i class="fa fa-angle-down"></i></a>
+	                <div class="clearfix"></div>
+	                {% endif %}
+                  </div>
+                </li>
+              {% endfor %}
+              {% else %}
+              <div class="text-center">
+                <div class="ccs-tip ccs-tip-comeon"></div>
+                <div class="ccs-desc">暂无评论，快来抢沙发~</div>
+              </div>
+              {% endif %} {# if reply #}
+            </ul>
+            {% if reply_counts > 10 %}
+            <div class="text-center mb-30" id="dmc"><button class="btn btn-primary btn-xs" data-nid="{{detail.id}}" data-remainder="{{reply_counts|add:'-10'}}">还有{{reply_counts|add:'-10'}}条评论&nbsp;&nbsp;<i class="fa fa-angle-down"></i></button></div>
+            {% endif %}
+              <div class="form-group publish-area submit-area">
+                <div class="input-group">
+                  <textarea class="form-control text-wrapper" placeholder="快来发表你的看法" rows="6" maxlength="500"></textarea>
+                </div>
+                <div class="submit-btn-group">
+                  <span class="emotion-icon" role="button"><i class="fa fa-smile-o"></i></span>
+                  <div class="btn-group">
+	                <button class="btn btn-primary btn-sm btn-submit btn-publish" data-nid='{{detail.id}}'>发表</button>
+                  </div>
+                </div>					
+              </div>
+            </div>
+            
+          </div> <!-- comment -->
+        </section>
+      {% endblock %}
+      
+      {% block news_aside %}
+      </div>
+    <aside>
+      <div class="col-lg-3 col-md-3 hidden-xs hidden-sm">
+        {% if rel_link_list %}
+        <section class="panel">
+          <div class="panel-heading">
+            <h3>相关电影</h3>
+          </div>
+          <div class="panel-body media-list rel_links">
+            {% for item in rel_link_list %}
+            <div class="media">
+              <div class="media-left"><a href="{{item.link}}"><img src="{{item.poster}}" alt="{{item.ch_name}}"></a></div>
+              <div class="media-body">
+                <div class="media-heading"><h4><a href="{{item.link}}">{{item.ch_name}} <span>({{item.year}})</span></a></h4></div>
+                {% if item.score == 0 %}<p>尚未上映</p>{% else %}<p class="douban-color">{{item.score}}</p>{% endif %}
+                <p>导演：{{item.director}}</p>
+                <p>主演：{{item.actor}}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+        {% else %}
+        <div style="height:586px;background:url('/static/images/common/chongwuxiaojingling.png') no-repeat"></div>
+        {% endif %}
+      </div>
+    </aside>
+    {% endblock %}
+    </div>
+    
+    
+    </article>
+  </div> <!-- container -->
+{% endblock %}
+
+{% block js_own %}
+<script src="/static/js/news/news.js" type="text/javascript"></script>
+<script src="/static/js/plugs/sinaEmotion/jquery.sinaEmotion.js" type="text/javascript"></script>
+<script src="//cdn.bootcss.com/bootstrap-maxlength/1.7.0/bootstrap-maxlength.min.js" type="text/javascript"></script>
+<script src="//cdn.bootcss.com/ekko-lightbox/4.0.1/ekko-lightbox.min.js"></script>
+<script>
+$(function() {
+	$('.img_left_frame>a, .img_right_frame>a, .img_center_frame>a').click(function (e) {
+	    e.preventDefault();
+	    var $_this = $(this);
+	    var $title = $_this.attr('data-title');
+	    console.log($title)
+	    if(typeof($title)=='undefined') {
+	    	console.log('123')
+	    	$_this.attr('data-title', $_this.next().text());
+	    }
+	    $_this.ekkoLightbox({
+	    	'loadingMessage': '<div class="text-center"><i class="fa fa-spinner fa-spin"></i> 加载中……</div>'
+	    });
+	    
+	    
+	});
+});
+
+</script>
+  {% block js_news_own %} {% endblock %}
+{% endblock %}

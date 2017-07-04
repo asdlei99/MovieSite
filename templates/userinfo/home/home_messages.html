@@ -1,0 +1,154 @@
+{% extends 'userinfo/home/home_base.html' %}
+{% load my_tags %}
+{% block title %}我的私信 - 比格电影{% endblock %}
+{% block meta_own %} {% endblock %}
+
+  {% block home_css_own %}
+  <link href="/static/css/plugs/sinaEmotion/jquery.sinaEmotion.css" rel="stylesheet">
+  {% endblock %}
+      {% block left_menu %}
+      <div class="info-block mb-30 list-group list-menu">
+         <a href="/user/home/" class="list-group-item">
+           <i class="fa fa-fw fa-user mr-10"></i>
+           <span class="badge"><i class="fa fa-angle-right"></i></span>个人中心
+         </a>
+         <a href="/user/home/notification/" class="list-group-item">
+           <i class="fa fa-fw fa-bell mr-10"></i>
+           <span class="badge"><i class="fa fa-angle-right"></i></span>通知提醒
+         </a>
+         <a href="/user/home/messages/" class="list-group-item active">
+           <i class="fa fa-fw fa-envelope mr-10"></i>
+           <span class="badge"><i class="fa fa-angle-right"></i></span>我的私信
+         </a>
+         <a href="/user/home/settings/" class="list-group-item">
+           <i class="fa fa-fw fa-gear mr-10"></i>
+           <span class="badge"><i class="fa fa-angle-right"></i></span>账号设置
+         </a>
+      </div> <!-- left-menu -->
+      {% endblock %}
+
+      {% block middle_content %}
+        <div id="messages">
+          {% if messages %}
+          <div class="list-group-item text-center" id="message-list-title">
+            <i class="fa fa-envelope-o mr-10"></i>信箱
+          </div>
+          <div class="message-list list-group">
+            {% for msg in messages %}
+            <a class="list-group-item" data-msgid="{{msg.id}}" role="button"> {# message overviews #}
+              <div class="media">
+                <div class="media-left"><img class="media-object img-circle" src="{% if msg.sender.id == user_info.id %}{{msg.receiver.thumb_s}}{% else %}{{msg.sender.thumb_s}}{% endif %}"></div>
+                <div class="media-body">
+                  <div class="media-heading">{% if msg.sender.id == user_info.id %}{{msg.receiver.username}}{% else %}{{msg.sender.username}}{% endif %}<time class="pull-right">{% if msg.newest_reply %}{{msg.update_date|date:"Y-m-d H:i:s"}}{% else %}{{msg.update_date|date:"Y-m-d H:i:s"}}{% endif %}</time></div>
+                  <small>
+                    {% if msg.newest_reply %}
+                      {{msg.newest_reply.content|safe}}
+                    {% else %}
+                      {{msg.content|safe}}
+                    {% endif %}
+                  </small>
+                  {% if msg.unread_counts and user_info.id == msg.newest_reply.receiver.id %}<span class="badge pull-right">{{msg.unread_counts}}</span>{% endif %}
+                </div>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+          <!-- BackMenu -->
+          <div class="list-group-item hidden" id="message-menu">
+            <a class="a-dark" id="back-to-message-list" role="button"><i class="fa fa-chevron-left"></i>&nbsp;&nbsp;返回</a>
+          </div>
+          {% for msg in messages %}
+          <div class="list-group-item message-item hidden" id="md{{msg.id}}"> {# message details #} 
+            <div class="media-list">
+            {% if msg.user_message.all|length < 10 %} {# 9个回复或以内没有显示更多 #}
+              {% if msg.sender.id == user_info.id %}
+              <div class="media">
+                <div class="media-left"><div class="avatar-s"></div></div>
+                <div class="media-body">
+                  <div class="bubble bubble-dark">{{msg.content|safe}}</div>
+                </div>
+                <div class="media-right">
+                  <a href="/user/profile/{{msg.sender.id}}/{{msg.sender.username}}/"><img class="media-object img-circle avatar-s" src="{{msg.sender.thumb_s}}"></a>
+                </div>
+                <time class="text-right pt-10 btn-block">{{msg.create_date|date:"Y-m-d H:i:s"}}</time>
+              </div>
+              {% else %}
+              <div class="media">
+                <div class="media-left">
+                  <a href="/user/profile/{{msg.sender.id}}/{{msg.sender.username}}/"><img class="media-object img-circle avatar-s" src="{{msg.sender.thumb_s}}"></a>
+                </div>
+                <div class="media-body">
+                  <div class="bubble bubble-light">{{msg.content|safe}}</div>
+                </div>
+                <div class="media-right"><div class="avatar-s"></div></div>
+                <time class="text-left pt-10 btn-block">{{msg.create_date|date:"Y-m-d H:i:s"}}</time>
+              </div>
+              {% endif %}
+            {% else %}
+              <div class="text-center load-more">
+                <small role="button">加载更多</small>
+              </div>
+              {# 回复数大余4个的时候应该隐藏msg，并添加显示更多 #}
+            {% endif %}
+            {% if msg.user_message.all|length %}
+              {% for reply in msg.user_message.all|my_getLastMsgReplyList reversed %}
+              {% if reply.sender.id == user_info.id %}
+              <div class="media">
+                <div class="media-left"><div class="avatar-s"></div></div>
+                <div class="media-body">
+                  <div class="bubble bubble-dark">{{reply.content|safe}}</div>
+                </div>
+                <div class="media-right">
+                  <a href="/user/profile/{{reply.sender.id}}/{{reply.sender.username}}/" target="_blank"><img class="media-object img-circle avatar-s" src="{{reply.sender.thumb_s}}"></a>
+                </div>
+                <time class="text-right pt-10 btn-block">{{reply.create_date|date:"Y-m-d H:i:s"}}</time>
+              </div>
+              {% else %}
+              <div class="media">
+                <div class="media-left">
+                  <a href="/user/profile/{{reply.sender.id}}/{{reply.sender.username}}/" target="_blank"><img class="media-object img-circle avatar-s" src="{{reply.sender.thumb_s}}"></a>
+                </div>
+                <div class="media-body">
+                  <div class="bubble bubble-light">{{reply.content|safe}}</div>
+                </div>
+                <div class="media-right"><div class="avatar-s"></div></div>
+                <time class="text-left pt-10 btn-block">{{reply.create_date|date:"Y-m-d H:i"}}</time>
+              </div>
+              {% endif %}
+              {% endfor %}
+            {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+          <div class="form-group sendmsg-area submit-area list-group-item hidden">
+            <div class="input-group">
+              <textarea class="form-control text-wrapper" placeholder="输入回复内容" rows="4" maxlength="500"></textarea>
+            </div>
+            <div class="submit-btn-group">
+              <span class="emotion-icon" role="button"><i class="fa fa-smile-o"></i></span>
+              <div class="btn-group">
+	            <button class="btn btn-primary btn-sm btn-submit btn-sendmsg">发送</button>
+              </div>
+            </div>					
+          </div>
+
+          {% else %} {# 若无私信 #}
+            <div class="list-group">
+              <div class="list-group-item">
+                <div class="p-20 text-center">
+                  <div class="no-tip no-tip-comeon"></div>
+                  <div class="no-tip-desc">你还没有收到任何私信，快去联系一下好友吧~</div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          
+        </div>
+      {% endblock %}
+
+
+{% block home_js_own %}
+<!-- <script src="/static/js/plugs/maxlength/bootstrap-maxlength.js" type="text/javascript"></script> -->
+<script src="//cdn.bootcss.com/bootstrap-maxlength/1.7.0/bootstrap-maxlength.min.js"></script>
+<script src="/static/js/plugs/sinaEmotion/jquery.sinaEmotion.js" type="text/javascript"></script>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'layout.html' %}
+  {% block description %}<meta name="description" content="">{% endblock %}
+  {% block title %}<title>搜索 - 曲奇坊电影</title>{% endblock %}
+  
+  {% block css_own %} 
+  <link href="/static/css/search/search_index.css" rel="stylesheet">
+  {% endblock %}
+  
+</head>
+<body>
+  {% block base_nav %} {% endblock %}
+
+   {% block own_nav %}
+   <nav role="navigation" class="navbar navbar-default">
+    <div class="container">
+       <div class="navbar-header">
+         <button data-toggle="collapse" class="navbar-toggle" type="button">
+           <span class="sr-only">Toggle navigation</span>
+         </button>
+         <a class="navbar-brand" href="/"><span class="fui-home"></span></a>
+       </div>
+       <div id="bs-example-navbar-collapse-10" class="collapse navbar-collapse">
+         <p class="navbar-text">Links You and Me</p>
+       </div>
+    </div>
+  </nav>
+   {% endblock %}
+   
+  {% block main_content %}
+  <div class="container">
+    <div class="row main-part">
+      <a class="brand"><img style="width: 50px;" src="/static/images/common/logo.png"> 曲奇坊<span style="font-size:18px;font-style:italic;">电影</span></a>
+      <div class="col-lg-6 col-md-8 col-lg-offset-3 col-md-offset-2">
+        <form action="/search/" method="get" role="search">
+          {% csrf_token %}
+          <div class="form-group">
+            <div class="input-group focus">
+          
+              <input type="text" class="form-control" maxlength="30" autocomplete="off" autofocus>
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button">搜索</button>
+              </span>
+            </div><!-- /input-group -->
+            <div class="search-wrap" id="search-wrap"></div>
+            <div class="search-wrap" id="search-wrap-recommend">
+              {% for item in search_recommend %}
+              <a class="search-item" href="{{item.url}}">
+                <div class="col-lg-2 col-md-2 img-wrap"><img src="{{item.poster}}"></div>
+                <div class="col-lg-9 col-md-9">
+                  <div class="movie-name">{{item.ch_name}}<span>{{item.year}}</span></div>
+                  <div class="foreign-name">{{item.foreign_name}}<br></div>
+                </div>
+                <div class="col-lg-1 col-md-1"></div> <!-- 暂时没用 -->
+              </a>
+              {% endfor %}
+            </div>
+          
+          {% if result %}
+            {% for item in result %}
+            <a class="search-item" href="{{item.url}}">
+              <div class="col-lg-2 col-md-2"><img src="{{item.poster}}" alt="《{{item.ch_name}}》海报"></div>
+              <div class="col-lg-9 col-md-9">
+                <div class="movie-name">{{item.name}}<span>{{item.year}}</span></div>
+                <div class="foreign-name">{{item.foreign_name}}</div>
+              </div>
+              <div class="col-lg-1 col-md-1"></div>
+            </a>
+            {% endfor %}
+          {% endif %}
+          
+        </div>  <!-- form-group -->
+      </form>
+      
+      <div class="well">
+        <div>热门标签<a href="#">更多<span class="fui-arrow-right"></span></a></div>
+        <a class="btn btn-sm btn-q-blue" href="#">盗墓笔记</a>
+        <a class="btn btn-sm btn-q-yellow" href="#">预告</a>
+        <a class="btn btn-sm btn-q-purple" href="#">爱情</a>
+        <a class="btn btn-sm btn-q-orange" href="#">我最好朋友的婚礼</a>
+        <a class="btn btn-sm btn-q-gray" href="#">海洋之歌</a>
+        <a class="btn btn-sm btn-q-purple" href="#">夏有乔木 雅望天堂</a>
+        <a class="btn btn-sm btn-q-red" href="#">韩国</a>
+        <a class="btn btn-sm btn-q-yellow" href="#">美国</a>
+        <a class="btn btn-sm btn-q-green" href="#">24：逆转时空</a>
+        <a class="btn btn-sm btn-q-orange" href="#">科幻</a>
+        <a class="btn btn-sm btn-q-gray" href="#">冯小刚</a>
+        <a class="btn btn-sm btn-q-blue" href="#">高圆圆</a>
+        <a class="btn btn-sm btn-q-blue" href="#">怦·心跳</a>
+        <a class="btn btn-sm btn-q-red" href="#">谎言西西里</a>
+        <a class="btn btn-sm btn-q-green" href="#">微微一笑很倾城</a>
+        <a class="btn btn-sm btn-q-orange" href="#">那件疯狂的小事叫爱情</a>
+        <a class="btn btn-sm btn-q-purple" href="#">惊天破</a>
+        <a class="btn btn-sm btn-q-gray" href="#">豆瓣高分</a>
+      </div>
+
+      <div class="history visible-lg-block visible-md-block">
+        <div>浏览历史<a href="#">更多<span class="fui-arrow-right"></span></a></div>
+            <a href="#" class="col-lg-3 col-md-3"><img src="/static/images/movie/p/1607/p2369494008.jpg">火海凌云 &nbsp;&nbsp;<span class="douban-color">7.7</span></a>
+            <a href="#" class="col-lg-3 col-md-3"><img src="/static/images/movie/p/1606/p2355609922.jpg">泰山归来：险战丛林 &nbsp;&nbsp;<span class="douban-color">6.1</span></a>
+            <a href="#" class="col-lg-3 col-md-3"><img src="/static/images/movie/p/1606/p2335953162.jpg">大鱼海棠 &nbsp;&nbsp;<span class="douban-color">6.9</span></a>
+            <a href="#" class="col-lg-3 col-md-3"><img src="/static/images/movie/p/1606/p2335721079.jpg">摇滚藏獒   &nbsp;&nbsp;<span class="douban-color">6.8</span></a>
+      </div>
+
+    </div> <!-- col -->
+    
+
+    
+  </div> <!-- row main-part -->
+</div>
+{% endblock %}
+
+
+{% block js_own %} 
+<script src="/static/js/search/search.js"></script>
+{% endblock %}
+</body>
+</html>

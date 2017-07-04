@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block title %}社区 - 比格电影{% endblock %}
+{% block meta_own %}{% endblock %}
+    
+{% block css_own %}
+<link href="/static/css/bbs/bbs_index.css?v=161124.1" rel="stylesheet">
+<link href="//cdn.bootcss.com/summernote/0.8.2/summernote.css" rel="stylesheet">
+<link href="/static/css/plugs/sinaEmotion/jquery.sinaEmotion.css" rel="stylesheet">
+{% block css_bbs_own %} {% endblock %}
+  
+{% endblock %}
+
+{% block main_content %}
+
+  <div class="container">
+    {% block modals %} {% endblock %}
+    <div class="row">
+      <div class='col-lg-12 breadcrumb hidden-xs hidden-sm'>
+        <a class="btn btn-info btn-arrow-right" href="/">主页</a>
+        {% block breadcrumb_content %} {% endblock %}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-9 col-md-9" id="left-part">
+        {% block left_part_content %} {% endblock %}
+      </div>
+      <div class="col-lg-3 col-md-3 hidden-xs hidden-sm" id="right-part">
+        {% if not logined %}
+        <div class="alert alert-warning alert-dismissible fade in">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <div class="media">
+            <div class="media-left">
+              <div class="ccs-tip ccs-tip-comeon"></div>
+            </div>
+            <div class="media-body">
+              <div class="media-heading"><div>Hi~<br>欢迎来到比格电影社区。</div></div>
+            </div>
+            <p>快来 <a href="/user/login/">登录</a> 或 <a href="/user/register/">注册</a>，和小伙伴们一起玩吧！</p>
+          </div>
+          
+        </div>
+        {% endif %}
+        <div class="panel info-block">
+          <div class="panel-heading"><h2>热门话题</h2></div>
+          <div class="list-group">
+            {% for item in hot_posts %}
+            <a href="/bbs/post/{{item.id}}/" class="list-group-item">
+               {{item.title}} <span class="badge">{{item.post_reply.all|length}}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <div class="panel info-block">
+          <div class="panel-heading"><h2>明星会员</h2></div>
+          <div class="panel-body media-list">
+            <div class="media">
+              ...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  
+
+
+{% endblock %}
+
+{% block js_own %}
+<script src='/static/js/bbs/bbs.js'></script>
+<script src="//cdn.bootcss.com/summernote/0.8.2/summernote.min.js"></script>
+<script src="//cdn.bootcss.com/summernote/0.8.2/lang/summernote-zh-CN.min.js"></script>
+<script src="/static/js/plugs/sinaEmotion/jquery.sinaEmotion.js" type="text/javascript"></script>
+<script src="//cdn.bootcss.com/bootstrap-maxlength/1.7.0/bootstrap-maxlength.min.js" type="text/javascript"></script>
+
+{% block js_bbs_own %} {% endblock %}
+{% endblock %}
+

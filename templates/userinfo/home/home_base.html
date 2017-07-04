@@ -1,0 +1,207 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block title %}个人中心 - 比格电影{% endblock %}
+{% block meta_own %}{% endblock %}
+
+{% block css_own %}
+<link href="/static/css/userinfo/home/home.css" rel="stylesheet">
+  {% block home_css_own %} {% endblock %}
+{% endblock %}
+
+{% block main_content %}
+  {% block modals_own %}{% endblock %}
+  {% block login_modal %}{% endblock %}
+  {% block my_fans_modal %}
+  <div class="modal fade" id="myFansModal" tabindex="-1" role="dialog" aria-labelledby="myFansModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h5 class="modal-title">我的粉丝</h5>
+        </div>
+
+        <div class="modal-body p-0">
+          <div class="modal-user-list-wrap">
+            <ul class="list-unstyled list-group">
+            {% if my_fans %}
+              {% for item in my_fans %}
+              <li class="list-group-item">
+                <div class="media">
+                  <div class="media-left">
+                    <a class="username" href="/user/profile/{{item.origin_user_of_focus.id}}/{{item.origin_user_of_focus.username}}/" target="_blank">
+                      <img class="img-circle avatar-s" src="{{item.origin_user_of_focus.thumb_s}}">
+                    </a>
+                  </div>
+                  <div class="media-body">
+
+                    <div class="pull-right">
+                      <button class="btn btn-primary btn-xs btn-msg" data-uid="{{item.origin_user_of_focus.id}}">私信</button>
+                      <button class="btn btn-warning btn-xs btn-focus" data-uid="{{item.origin_user_of_focus.id}}">{% if item.i_focused %}已粉{% else %}关注{% endif %}</button>
+                    </div>
+
+                    <a class="username" href="/user/profile/{{item.origin_user_of_focus.id}}/{{item.origin_user_of_focus.username}}/" target="_blank">{{item.origin_user_of_focus.username}}</a>
+                    <p>{{item.origin_user_of_focus.mysign}}</p>
+                  </div>
+                </div>
+              </li>
+              {% endfor %}
+            {% else %}
+              <li class="list-group-item">还没有人关注你 ︿(￣︶￣)︿</li>
+            {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+  {% block my_focused_modal %}
+  <div class="modal fade" id="myFocusedModal" tabindex="-1" role="dialog" aria-labelledby="myFocusedModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h5 class="modal-title">我的关注</h5>
+        </div>
+
+        <div class="modal-body p-0">
+          <div class="modal-user-list-wrap">
+            <ul class="list-unstyled">
+            {% if my_focused %}
+              {% for item in my_focused %}
+              <li class="list-group-item">
+                <div class="media">
+                  <a class="media-left" href="/user/profile/{{item.target_user.id}}/{{item.target_user.username}}/" target="_blank">
+                    <img class="img-circle avatar-s" src="{{item.target_user.thumb_s}}">
+                  </a>
+                  <div class="media-body">
+                    <div class="pull-right">
+                      <button class="btn btn-xs btn-primary btn-msg" data-uid="{{item.target_user.id}}">私信</button>
+                      <button class="btn btn-xs btn-warning btn-focus" data-uid="{{item.target_user.id}}">已粉</button>
+                    </div>
+                    <a class="username" href="/user/profile/{{item.target_user.id}}/{{item.target_user.username}}/" target="_blank">{{item.target_user.username}}</a>
+                    <p>{{item.target_user.mysign}}</p>
+                  </div>
+                </div>
+              </li>
+              {% endfor %}
+            {% else %}
+              <li class="list-group-item panel-body text-center">
+                  <div class="ccs-tip ccs-tip-shock"></div>
+                  <div class="ccs-desc">{{address}}还没有关注过任何人~</div>
+              </li>
+            {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 hidden-xs hidden-sm" id="left-part">
+          {% block left_menu %} {% endblock %}
+          
+          {% block base_info %} {% endblock %}
+
+	      <div class="info-block" id="about">
+	        <div class="panel-body">
+	          <h5 class="item-heading">我的动态</h5>
+	          <ul class="list-unstyled">
+                <li><i class="fa fa-fw fa-star mr-10"></i>{% if latest_collection_cate_ch %}最近收藏了{{latest_collection_cate_ch}} <a href="/{{latest_collection_cate}}/{{latest_collection.id}}/" target="_blank">{{latest_collection.ch_name}}</a>{% else %}还没有收藏过任何影片{% endif %}</li>
+                <li><i class="fa fa-fw fa-comment mr-10"></i>{% if latest_rating_cate_ch %}最近评论过{{latest_rating_cate_ch}} <a href="/{{latest_rating_cate}}/{{latest_rating.id}}/" target="_blank">{{latest_rating.ch_name}}</a>{% else %}还没有发表过任何影片评论{% endif %}</li>
+                <li><i class="fa fa-fw fa-heart mr-10"></i>{% if latest_focus %}最近关注了 <a href="/user/profile/{{latest_focus.target_user.id}}/{{latest_focus.target_user.username}}/" target="_blank">{{latest_focus.target_user.username}}</a>{% else %}还没有关注过其他人{% endif %}</li>
+                <li><i class="fa fa-fw fa-user-plus mr-10"></i>{% if latest_fans %}收获了一个新粉丝 <a href="/user/profile/{{latest_fans.origin_user.id}}/{{latest_fans.origin_user_of_focus.username}}/" target="_blank">{{latest_fans.origin_user_of_focus.username}}</a>{% else %}还没有任何人关注过你{% endif %}</li>
+              </ul>
+	        </div>
+	      </div>
+	      
+	      <div class="info-block" id="statistics">
+	        <div class="panel-body">
+	          <h5 class="item-heading">我的成就</h5>
+	          <ul class="list-unstyled">
+	            <li><span>发帖:</span>{{post_counts}}</li>
+                <li><span>影评:</span>{{comment_counts}}</li>
+                <li><span>对影片打分:</span>{{rating_counts}}</li>
+                <li><span>收藏影片:</span>{{collect_counts}}</li>
+                <li><span>获得总经验值:</span>{{user_info.exp}}</li>
+                <li><span>目前等级:</span>{{my_level}}</li>
+                <li><span>加入比格电影:</span>{% if reg_days %}{{reg_days}} 天{% else %}今天{% endif %}</li>
+	          </ul>
+	        </div>
+	      </div>
+      </div>
+      
+      <div class="col-lg-6" id="middle-part">
+        {% block middle_content %} {% endblock %}
+      </div>
+      
+      <div class="col-lg-3 hidden-xs hidden-sm" id="right-part">
+
+        <div class="info-block" id="active">
+          <div class="panel-body">
+	         <h5 class="item-heading">活跃用户</h5>
+	         <ul class="media-list">
+	           {% for item in active_users %}
+               <li class="media">
+                 <a class="media-left" href="/user/profile/{{item.id}}/{{item.username}}/" target="_blank" title="{{item.username}}"><img class="media-object img-circle avatar-m" title="{{item.username}}" src="{{item.thumb_m}}"></a>
+                 <div class="media-body">
+                   <div class="media-heading">
+                     <a class="mr-10" href="/user/profile/{{item.id}}/{{item.username}}/" target="_blank">{{item.username}}</a>
+                     <span class="label level bg-level-{% if item.ulevel > 9 %}{{item.ulevel|get_digit:'2'}}{% else %}0{% endif %}">Lv{{item.ulevel}}</span>
+                   </div>
+                   <div class="media-content">
+                     <p class="text-smaller text-lighter">{% if item.mysign|length > 24 %}{{item.mysign|slice:'24'}}...{% else %}{{item.mysign}}{% endif %}</p>
+                   </div>
+                 </div>
+               </li>
+               {% endfor %}
+              </ul>
+	        </div>
+	      </div>
+	      <div class="info-block" id="recommend">
+            <div class="panel-body">
+	          <h5 class="item-heading">推荐电影</h5>
+	          <ul class="list-unstyled">
+	            {% for item in movie_recommend %}
+                <li class="media">
+                  <div class="media-left">
+                    <a href="/{{item.cate}}/{{item.id}}/" target="_blank"><img class="media-object" src="{{item.poster}}" alt="{{item.ch_name}}海报"></a>
+                    
+                  </div>
+                  <div class="media-body">
+                    <div class="media-heading">
+                      <a class="mr-10" href="/{{item.cate}}/{{item.id}}/" target="_blank">{{item.ch_name}}</a>
+                      <span class="text-smaller text-lighter">({{item.year}})</span>
+                    </div>
+                    <p class="text-smaller text-lighter">{% if item.reason|length > 60 %}{{item.reason|slice:'60'}}...{% else %}{{item.reason}}{% endif %}</p>
+                  </div>
+                  
+                 </li>
+                 {% endfor %}
+              </ul>
+	        </div>
+	      </div>
+	      
+	      <div class="info-block" id="visitors">
+            <div class="panel-body">
+	          <h5 class="item-heading">最近访客</h5>
+	          <ul class="list-inline">
+	            {% for item in recent_visitors %}
+                <li><a target="_blank" title="{{item.visitor.username}}" href="/user/profile/{{item.visitor.id}}/{{item.visitor.username}}/"><img class="img-circle media-object avatar-s" src="{{item.visitor.thumb_s}}" alt="avatar"></a></li>
+                {% endfor %}
+              </ul>
+	        </div>
+	      </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block js_own %} 
+<script src="/static/js/userinfo/home/home.js?v=161205.1" type="text/javascript"></script>
+  {% block home_js_own %} {% endblock %} 
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends 'userinfo/home/home_base.html' %}
+{% load my_tags %}
+{% block title %}我的通知 - 比格电影{% endblock %}
+{% block meta_own %}{% endblock %}
+{% block home_css_own %} {% endblock %}
+      {% block my_fans_modal %}{% endblock %}
+      {% block my_focused_modal %}{% endblock %}
+
+      {% block left_menu %}
+      <div class="info-block mb-30 list-group list-menu">
+        <a href="/user/home/" class="list-group-item">
+          <i class="fa fa-fw fa-user mr-10"></i>
+          <span class="badge"><i class="fa fa-angle-right"></i></span>个人中心
+        </a>
+        <a href="/user/home/notification/" class="list-group-item active">
+          <i class="fa fa-fw fa-bell mr-10"></i>
+          <span class="badge"><i class="fa fa-angle-right"></i></span>通知提醒
+        </a>
+        <a href="/user/home/messages/" class="list-group-item">
+          <i class="fa fa-fw fa-envelope mr-10"></i>
+          <span class="badge"><i class="fa fa-angle-right"></i></span>我的私信
+        </a>
+        <a href="/user/home/settings/" class="list-group-item">
+          <i class="fa fa-fw fa-gear mr-10"></i>
+          <span class="badge"><i class="fa fa-angle-right"></i></span>账号设置
+        </a>
+      </div> <!-- left-menu -->
+      {% endblock %}
+
+      {% block middle_content %}
+        <div class="notice-nav-wrap info-block">
+          <ul class="list-inline text-center">
+            <li class="active mr-10"><a role="button">最新通知</a></li>
+            <li><a href="/user/home/notification/?c=history">历史通知</a></li>
+          </ul>
+        </div>
+        <div class="media-list list-group" id="notice-list">
+        {% if notice_result|length > 0 %}
+        {% for item in notice_result %}
+        <div class="list-group-item">
+          {% if item.origin_user_of_focus %}
+          <div class="media-left">
+            <div class="pr-10"><i class="fa fa-heart"></i></div>
+          </div>
+          <div class="media-body">
+            <div class="media-heading">
+              <a href="/user/profile/{{item.origin_user_of_focus.id}}/{{item.origin_user_of_focus.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.origin_user_of_focus.thumb_s}}">&nbsp;{{item.origin_user_of_focus.username}}</a> 关注了你
+              <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+            </div>
+          </div>
+          {% else %}
+            {% if item.movie_reply %} {# movie_rr #}
+            <div class="media-left">
+              <div class="pr-10"><i class="fa fa-comment"></i></div>
+            </div>
+            <div class="media-body">
+              <div class="media-heading comment-heading">
+                <a href="/user/profile/{{item.user.id}}/{{item.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.user.thumb_s}}">&nbsp;{{item.user.username}}</a> 回复了你的对电影<a href="/movie/{{item.movie_reply.movie.id}}/" target="_blank">《{{item.movie_reply.movie.ch_name}}》</a>的评论
+                <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+              </div>
+              <div class="comment-content text-content">{{item.content|my_removeMedia|safe}}</div>
+              <div class="media well post-quote-wrap text-content">
+                <div class="media-left">
+                  <a href="/user/profile/{{item.movie_reply.user.id}}/{{item.movie_reply.user.username}}/" target="_blank"><img class="avatar-s img-circle" src="{{item.movie_reply.user.thumb_s}}"></a>
+                </div>
+                <div class="media-body">
+                  <div class="media-heading"><a class="username" href="/user/profile/{{item.movie_reply.user.id}}/{{item.movie_reply.user.username}}/" target="_blank">{{item.movie_reply.user.username}}</a></div>
+                  <div class="media-intro">
+                    <i class="fa fa-quote-left fa-2x pull-left"></i>
+                    {{item.movie_reply.content|safe}}
+                    <div class="comment-fade-cover"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            {% if item.tv_reply %}
+            <div class="media-left">
+              <div class="pr-10"><i class="fa fa-comment"></i></div>
+            </div>
+            <div class="media-body">
+              <div class="media-heading comment-heading">
+                <a href="/user/profile/{{item.user.id}}/{{item.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.user.thumb_s}}">&nbsp;{{item.user.username}}</a> 回复了你的对电视剧<a href="/tv/{{item.tv_reply.tv.id}}/" target="_blank">《{{item.tv_reply.tv.ch_name}}》</a>的评论
+                <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+              </div>
+              <div class="comment-content text-content">{{item.content|my_removeMedia|safe}}</div>
+              <div class="media well post-quote-wrap text-content">
+                <div class="media-left">
+                  <a href="/user/profile/{{item.tv_reply.user.id}}/{{item.tv_reply.user.username}}/" target="_blank"><img class="avatar-s img-circle" src="{{item.tv_reply.user.thumb_s}}"></a>
+                </div>
+                <div class="media-body">
+                  <div class="media-heading"><a class="username" href="/user/profile/{{item.tv_reply.user.id}}/{{item.tv_reply.user.username}}/" target="_blank">{{item.tv_reply.user.username}}</a></div>
+                  <div class="media-intro">
+                    <i class="fa fa-quote-left fa-2x pull-left"></i>
+                    {{item.tv_reply.content|safe}}
+                    <div class="comment-fade-cover"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            {% if item.anime_reply %}
+            <div class="media-left">
+              <div class="pr-10"><i class="fa fa-comment"></i></div>
+            </div>
+            <div class="media-body">
+              <div class="media-heading comment-heading">
+                <a href="/user/profile/{{item.user.id}}/{{item.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.user.thumb_s}}">&nbsp;{{item.user.username}}</a> 回复了你的对动漫<a href="/anime/{{item.anime_reply.anime.id}}/" target="_blank">《{{item.anime_reply.anime.ch_name}}》</a>的评论
+                <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+              </div>
+              <div class="comment-content text-content">{{item.content|my_removeMedia|safe}}</div>
+              <div class="media well post-quote-wrap text-content">
+                <div class="media-left">
+                  <a href="/user/profile/{{item.anime_reply.user.id}}/{{item.anime_reply.user.username}}/" target="_blank"><img class="avatar-s img-circle" src="{{item.anime_reply.user.thumb_s}}"></a>
+                </div>
+                <div class="media-body">
+                  <div class="media-heading"><a class="username" href="/user/profile/{{item.anime_reply.user.id}}/{{item.anime_reply.user.username}}/" target="_blank">{{item.anime_reply.user.username}}</a></div>
+                  <div class="media-intro">
+                    <i class="fa fa-quote-left fa-2x pull-left"></i>
+                    {{item.anime_reply.content|safe}}
+                    <div class="comment-fade-cover"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            {% if item.show_reply %}
+            <div class="media-left">
+              <div class="pr-10"><i class="fa fa-comment"></i></div>
+            </div>
+            <div class="media-body">
+              <div class="media-heading comment-heading">
+                <a href="/user/profile/{{item.user.id}}/{{item.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.user.thumb_s}}">&nbsp;{{item.user.username}}</a> 回复了你的对综艺<a href="/show/{{item.show_reply.show.id}}/" target="_blank">《{{item.show_reply.show.ch_name}}》</a>的评论
+                <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+              </div>
+              <div class="comment-content text-content">{{item.content|my_removeMedia|safe}}</div>
+              <div class="media well post-quote-wrap text-content">
+                <div class="media-left">
+                  <a href="/user/profile/{{item.show_reply.user.id}}/{{item.show_reply.user.username}}/" target="_blank"><img class="avatar-s img-circle" src="{{item.show_reply.user.thumb_s}}"></a>
+                </div>
+                <div class="media-body">
+                  <div class="media-heading"><a class="username" href="/user/profile/{{item.show_reply.user.id}}/{{item.show_reply.user.username}}/" target="_blank">{{item.show_reply.user.username}}</a></div>
+                  <div class="media-intro">
+                    <i class="fa fa-quote-left fa-2x pull-left"></i>
+                    {{item.show_reply.content|safe}}
+                    <div class="comment-fade-cover"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %} {# show_reply #}
+            {% endif %} {# anime_reply #}
+            {% endif %} {# tv_reply #}
+            {% endif %} {# movie_reply #}
+          {% if item.movie_reply_like %}
+          <div class="media-left">
+            <div class="pr-10"><i class="fa fa-thumbs-up"></i></div>
+          </div>
+          <div class="media-body">
+            <div class="media-heading comment-heading">
+              <a href="/user/profile/{{item.user.id}}/{{item.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.user.thumb_s}}">&nbsp;{{item.user.username}}</a> 赞了你对电影<a href="/movie/{{item.movie_reply_like.movie.id}}" target="_blank">《{{item.movie_reply_like.movie.ch_name}}》</a>的评论
+              <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+            </div>
+            <div class="media well post-quote-wrap text-content">
+              <div class="media-left">
+                <a href="/user/profile/{{item.movie_reply_like.user.id}}/{{item.movie_reply_like.user.username}}/" target="_blank"><img class="avatar-s img-circle" src="{{item.movie_reply_like.user.thumb_s}}"></a>
+              </div>
+              <div class="media-body">
+                <div class="media-heading"><a class="username" href="/user/profile/{{item.movie_reply_like.user.id}}/{{item.movie_reply_like.user.username}}/" target="_blank">{{item.movie_reply_like.user.username}}</a></div>
+                <div class="media-intro">
+                  <i class="fa fa-quote-left fa-2x pull-left"></i>
+                  {{item.movie_reply_like.content|safe}}
+                  <div class="comment-fade-cover"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %} {# movie_reply_like #}
+          
+          {% if item.post %}
+          <div class="media-left">
+            <div class="pr-10"><i class="fa fa-comment"></i></div>
+          </div>
+          <div class="media-body">
+            <div class="media-heading comment-heading">
+              <a href="/user/profile/{{item.user.id}}/{{item.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.user.thumb_s}}">&nbsp;{{item.user.username}}</a> 回复了你的帖子
+              <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+            </div>
+            <div class="comment-content text-content">{{item.content|my_removeMedia|safe|slice:'100'}}</div>
+            <div class="media well post-quote-wrap text-content">
+              <div class="media-left">
+                <a href="/bbs/post/{{item.post.id}}/" target="_blank"><img class="avatar-m" src="{% if item.post.img_thumb %}{{item.post.img_thumb}}{% else %}/static/images/default/post_thumb_default.png{% endif %}"></a>
+              </div>
+              <div class="media-body">
+                <div class="media-heading"><a href="/bbs/post/{{item.post.id}}/" target="_blank">{{item.post.title}}</a></div>
+                <div class="media-intro">
+                  <i class="fa fa-quote-left fa-2x pull-left"></i>
+                  {{item.post.content|my_removeMedia|safe|slice:'100'}}
+                  <div class="comment-fade-cover"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %} {# post #}
+          {% if item.post_reply %}
+          <div class="media-left">
+            <div class="pr-10"><i class="fa fa-comment"></i></div>
+          </div>
+          <div class="media-body">
+            <div class="media-heading comment-heading">
+              <a href="/user/profile/{{item.user.id}}/{{item.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{item.user.thumb_s}}">&nbsp;{{item.user.username}}</a> 回复了你在帖子 <a href="/bbs/post/{{item.post_reply.post.id}}/" target="_blank">{{item.post_reply.post.title}}</a> 中的回复
+              <time class="pull-right">{{item.create_date|my_datetrans}}</time>
+            </div>
+            <div class="comment-content">{{item.content|my_removeMedia|safe|slice:'100'}}</div>
+            <div class="well media-wrap">
+              <div class="media">
+                <div class="media-left">
+                  <a href="/user/profile/{{item.post_reply.user.id}}/{{item.post_reply.user.username}}/" target="_blank"><img class="avatar-s img-circle" src="{{item.post_reply.user.thumb_s}}"></a>
+                </div>
+                <div class="media-body quote-wrap text-content">
+                  <div class="media-heading"><a class="username" href="/user/profile/{{item.post_reply.user.id}}/{{item.post_reply.user.username}}/" target="_blank">{{item.post_reply.user.username}}</a> :</div>
+                  <div class="media-intro"><i class="fa fa-quote-left fa-2x pull-left"></i>
+                     {{item.post_reply.content|my_removeMedia|safe|slice:'100'}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %} {# post_reply #}
+          {% endif %} {# read_focus #}  
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="list-group-item">
+          <div class="p-20 text-center">
+            <div class="ccs-tip ccs-tip-happy"></div>
+            <div class="ccs-desc">暂时没有新通知哦~</div>
+          </div>
+        </div>
+        {% endif %} {# notice_result #}
+      </div> <!-- #notice-list -->
+      <ul id="next-page">{{page_list}}</ul>
+    {% endblock %}
+
+
+
+{% block home_js_own %}
+<script src="//cdn.bootcss.com/jquery-infinitescroll/2.0b2.120520/jquery.infinitescroll.min.js"></script>
+{% endblock %}

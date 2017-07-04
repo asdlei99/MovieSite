@@ -1,0 +1,86 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block title %}影视资讯 - 比格电影{% endblock %}
+{% block description %}影视资料、电影新闻、影星、美剧、预告片、论坛{% endblock %}
+{% block keywords %}影视资料,电影新闻,影星,美剧,预告片{% endblock %}
+{% block meta_own %}{% endblock %}
+
+{% block css_own %}
+<link rel='stylesheet' href='/static/css/news/news_index.css'>
+<link href="//cdn.bootcss.com/flexslider/2.6.3/flexslider.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block main_content %}
+
+  <div class="container">
+    <div class="row">
+      <div class='col-lg-12 breadcrumb hidden-xs hidden-sm'>
+        <a class="btn btn-info btn-arrow-right" href="/">主页</a>
+        <h1><a class="btn btn-primary btn-arrow-right" href="/news/">新闻</a></h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-md-6 news-carousel">
+        <div class="loading-bg">Loading ...</div>
+        <div class='flexslider'>
+            <ul class="slides">
+              {% for s in slider %}
+              <li>
+		        <a href="/news/{{s.news_id}}/" target="_blank"><img class="img-rounded" src="{{s.img_url}}" alt="{{s.desc}}"></a>
+		        <div class="news-caption flex-caption img-rounded"><a href="/news/{{s.news_id}}/" class="flex-caption-text" role="button">{{s.desc}}</a></div>
+		      </li>
+              {% endfor %}
+            </ul>
+        </div>
+
+      </div>
+      <div class="col-lg-6 col-md-6 hidden-xs hidden-sm news-recommend">
+        {% for item in recommend %}
+        <div class="col-lg-4 col-md-4">
+          <div class="recommend-img-wrap">
+            <a href="/news/{{item.id}}/" target="_blank"><img class="img-rounded" src="{{item.news_image}}" alt="{{item.title}}">
+            <span class="news-caption recommend-caption">{{item.title}}</span></a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    
+    <div class="row">
+      <h2>最新</h2>
+      <div class="col-lg-12 news-list">
+        {% for item in news_list %}
+        <div class="col-lg-3 col-md-4 col-sm-4 col-xs-6 news-list-item">
+          <a class="news-img-wrap" href="/news/{{item.id}}/" target="_blank"><img class="img-rounded" src="{{item.news_image}}" alt="{{item.title}},{{item.subtitle}}"></a>
+          <h3 class="news-title"><a href="/news/{{item.id}}/" target="_blank">{{item.title|slice:'16'}}</a></h3>
+          <p class="subtitle"><a href="/news/{{item.id}}/" target="_blank">{{item.subtitle}}</a></p>
+          <time><i class="fa fa-calendar-o"></i> {{item.create_date|my_datetrans}}</time>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="clearfix"></div>
+      <div class="col-lg-12 text-center show-more-wrap">
+        <button class="btn btn-primary btn-sm btn-get-more">加载更多&nbsp;&nbsp;<i class="fa fa-angle-down"></i></button>
+      </div>
+    </div>
+  
+  </div>
+
+
+{% endblock %}
+
+{% block js_own %}
+<script type="text/javascript" src='/static/js/news/news.js'></script>
+<script src="//cdn.bootcss.com/flexslider/2.6.3/jquery.flexslider-min.js"></script>
+<script>
+$(window).load(function() {
+        $('.flexslider').flexslider({
+                animation: "fade",
+                slideshowSpeed: 5000,
+                start: function() {
+                        $('.loading-bg').remove();
+                }
+        });
+});
+</script>
+{% endblock %}

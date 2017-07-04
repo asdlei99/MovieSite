@@ -1,0 +1,480 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block meta_own %}<meta name="baidu-site-verification" content="P76BVYFUNm" />{% endblock %}
+{% block css_own %}
+<link href="/static/css/index/index.css" rel="stylesheet">
+<link href="/static/css/plugs/wow/style.css" rel="stylesheet">
+{% endblock %}
+
+  {% block index_heading %}
+  <h1><a class="navbar-brand" href="/" title="比格电影">比格<span>电影</span></a></h1>
+  {% endblock %}
+
+  {% block main_content %}
+
+  <div class="container">
+    <div class="row" id="slider-wrap">
+      <div id="wowslider-container1">
+	    <div class="ws_images">
+	      <ul>
+	        {% for s in sliders %}
+	        <li><a href="/{{s.cate}}/{{s.media_id}}/"><img src="{{s.img_url}}" alt="{{s.media_name}}海报" title="{{s.media_name}}"></a>{{s.desc}}</li>
+	        {% endfor %}
+	      </ul>
+	    </div>
+	    <div class="ws_bullets">
+	      <div>
+	        {% for s in sliders %}
+            <a role="button" title=""><span>{{forloop.counter}}</span></a>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="ws_script" style="position:absolute;left:-99%"></div>
+        <div class="ws_shadow"></div>
+      </div>	
+     </div>
+
+    <div class="media-wrap row">
+      <section>
+        <h2><a href="/movie/">电影</a></h2>
+        {{s.img_url}}
+        <div class="col-lg-9 col-md-9 col-sm-12">
+		  <ul class="nav nav-tabs">
+		    <li class="active"><a href="#movie-n" data-toggle="tab">最新上映</a></li>
+		    <li><a href="#movie-r" data-toggle="tab">经典推荐</a></li>
+		    <li><a href="#movie-f" data-toggle="tab">即将上映</a></li>
+		    <li class="pull-right"><a href="/movie/">更多 ></a></li>
+	      </ul>
+		  <div class="tab-content">
+		    <div class="tab-pane fade in active" id="movie-n">
+			  {% for item in movie_new_release %}
+			  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 item-wrap">
+			    <a class="item-block" href="/movie/{{item.id}}/" title="{{item.ch_name}}" target="_blank">
+			      <img class="lazy" src="/static/images/default/poster/p_200x284.png" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			      {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			    </a>
+			    <div class="item-name">
+			      <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+			      {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			    </div>
+			  </div>
+			  {% endfor %}
+			  <div class="clearfix"></div>
+            </div>
+          
+            <div class="tab-pane fade" id="movie-r">
+              {% for item in movie_recommend %}
+              <div class="col-lg-6">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 item-wrap">
+                  <a class="item-block" href="/movie/{{item.id}}/" target="_blank">
+			        <img class="lazy" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			        {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			      </a>
+			      <div class="item-name">
+			        <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+			        {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			      </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 item-wrap">
+                  {% if item.director %}<p><span class="text-lighter">导演：</span>{{item.director|my_slice:1}}</p>{% endif %}
+                  {% if item.actor %}<p><span class="text-lighter">主演：</span>{{item.actor|my_slice:3}}</p>{% endif %}
+                  <p><span class="text-lighter">国家地区：</span>{{item.region|my_slice:3}}</p>
+                  <p><span class="text-lighter">推荐理由：</span>{{item.reason}}</p>
+                </div>
+              </div>
+              <div class="clf"></div>
+              {% endfor %}
+              <div class="clearfix"></div>
+            </div>
+            <div class="tab-pane fade" id="movie-f">
+              {% for item in movie_near_future %}
+			  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 item-wrap">
+			    <a class="item-block" href="/movie/{{item.id}}/" target="_blank">
+			      <img class="lazy" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			      {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			    </a>
+			    <div class="item-name">
+			      <h4><a class="name-score">{{item.ch_name}}</a></h4>
+			    </div>
+			  </div>
+			  {% endfor %}
+			  <div class="clearfix"></div>
+            </div>
+	      </div> 
+	    </div>  <!-- movie left part -->
+	  
+	    <aside>
+	      <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
+	        <ul class="nav nav-tabs">
+	          <li class="active"><a href="#movie-w" data-toggle="tab">本周TOP10</a></li>
+	          <li><a href="#movie-m" data-toggle="tab">本月TOP10</a></li>
+            </ul>
+            <div class="tab-content">
+		      <div class="tab-pane in active fade" id="movie-w">
+		      {% for item in movie_weekly_top %}
+			    <a href="/movie/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		      {% endfor %}
+		      </div>
+		      <div class="tab-pane fade" id="movie-m">
+		        {% for item in movie_monthly_top %}
+			    <a href="/movie/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		        {% endfor %}
+		      </div>
+		    </div>
+	      </div>
+	    </aside>
+	    
+	  </section>
+    </div>
+
+
+    <div class="media-wrap row">
+      <section>
+        <h2><a href="/tv/">电视剧</a></h2>
+        <div class="col-lg-9 col-md-9 col-sm-12">
+		  <ul class="nav nav-tabs">
+		    <li class="active"><a href="#tv-n" data-toggle="tab">正在热播</a></li>
+		    <li><a href="#tv-r" data-toggle="tab">经典推荐</a></li>
+		    <li class="pull-right"><a href="/tv/">更多 ></a></li>
+	      </ul>
+		  <div class="tab-content">
+		    <div class="tab-pane fade in active" id="tv-n">
+			  {% for item in tv_new_release %}
+			  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 item-wrap">
+			    <a class="item-block" href="/tv/{{item.id}}/" title="{{item.ch_name}}" target="_blank">
+			      <img class="lazy" src="/static/images/default/poster/p_200x284.png" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			      {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			    </a>
+			    <div class="item-name">
+                  <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+                  {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			    </div>
+			  </div>
+			  {% endfor %}
+			  <div class="clearfix"></div>
+			</div>
+			<div class="tab-pane fade" id="tv-r">
+              {% for item in tv_recommend %}
+              <div class="col-lg-6">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 item-wrap">
+                  <a class="item-block" href="/tv/{{item.id}}/">
+			        <img class="lazy" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			        {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			      </a>
+			      <div class="item-name">
+			        <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+			        {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			      </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 item-wrap">
+                  {% if item.director %}<p><span class="text-lighter">导演：</span>{{item.director|my_slice:1}}</p>{% endif %}
+                  {% if item.actor %}<p><span class="text-lighter">主演：</span>{{item.actor|my_slice:3}}</p>{% endif %}
+                  <p><span class="text-lighter">国家地区：</span>{{item.region|my_slice:3}}</p>
+                  <p><span class="text-lighter">推荐理由：</span>{{item.reason}}</p>
+                </div>
+              </div>
+              <div class="clf"></div>
+              {% endfor %}
+              <div class="clearfix"></div>
+            </div>
+		  </div>
+	    </div> <!-- tv left part -->
+	  
+	    
+	    <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
+	      <aside>
+	        <ul class="nav nav-tabs">
+	          <li class="active"><a href="#tv-w" data-toggle="tab">本周TOP10</a></li>
+	          <li><a href="#tv-m" data-toggle="tab">本月TOP10</a></li>
+            </ul>
+            <div class="tab-content">
+		      <div class="tab-pane in active fade" id="tv-w">
+
+		        {% for item in tv_weekly_top %}
+			    <a href="/tv/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		        {% endfor %}
+		      </div>
+		      <div class="tab-pane fade" id="tv-m">
+		        {% for item in tv_monthly_top %}
+			    <a href="/tv/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		        {% endfor %}
+		      </div>
+		    </div>
+		  </aside>
+	    </div>
+	  </section>
+    </div>
+    
+    <div class="news-wrap row">
+      <section>
+        <h2><a href="/news/">影视资讯</a></h2>
+        <div class="col-lg-9 col-md-9 col-sm-12">
+          <ul class="nav nav-tabs">
+		    <li class="active"><a href="#news-new" data-toggle="tab">最新资讯</a></li>
+		    <li><a href="#news-hot" data-toggle="tab">最热资讯</a></li>
+		    <li class="pull-right"><a href="/news/">更多 ></a></li>
+	      </ul>
+	      <div class="tab-content">
+		    <div class="tab-pane fade in active" id="news-new">
+              {% for item in news_new %}
+		      <div class="news-item col-lg-4 col-md-4 col-sm-4 col-xs-6">
+		        <a href="/news/{{item.id}}" target="_blank"><img class="lazy" src="/static/images/default/news/n_278x150.png" data-original="{{item.news_image}}" alt="{{item.title}}"></a>
+		        <div>
+		          <h3><a href="/news/{{item.id}}/">{{item.title}}</a></h3>
+		          <p class="text-lighter hidden-sm hidden-xs">{{item.subtitle}}</p>
+		          <span class="small text-lighter">{{item.create_date|my_datetrans}}</span>
+		        </div>
+		      </div>
+		      {% endfor %}
+		      <div class="clearfix"></div>
+		    </div>
+		    <div class="tab-pane fade" id="news-hot">
+			  {% for item in news_hot %}
+		      <div class="news-item col-lg-4 col-md-4 col-sm-4 col-xs-6">
+		        <a href="/news/{{item.id}}" target="_blank"><img class="lazy" data-original="{{item.news_image}}" alt="{{item.title}}"></a>
+		        <div>
+		          <h3><a href="/news/{{item.id}}/">{{item.title}}</a></h3>
+		          <p class="text-lighter hidden-sm hidden-xs">{{item.subtitle}}</p>
+		          <span class="small text-lighter">{{item.create_date|my_datetrans}}</span>
+		        </div>
+		      </div>
+		      {% endfor %}
+			  <div class="clearfix"></div>
+		    </div>
+		  </div>
+	    </div> <!-- news left part -->
+	  
+	    <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
+	      <aside>
+	        <ul class="nav nav-tabs">
+	          <li class="active"><a href="#news-m" data-toggle="tab">今日TOP10</a></li>
+	          <li><a href="#news-w" data-toggle="tab">本周TOP10</a></li>
+	          
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane fade" id="news-m">
+		        {% for item in news_daily_top %}
+		        <a href="/news/{{item.id}}/">{{item.title}}</a>
+		        {% endfor %}
+		      </div>
+		      <div class="tab-pane in active fade" id="news-w">
+		        {% for item in news_weekly_top %}
+		        <a href="/news/{{item.id}}/">{{item.title}}</a>
+		        {% endfor %}
+		      </div>
+		      
+		    </div>
+		  </aside>
+	    </div>
+	    
+	  </section>
+    </div> <!-- news-wrap -->
+    
+    
+    <div class="media-wrap row">
+      <section>
+        <h2><a href="/anime/">动漫</a></h2>
+        <div class="col-lg-9 col-md-9 col-sm-12">
+          <ul class="nav nav-tabs">
+		    <li class="active"><a href="#anime-n" data-toggle="tab">正在热播</a></li>
+		    <li><a href="#anime-r" data-toggle="tab">经典推荐</a></li>
+		    <li class="pull-right"><a href="/anime/">更多 ></a></li>
+	      </ul>
+		  <div class="tab-content">
+		    <div class="tab-pane fade in active" id="anime-n">
+			  {% for item in anime_new_release %}
+			  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 item-wrap">
+			    <a class="item-block" href="/anime/{{item.id}}/" title="{{item.ch_name}}" target="_blank">
+			      <img class="lazy" src="/static/images/default/poster/p_200x284.png" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			      {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			    </a>
+			    <div class="item-name">
+			      <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+			      {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			    </div>
+			  </div>
+              {% endfor %}
+              <div class="clearfix"></div>
+            </div>
+            <div class="tab-pane fade" id="anime-r">
+              {% for item in anime_recommend %}
+              <div class="col-lg-6">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 item-wrap">
+                  <a class="item-block" href="/anime/{{item.id}}/" target="_blank">
+			        <img class="lazy" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			        {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			      </a>
+			      <div class="item-name">
+			        <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+			        {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			      </div>
+                </div>
+            
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 item-wrap">
+                  {% if item.director %}<p><span class="text-lighter">导演：</span>{{item.director|my_slice:1}}</p>{% endif %}
+                  {% if item.actor %}<p><span class="text-lighter">主演：</span>{{item.actor|my_slice:3}}</p>{% endif %}
+                  <p><span class="text-lighter">国家地区：</span>{{item.region|my_slice:3}}</p>
+                  <p><span class="text-lighter">推荐理由：</span>{{item.reason}}</p>
+                </div>
+              </div>
+              <div class="clf"></div>
+              {% endfor %}
+              <div class="clearfix"></div>
+            </div>
+            
+          </div>
+	    </div> <!-- anime left part -->
+	  
+	    <aside>
+	      <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
+	        <ul class="nav nav-tabs">
+	          <li class="active"><a href="#anime-w" data-toggle="tab">本周TOP10</a></li>
+	          <li><a href="#anime-m" data-toggle="tab">本月TOP10</a></li>
+            </ul>
+            <div class="tab-content">
+		      <div class="tab-pane in active fade" id="anime-w">
+		        {% for item in anime_weekly_top %}
+			    <a href="/anime/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		        {% endfor %}
+		      </div>
+		      <div class="tab-pane fade" id="anime-m">
+		        {% for item in anime_monthly_top %}
+			    <a href="/anime/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		        {% endfor %}
+		      </div>
+		    </div>
+	      </div>
+	    </aside>
+	  </section>
+    </div> <!-- anime-wrap -->
+    
+    <div class="media-wrap row">
+      <section>
+        <h2><a href="/show/">综艺</a></h2>
+        <div class="col-lg-9 col-md-9 col-sm-12">
+          <ul class="nav nav-tabs">
+		    <li class="active"><a href="#show-n" data-toggle="tab">正在热播</a></li>
+		    <li><a href="#show-r" data-toggle="tab">经典推荐</a></li>
+		    <li class="pull-right"><a href="/show/">更多 ></a></li>
+	      </ul>
+		  <div class="tab-content">
+		    <div class="tab-pane fade in active" id="show-n">
+			  {% for item in show_new_release %}
+			  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 item-wrap">
+			    <a class="item-block" href="/show/{{item.id}}/" title="{{item.ch_name}}" target="_blank">
+			      <img class="lazy" src="/static/images/default/poster/p_200x284.png" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			      {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			    </a>
+			    <div class="item-name">
+			      <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+			      {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			    </div>
+			  </div>
+              {% endfor %}
+              <div class="clearfix"></div>
+            </div>
+            <div class="tab-pane fade" id="show-r">
+              {% for item in show_recommend %}
+              <div class="col-lg-6">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 item-wrap">
+                  <a class="item-block" href="/show/{{item.id}}/" target="_blank">
+			        <img class="lazy" data-original="{{item.poster}}" alt="{{item.ch_name}}海报">
+			        {% if not item.types == '未知' %}<span class="item-info">{{item.types|slice:"13"}}</span>{% endif %}
+			      </a>
+			      <div class="item-name">
+			        <h4><a class="name-score">{{item.ch_name}}</a></h4>&nbsp;&nbsp;
+			        {% if not item.score == 0 %}<span class="douban-color">{{item.score}}</span>{% endif %}
+			      </div>
+                </div>
+            
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 item-wrap">
+                  {% if item.director %}<p><span class="text-lighter">导演：</span>{{item.director|my_slice:1}}</p>{% endif %}
+                  {% if item.actor %}<p><span class="text-lighter">主演：</span>{{item.actor|my_slice:3}}</p>{% endif %}
+                  <p><span class="text-lighter">国家地区：</span>{{item.region|my_slice:3}}</p>
+                  <p><span class="text-lighter">推荐理由：</span>{{item.reason}}</p>
+                </div>
+              </div>
+              <div class="clf"></div>
+              {% endfor %}
+              <div class="clearfix"></div>
+            </div>
+
+          </div>
+	    </div> <!-- show left part -->
+	  
+	    <aside>
+	      <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
+	        <ul class="nav nav-tabs">
+	          <li class="active"><a href="#show-w" data-toggle="tab">本周TOP10</a></li>
+	          <li><a href="#show-m" data-toggle="tab">本月TOP10</a></li>
+            </ul>
+            <div class="tab-content">
+		      <div class="tab-pane in active fade" id="show-w">
+		        {% for item in show_weekly_top %}
+			    <a href="/show/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		        {% endfor %}
+		      </div>
+		      <div class="tab-pane fade" id="show-m">
+		        {% for item in show_monthly_top %}
+			    <a href="/show/{{item.id}}/">{{item.ch_name}}
+			      <span class="douban-color">{% if not item.score == 0 %}{{item.score}}{% else %}-{% endif %}</span>
+			    </a>
+		        {% endfor %}
+		      </div>
+		    </div>
+	      </div>
+	    </aside>
+	  </section>
+    </div> <!-- show-wrap -->
+    
+    
+    <div class="row media-wrap hidden-sm hidden-xs">
+      <h2>友情链接</h2>
+      <div class="col-lg-12">
+      <table class="table table-condensed">
+        <tr>
+		  <td><a href="http://www.ystt88.com" target="_blank">影视天堂</a></td>
+		</tr>
+      </table>
+      </div>
+    </div>
+    
+
+  </div>
+{% endblock %}
+  
+
+
+{% block js_own %}
+  <script src="/static/js/plugs/wow/wowslider.js"></script>
+  <script src="/static/js/plugs/wow/script.js"></script>
+  <script src="//cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js" type="text/javascript"></script>
+  <script>
+  $(function() {
+	    $(".media-wrap img.lazy").lazyload({
+	    	effect : "fadeIn",
+	    	threshold: 100,
+	    	//placeholder: "/static/images/default/poster/p_200x284.png"
+	    });
+	    $(".news-wrap img.lazy").lazyload({
+	    	effect : "fadeIn",
+	    	threshold: 100,
+	    	//placeholder: "/static/images/default/news/n_278x150.png"
+	    });
+	});
+  </script>
+{% endblock %}

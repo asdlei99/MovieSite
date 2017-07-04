@@ -1,0 +1,298 @@
+{% extends 'userinfo/home/home_base.html' %}
+{% load my_tags %}
+{% block title %}个人中心 - 比格电影{% endblock %}
+{% block meta_own %} {% endblock %}
+{% block home_css_own %}
+<link href="//cdn.bootcss.com/ekko-lightbox/4.0.1/ekko-lightbox.min.css" rel="stylesheet">
+<link href="/static/css/plugs/sinaEmotion/jquery.sinaEmotion.css" rel="stylesheet">
+<link href="/static/css/plugs/fineuploader/fine-uploader-gallery.css" rel="stylesheet">
+<!-- <script src="/static/js/plugs/fineuploader/fine-uploader.js"></script> -->
+<script src="//cdn.bootcss.com/file-uploader/5.11.8/all.fine-uploader/all.fine-uploader.min.js"></script>
+<script type="text/template" id="qq-template-gallery">
+        <div class="qq-uploader-selector qq-uploader qq-gallery" qq-drop-area-text="拖动图片到这里">
+            <div class="progress qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+                <div class="progress-bar progress-bar-info progress-bar-striped active qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" ></div>
+            </div>
+            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
+                <span class="qq-upload-drop-area-text-selector"></span>
+            </div>
+            <div class="btn qq-upload-button-selector qq-upload-button">
+                <div><big><i class="fa fa-plus"></i></big></div>
+            </div>
+            <span class="qq-drop-processing-selector qq-drop-processing">
+                <span>处理拖动图片中...</span>
+                <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
+            </span>
+            <ul class="qq-upload-list-selector qq-upload-list" role="region" aria-live="polite" aria-relevant="additions removals">
+                <li>
+                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
+                    <div class="progress qq-progress-bar-container-selector qq-progress-bar-container">
+                        <div class="progress-bar progress-bar-info progress-bar-striped active qq-progress-bar-selector qq-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
+                    <div class="qq-thumbnail-wrapper">
+                        <img class="qq-thumbnail-selector" qq-max-size="120" qq-server-scale>
+                    </div>
+                    <button type="button" class="qq-upload-cancel-selector qq-upload-cancel">X</button>
+                    <button type="button" class="qq-upload-retry-selector qq-upload-retry alert alert-warning">
+                        <span class="qq-btn qq-retry-icon" aria-label="重试"></span>重试
+                    </button>
+
+                    <div class="qq-file-info">
+                        <div class="qq-file-name">
+                            <span class="qq-upload-file-selector qq-upload-file"></span>
+                            
+                        </div>
+                        
+                        <span class="qq-upload-size-selector qq-upload-size"></span>
+                        <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">
+                            <span class="qq-btn qq-delete-icon" aria-label="删除"></span>
+                        </button>
+                        <button type="button" class="qq-btn qq-upload-pause-selector qq-upload-pause">
+                            <span class="qq-btn qq-pause-icon" aria-label="暂停"></span>
+                        </button>
+                        <button type="button" class="qq-btn qq-upload-continue-selector qq-upload-continue">
+                            <span class="qq-btn qq-continue-icon" aria-label="继续"></span>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+
+            <dialog class="qq-alert-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">Close</button>
+                </div>
+            </dialog>
+
+            <dialog class="qq-confirm-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">No</button>
+                    <button type="button" class="qq-ok-button-selector">Yes</button>
+                </div>
+            </dialog>
+
+            <dialog class="qq-prompt-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <input type="text">
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">Cancel</button>
+                    <button type="button" class="qq-ok-button-selector">Ok</button>
+                </div>
+            </dialog>
+        </div>
+</script>
+{% endblock %}
+    {% block modals_own %}
+    <div class="modal" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModal">
+      <div class="modal-dialog modal-sm" role="deleteConfirm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">确认删除</h4>
+          </div>
+          <div class="modal-body text-center">
+            <button class="btn btn-sm btn-default-outline mr-10" id="cancel-delete">取消</button>
+            <button class="btn btn-sm btn-danger" id="confirm-delete">确定</button>
+            <!-- <div class="clearfix"></div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="editCancelModal" tabindex="-1" role="dialog" aria-labelledby="editCancelModal">
+      <div class="modal-dialog modal-sm" role="editCancel">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">确认放弃编辑</h4>
+          </div>
+          <div class="modal-body text-center">
+            <div class="media">
+              <div class="media-left"><div class="ccs-tip ccs-tip-query"></div></div>
+              <div class="media-body media-middle">
+                <div class="ccs-desc">确定放弃正在编辑的内容吗？</div>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-default-outline mr-10" id="cancel-ce">取消</button>
+            <button class="btn btn-sm btn-danger" id="confirm-ce">确定</button>
+            <!-- <div class="clearfix"></div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="sendMsgModal" tabindex="-1" role="dialog" aria-labelledby="sendMsgModal" data-backdrop="static">
+      <div class="modal-dialog" role="sendMsg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">发送私信</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group send-msg-area submit-area">
+              <div class="input-group">
+                <textarea class="form-control text-wrapper" placeholder="输入私信内容" rows="4" maxlength="500"></textarea>
+              </div>
+              <div class="submit-btn-group">
+                <span class="emotion-icon" role="button"><i class="fa fa-smile-o"></i></span>
+                <div class="btn-group">
+                  <button class="btn btn-primary btn-sm btn-submit">发送</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+      {% block left_menu %} {% endblock %}
+      {% block base_info %}
+	      <div class="info-block mb-30" id="base">
+	        <div class="panel-heading" style="background-image: url({% if user_info.profile_bg %}{{user_info.profile_bg}}{% else %}/static/images/default/userinfo/bg_default/info.jpg{% endif %});background-repeat:no-repeat"></div>
+	        <div class="panel-body text-center">
+	          <a href="/user/profile/{{user_info.id}}/{{user_info.username}}/">
+	            <img class="avatar" src="{{user_info.thumb_l}}">
+	          </a>
+	
+	          <p class="mb-10">
+	            <a class="username" href="/user/profile/{{user_info.id}}/{{user_info.username}}/">{{user_info.username}}</a>
+	          </p>
+	
+	          <p class="mb-30">{{user_info.mysign}}</p>
+	
+	          <ul class="list-unstyled">
+	            <li>
+	              <a href="#myFocusedModal" data-toggle="modal" data-target="#myFocusedModal">关注
+	                <h6>{% if my_focused %}{{my_focused|length}}{% else %}0{% endif %}</h6>
+	              </a>
+	            </li>
+	            <li>
+	              <a href="#myFansModal" data-toggle="modal" data-target="#myFansModal">粉丝
+	                <h6>{% if my_fans %}{{my_fans|length}}{% else %}0{% endif %}</h6>
+	              </a>
+	            </li>
+	          </ul>
+	        </div>
+	      </div> <!-- base-info -->
+	    {% endblock %}
+        {% block middle_content %}
+        <ul class="media-list" id="speak">
+          <li class="list-group-item">
+            <div class="form-group publish-area">
+              <div class="input-group">
+                <textarea class="form-control text-wrapper" placeholder="说些什么吧" maxlength="500"></textarea>
+                <span class="input-group-btn"><button class="btn"><i class="fa fa-camera"></i></button></span>
+			  </div>
+			  <div class="publish-btn-group submit-btn-group hidden">
+			    <span class="emotion-icon"><i class="fa fa-smile-o"></i></span> 
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-photo"><i class="fa fa-camera"></i></button>
+                  <button class="btn btn-primary btn-sm btn-submit" id="btn-publish">发表</button>
+			    </div>
+			  </div>
+            </div>
+    	    <div class="hidden" id="fine-uploader-gallery"> </div>
+
+          </li>
+          {% if speak_result %}
+          {% for speak in speak_result %}
+          <li class="list-group-item speak-item">
+            <div class="media-left"><a href="/user/profile/{{speak.user.id}}/{{speak.user.username}}/" target="_blank">
+              <img class="media-object img-circle avatar-s" src="{{speak.user.thumb_s}}">
+            </a></div>
+            <div class="media-body">
+	          <div class="media-heading"><a href="/user/profile/{{speak.user.id}}/{{speak.user.username}}/">{{speak.user}}</a><time class="pull-right">{{speak.create_date|my_datetrans}}</time></div>
+	          <div class="media-content text-content">{{speak.content|safe}}</div>
+              {% if speak.speak_photo %}
+	          <div class="msg-img-wrap">
+	            {{speak.speak_photo|my_resolvePhotoUrl|safe}}
+	            <div class="clearfix"></div>
+	          </div>
+	          {% endif %}
+
+	          <div class="media-bottom text-right" data-sid="{{speak.id}}">
+	            {% if speak.user.id == user_info.id %}
+	            <a class="btn-del btn-del-speak mr-10" role="button">删除</a>
+	            {% else %}
+	            <!-- <a class="btn-speak-forward mr-10" role="button">转发</a> -->
+	            {% endif %}
+	            <a class="btn-speak-like mr-10" role="button">赞{% if speak.user_speak_of_like.all|length %}({{speak.user_speak_of_like.all|length}}){% endif %}</a>
+	            <a class="btn-speak-reply" role="button">评论{% if speak.user_speak_of_reply.all|length %}({{speak.user_speak_of_reply.all|length}}){% endif %}</a>
+	          </div>
+	            
+	          {% if speak.user_speak_of_reply.all|length %}
+	          <ul class="media-list speak-reply-list">
+	            {% for reply in speak.user_speak_of_reply.all %}
+	            <li class="media">
+	              <div class="media-left"><a href="/user/profile/{{reply.user.id}}/{{reply.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{reply.user.thumb_s}}"></a></div>
+	              <div class="media-body">
+	                <div class="media-heading text-content"><a class="username" href="/user/profile/{{reply.user.id}}/{{reply.user.username}}/" target="_blank">{{reply.user.username}}</a> : {{reply.content|safe}}</div>
+	                <div class="media-bottom" data-uid="{{reply.user.id}}" data-rid="{{reply.id}}">
+	                  <time class="mr-20">{{reply.create_date|my_datetrans}}</time>
+	                  <a class="btn-reply-r mr-10" role="button" title="回复"><i class="fui-chat"></i></a>
+	                  {% if reply.user.id == user_info.id %}
+	                  <a class="btn-del btn-del-reply" role="button" title="删除"><i class="fa fa-trash-o"></i></a>
+	                  {% endif %}
+	                </div>
+	                {% if reply.user_speak_reply.all|length %}
+	                <ul class="media-list speak-rr-list">
+	                  {% for rr in reply.user_speak_reply.all %}
+                      <li class="media">
+                        <div class="media-left"><a href="/user/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank"><img class="avatar-xs img-circle" src="{{rr.user.thumb_s}}"></a></div>
+                        <div class="media-body">
+                          <div class="media-heading">
+                            {% if not rr.target_user.id == rr.user.id %}
+                            <a class="username" href="/user/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank">{{rr.user.username}}</a>&nbsp;回复&nbsp;
+                            <a class="username" href="/user/profile/{{rr.target_user.id}}/{{rr.target_user.username}}/" target="_blank">{{rr.target_user.username}}</a>&nbsp;:&nbsp;{{rr.content|safe}}
+                            {% else %}
+                            <a class="username" href="/user/profile/{{rr.user.id}}/{{rr.user.username}}/" target="_blank">{{rr.user.username}}</a>&nbsp;:&nbsp;{{rr.content|safe}}
+                            {% endif %}
+                          </div>
+                          <div class="media-bottom" data-uid="{{rr.user.id}}" data-rrid="{{rr.id}}" data-rid="{{reply.id}}"> {# data-rrid删除时用 #}
+                            <time class="mr-20">{{rr.create_date|my_datetrans}}</time>
+                            <a class="btn-reply-r mr-10" role="button" title="回复"><i class="fui-chat"></i></a>
+	                        {% if rr.user.id == user_info.id %}
+	                        <a class="btn-del btn-del-rr" role="button" title="删除"><i class="fa fa-trash-o"></i></a>
+	                        {% endif %}
+                          </div>
+                        </div>
+                      </li>
+                      {% endfor %}
+	                </ul>
+	                {% endif %}
+	              </div>
+	            </li>
+	          {% endfor %}
+	          </ul>
+	          {% endif %}
+	        </div>
+	          
+	          
+
+          </li>
+          {% endfor %}
+          {% else %}
+          <div class="list-group-item">
+            <div class="p-20 text-center">
+              <div class="ccs-tip ccs-tip-shock"></div>
+              <div class="ccs-desc">你关注的人和你没有发表过任何说说~</div>
+            </div>
+          </div>
+          {% endif %}
+        </ul>
+
+        <ul id="next-page">{{page_list}}</ul>
+        {% endblock %}
+ {% block home_js_own %}
+<script src="/static/js/plugs/sinaEmotion/jquery.sinaEmotion.js" type="text/javascript"></script>
+<!-- <script src="/static/js/plugs/maxlength/bootstrap-maxlength.js" type="text/javascript"></script> -->
+<script src="//cdn.bootcss.com/bootstrap-maxlength/1.7.0/bootstrap-maxlength.min.js"></script>
+<script src="//cdn.bootcss.com/ekko-lightbox/4.0.1/ekko-lightbox.min.js"></script>
+<script src="//cdn.bootcss.com/jquery-infinitescroll/2.0b2.120520/jquery.infinitescroll.min.js"></script>
+<script>
+
+</script>
+<script>
+
+</script>
+ {% endblock %} 

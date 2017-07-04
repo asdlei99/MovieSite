@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+  {% block title %}站内搜索 - 比格电影{% endblock %}
+  {% block css_own %} 
+  <link href="/static/css/search/search_index.css?v=161207.1" rel="stylesheet">
+  {% endblock %}
+  
+</head>
+<body>
+  {% block base_nav %} {% endblock %}
+   
+  {% block main_content %}
+  <div class="container">
+      <div class="col-lg-6 col-md-8 col-lg-offset-3 col-md-offset-2">
+      <a class="brand" href="/"><img style="width: 50px;" src="/static/images/common/bige_logo.png">比格<span style="font-size:18px;font-style:italic;">电影</span></a>
+        <form action="/search/" method="get" role="search">
+        {% csrf_token %}
+          <div class="form-group">
+            <div class="input-group focus">
+              <input type="text" class="form-control" id="search-index-input" maxlength="30" autocomplete="off" autofocus>
+              <span class="input-group-btn">
+                <button class="btn btn-primary" type="button">搜索</button>
+              </span>
+            </div><!-- /input-group -->
+            <div class="search-wrap" id="search-wrap"></div>
+            <div class="search-wrap" id="search-wrap-recommend">
+              {% for item in search_recommend %}
+              <a class="search-item" href="{{item.url}}">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 img-wrap"><img src="{{item.poster}}" alt="{{item.ch_name}}的海报"></div>
+                <div class="col-lg-10 col-md-10">
+                  <div class="movie-name">{{item.ch_name}}&nbsp;&nbsp;<span class="text-lighter text-smaller">({{item.year}})</span></div>
+                  <div class="foreign-name text-lighter">{{item.foreign_name}}<br></div>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          
+
+          
+        </div>  <!-- form-group -->
+      </form>
+      
+      <div class="well" id="hot-tags">
+        {% for item in hot_tags|slice:'20' %}
+        <a class="btn btn-sm btn-q-{{item.color}}" href="{{item.url}}">{{item.name}}</a>
+        {% endfor %}
+        {% for item in hot_tags|slice:'20:' %}
+        <a class="btn btn-sm btn-q-{{item.color}} hidden" href="{{item.url}}">{{item.name}}</a>
+        {% endfor %}
+        <a class="btn btn-sm btn-q-gray" id="more-tags" role="button">更多热门标签<span class="fa fa-angle-down"></span></a>
+      </div>
+
+
+    </div> <!-- col -->
+    
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+{% block js_own %} 
+<script src="/static/js/search/search.js"></script>
+{% endblock %}
+</body>
+</html>

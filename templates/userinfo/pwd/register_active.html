@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block title %}{% if success %}激活成功{% else %}激活失败{% endif %} - 账号激活 - 比格电影{% endblock %}
+{% block css_own %}
+<link href='/static/css/userinfo/pwd/login.css' rel='stylesheet' type='text/css'/>
+{% endblock %}
+
+{% block main_content %}
+	{% block quick_login %} {% endblock %}
+	{% block part1 %} {% endblock %}
+	{% block part2 %} {% endblock %}
+
+<div class="container">
+      <div class="form-wrap row col-xs-12 col-sm-8 col-md-6 col-lg-4">
+        <div class="login-form" style="background-image: url('/static/images/common/bg/marvel_bottom_bg_sm.png');background-repeat: no-repeat;background-position: bottom;">
+          {% if success %}
+          <div class="media">
+            <div class="media-left"><div class="ccs-tip ccs-tip-thankyou"></div></div>
+            <div class="media-body media-middle">
+              <p><i class="fa fa-check-circle text-primary"></i>&nbsp;&nbsp;Hi~ <strong>{{username}}</strong>，你的账号已成功激活！</p>
+              <p>感谢你花费宝贵的时间注册比格电影，祝你玩得愉快！</p>
+              <br><br>
+            </div>
+          </div>
+          <p><a href="/user/login/">登录</a><a href="/" style="float: right;">返回主页</a></p>
+          {% else %}
+          <div class="media">
+            <div class="media-left"><div class="ccs-tip ccs-tip-sorry"></div></div>
+            <div class="media-body media-middle">
+              <p><i class="fa fa-exclamation-circle text-danger"></i>&nbsp;&nbsp;
+                {% if error == '101' %}对不起，由于系统原因激活失败，请再次尝试。{% endif %}
+                {% if error == '51' %}对不起，链接验证失败。{% endif %}
+                {% if error == '24' %}对不起，链接验证失败。{% endif %}
+              </p>
+              <p>如有任何问题请致信比格电影。</p>
+              <p>Email:&nbsp;<a href="mailto:bigedianying@gmail.com">bigedianying@gmail.com</a></p>
+              <p><a href="/user/login/">登录</a><a href="/" style="float: right;">返回主页</a></p>
+            </div>
+          </div>
+          {% endif %}
+          
+        </div>
+      </div>
+	</div>
+
+{% endblock %}
+
+{% block footer %} {% endblock %}
+{% block js_own %}
+{% endblock %}

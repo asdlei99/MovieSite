@@ -1,0 +1,113 @@
+{% extends 'bbs/bbs_base.html' %}
+
+{% block meta_own %}{% endblock %}
+
+
+    {% block breadcrumb_content %}
+    <h1><a class="btn btn-primary btn-arrow-right" href="/bbs/">社区</a></h1>
+    {% endblock %}
+	{% block left_part_content %}
+	  <section>
+        <div class="panel info-block">
+          <div class="panel-heading">公告区</div>
+          <div class="panel-body">
+            <div class="media-list">
+              <div class="media p-10">
+                <div class="media-left"><a class="board-icon btn-q-blue text-center" href="/bbs/board/?b=notification">N</a><!-- <img class="media-object" src="/static/images/common/logo.png" style="height: 50px;" alt="第一个版块"> --></div>
+                <div class="media-body">
+                  <div class="media-heading"><h2><a class="board-title" href="/bbs/board/?b=notification">公告</a></h2></div>
+                  <div class="media-content">
+                    <p>重要通知都在这里呦</p>
+                    <p>{{np}}个主题，{{npr}}个贴子</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="panel info-block">
+          <div class="panel-heading">讨论区</div>
+          <div class="panel-body">
+            <div class="media-list">
+              <div class="media p-10 col-lg-6">
+                <div class="media-left"><a class="board-icon btn-q-green text-center" href="/bbs/board/?b=movie">M</a></div>
+                <div class="media-body">
+                  <div class="media-heading"><h2><a class="board-title" href="/bbs/board/?b=movie">电影</a></h2></div>
+                  <div class="media-content">
+                    <p>看一部电影，体验一次不同的人生</p>
+                    <p>{{mp}}个主题，{{mpr}}个贴子</p>
+                  </div>
+                </div>
+              </div>
+              <div class="media p-10 col-lg-6">
+                <div class="media-left"><a class="board-icon btn-q-orange text-center" href="/bbs/board/?b=tv">T</a></div>
+                <div class="media-body">
+                  <div class="media-heading"><h2><a class="board-title" href="/bbs/board/?b=tv">电视剧</a></h2></div>
+                  <div class="media-content">
+                    <p>火爆刺激的美剧，催人泪下的韩剧，手撕鬼子的...</p>
+                    <p>{{tp}}个主题，{{tpr}}个贴子</p>
+                  </div>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+              <div class="media p-10 col-lg-6">
+                <div class="media-left"><a class="board-icon btn-q-yellow text-center" href="/bbs/board/?b=anime">A</a></div>
+                <div class="media-body">
+                  <div class="media-heading"><h2><a class="board-title" href="/bbs/board/?b=anime">动漫</a></h2></div>
+                  <div class="media-content">
+                    <p>二次元的世界你们不懂</p>
+                    <p>{{ap}}个主题，{{apr}}个贴子</p>
+                  </div>
+                </div>
+              </div>
+              <div class="media p-10 col-lg-6">
+                <div class="media-left"><a class="board-icon btn-q-purple text-center" href="/bbs/board/?b=show">S</a></div>
+                <div class="media-body">
+                  <div class="media-heading"><h2><a class="board-title" href="/bbs/board/?b=show">综艺</a></h2></div>
+                  <div class="media-content">
+                    <p>闲暇的时间放松一下，开开眼界</p>
+                    <p>{{sp}}个主题，{{spr}}个贴子</p>
+                  </div>
+                </div>
+              </div>
+              <div class="media p-10 col-lg-6">
+                <div class="media-left"><a class="board-icon btn-q-light-green text-center" href="/bbs/board/?b=relaxing">R</a></div>
+                <div class="media-body">
+                  <div class="media-heading"><h2><a class="board-title" href="/bbs/board/?b=relaxing">综合讨论</a></h2></div>
+                  <div class="media-content">
+                    <p>芝麻小事到宇宙大事</p>
+                    <p>{{rp}}个主题，{{rpr}}个贴子</p>
+                  </div>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="panel info-block">
+          <div class="panel-heading">反馈区</div>
+          <div class="panel-body">
+            <div class="media-list">
+              <div class="media p-10">
+                <div class="media-left"><a class="board-icon btn-q-gray text-center" href="/bbs/board/?b=feedback"">F</a></div>
+                <div class="media-body">
+                  <div class="media-heading"><h2><a class="board-title" href="/bbs/board/?b=feedback">意见反馈</a></h2></div>
+                  <div class="media-content">
+                    <p>在这里提出你宝贵的建议吧</p>
+                    <p>{{fp}}个主题，{{fpr}}个贴子</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+	{% endblock %}
+        
+{% block js_bbs_own %} {% endblock %}

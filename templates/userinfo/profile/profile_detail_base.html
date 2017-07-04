@@ -1,0 +1,147 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block css_own %}
+<link href="/static/css/userinfo/home/profile.css" rel="stylesheet">
+{% endblock %}
+
+{% block main_content %}
+
+  <!-- Modal -->
+<div class="modal fade" id="myFansModal" tabindex="-1" role="dialog" aria-labelledby="myFansModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h5 class="modal-title">Ta的粉丝</h5>
+        </div>
+
+        <div class="modal-body p-0">
+          <div class="modal-user-list-wrap">
+            <ul class="list-unstyled list-group">
+            {% if his_fans %}
+              {% for item in his_fans %}
+              <li class="list-group-item">
+                <div class="media">
+                  <a class="media-left" href="/user/profile/{{item.origin_user.id}}/">
+                    <img class="img-circle avatar-s" src="{{item.origin_user.thumb_s}}">
+                  </a>
+                  <div class="media-body">
+                    <button class="btn btn-xs btn-primary-outline pull-right">
+                      <i class="fa fa-user-plus"></i> 关注
+                    </button>
+                    <strong><a href="/user/profile/{{item.origin_user.id}}/" target="_blank">{{item.origin_user.username}}</a></strong>
+                    <p class="small">我的签名</p>
+                  </div>
+                </div>
+              </li>
+              {% endfor %}
+            {% else %}
+              <li class="list-group-item">还没有人关注Ta ︿(￣︶￣)︿</li>
+            {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="myFocusedModal" tabindex="-1" role="dialog" aria-labelledby="myFocusedModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h5 class="modal-title">Ta的关注</h5>
+        </div>
+
+        <div class="modal-body p-0">
+          <div class="modal-user-list-wrap">
+            <ul class="list-unstyled list-group">
+            {% if his_focused %}
+              {% for item in his_focused %}
+              <li class="list-group-item">
+                <div class="media">
+                  <a class="media-left" href="/user/profile/{{item.target_user.id}}/">
+                    <img class="img-circle avatar-s" src="{{item.target_user.thumb_s}}">
+                  </a>
+                  <div class="media-body">
+                    <button class="btn btn-xs btn-primary-outline pull-right">
+                      <i class="fa fa-user-plus"></i> 关注
+                    </button>
+                    <strong><a href="/user/profile/{{item.target_user.id}}/" target="_blank">{{item.target_user.username}}</a></strong>
+                    <p class="small">{{item.target_user.mysign}}</p>
+                  </div>
+                </div>
+              </li>
+              {% endfor %}
+            {% else %}
+              <li class="list-group-item">Ta还没有关注任何人 ︿(￣︶￣)︿</li>
+            {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+
+
+  <div class="profile-detail-outer" style="background-image:url({% if profile_user_info.user_bg %}/media/userhome/profile/{{profile_user_info.id}}/profile_bg.jpg{% else %}/static/images/userinfo/bg_default/profile.jpg{% endif %}); background-position:center;background-position-y:900px;">
+    <div class="container">
+      <div class="profile-content">
+        <div class="avatar-wrap">
+        {% if logined %}
+        <a href="/user/home/settings/"><img class="img-circle img-responsive avatar-l" src="{{profile_user_info.thumb_l}}"></a>
+        {% else %}
+        <img class="img-circle img-responsive avatar-l" src="{{profile_user_info.thumb_l}}">
+        {% endif %}
+        </div>
+        <div class="other-wrap">
+          <h3>{{profile_user_info.username}}<span class="gender mars fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-mars fa-stack-1x fa-inverse"></i></span></h3>
+          <div>{{profile_user_info.mysign}}</div>
+        </div>
+        
+        
+      </div>
+    </div>
+    <div class="detail-nav-wrap">
+      <nav class="container">
+        <ul class="list-unstyled list-inline">
+          <li class="mr-20"><a href="#">个人主页</a></li>
+          <li><a href="#">电影</a></li>
+          <li><a href="#">电视剧</a></li>
+          <li><a href="#">动漫</a></li>
+          <li><a href="#">综艺</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container" style="margin-top: 80px;">
+    <!-- Tab panes -->
+    <div class="row">
+      <div class="col-lg-12 col-md-12">
+        <div class="tab-pane" id="collect" role="tabpanel">
+
+          <div class="list-group-item">
+            <div class="default-tip">空间主人还没有收藏任何影片~</div>
+          </div>
+       
+
+        
+        </div>
+        <div class="tab-pane fade" id="speak" role="tabpanel">说说</div>
+        <div class="tab-pane fade" id="comment" role="tabpanel">评论</div>
+        <div class="tab-pane fade" id="see" role="tabpanel">看过</div>
+      </div>
+    
+      </div> <!-- row -->
+  </div>
+{% endblock %}
+
+
+{% block js_own %}
+
+    <script src="/static/js/userinfo/home/profile.js" type="text/javascript"></script>
+{% endblock %}
+

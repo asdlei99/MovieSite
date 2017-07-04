@@ -1,0 +1,350 @@
+@CHARSET "UTF-8";
+
+a {
+  color: #34495e;
+}
+
+.active {
+  color: #1abc9c;
+}
+
+/* FILTER BAR */
+/*#movie-filter {
+  position: relative;
+  padding-top: 10px;
+}*/
+#filter-wrap ul {
+  margin-left: 0;
+}
+#filter-wrap a {
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: inherit;
+  font-weight: inherit;
+}
+#focus-bar {
+  border-left: 2px solid #1abc9c;
+}
+#focus-bar button {
+  background: none;
+  border: none;
+}
+#region-bar {
+  border-left: 2px solid #f39c12;
+}
+#type-bar {
+  border-left: 2px solid #3498db;
+  margin-bottom: 10px;
+}
+#filter-switch li {
+  padding-left: 0;
+}
+#filter-switch li a {
+  font-size: 16px;
+}
+.focus-active,.focus-active:focus,.focus-active:hover {
+  background: #1abc9c;
+  color: #fff;
+}
+.region-active,.region-active:focus,.region-active:hover {
+  background: #f39c12;
+  color: #fff;
+}
+.type-active,.type-active:focus,.type-active:hover {
+  background: #3498db;
+  color: #fff;
+}
+.category-active,.category-active:focus,.category-active:hover {
+  background: #9b59b6;
+  color: #fff;
+}
+/*#filter-wrap .fui-arrow-right,
+#filter-wrap .fui-arrow-left {
+  display: inline-block;
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+}*/
+
+/*#filter-switch {
+  padding-left: 15px;
+  padding-right: 15px;
+}*/
+#filter-switch {
+  margin-left: 0;
+}
+#filter-switch .display-thumb {	/* 排列格式 */
+  position: absolute;
+}
+#filter-switch #t1 {
+  right: 81px;
+}
+#filter-switch #t2 {
+  right: 48px;
+}
+#filter-switch #t3 {
+  right: 15px;
+}
+
+.table-hover>tbody>tr:hover>td,
+.table-hover>tbody>tr:hover>th {
+  background-color: #d9edf7;
+}
+
+
+
+  
+/***
+ MAIN_PART 
+ ***/
+
+/* LEFT PART */
+
+
+.t3-wrapper, .t2-wrapper {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+/*.t2-wrapper .col-lg-12 {
+  margin: 10px auto;
+  padding: 0;
+}*/
+.t2-wrapper img {
+
+  height: 217px;
+}
+.t2-wrapper .col-lg-12 .col-lg-9 > span {
+  color: #999;
+  font-size: 16px;
+}
+.t2-wrapper h4 {
+  display: inline;
+  font-size: 16px;
+}
+.t2-wrapper p > span {
+  color: #888;
+}
+.t2-wrapper p {
+  font-size: 14px;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+/*.t2-wrapper > div .col-lg-2 {
+  width: 20%;
+}
+.t2-wrapper > div .col-lg-9 {
+  width: 80%;
+}*/
+.t3-wrapper h4 {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: 400;
+  
+}
+
+/*** SEARCH ***/
+/*#category-bar {
+  border-left: 2px solid #1abc9c;
+}*/
+/*#result-counts {
+width: 42px;
+    display: inline-block;
+    text-align: center;	
+}*/
+
+/*** HOVER EFFECT  ***/
+.da-thumbs {
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
+.da-thumbs li {
+  float: left;
+  height: 290px;
+  position: relative;
+  /*box-shadow: 0 1px 3px rgba(0,0,0,0.1);*/
+}
+
+.da-thumbs li a,
+.da-thumbs li a img {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+.da-thumbs li a {
+  overflow: hidden;
+}
+.da-thumbs h4 {
+  display: inline;
+  margin: 0;
+  line-height: inherit;
+  font-size: inherit;
+  font-weight: normal;
+}
+.da-thumbs h4 > a {
+  display: inline!important;
+}
+.da-thumbs li a div {
+  position: absolute;
+  background: #333;
+  background: rgba(75,75,75,0.7);
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  font-size: 13px;
+}
+.da-thumbs li a div > span {
+  display: block;
+  padding: 5px 0;
+  margin: 15px;
+  /*text-transform: uppercase;*/
+  font-weight: normal;
+  /*text-align: justify;*/
+  color: rgba(255,255,255,0.9);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+  /*border-bottom: 1px solid rgba(255,255,255,0.5);*/
+  /*box-shadow: 0 1px 0 rgba(0,0,0,0.1), 0 -10px 0 rgba(255,255,255,0.3);*/
+}
+.da-thumbs li a div > span > hr {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  color: rgba(255,255,255,0.5);
+}
+
+.da-thumbs li > span {
+  display: block;
+  width: 100%;
+  height: 50px;
+  padding-top: 5px;
+  text-align: center;
+}
+
+.da-thumbs li a .label {
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+  font-weight: normal;
+  /*margin:0 2px 2px;*/
+  border-radius: 0;
+  background: rgba(0,0,0,.35);
+  color: #eee;
+}
+.hot-ribbon {
+  position: absolute;
+  top: -3px;
+  right: 2px;
+  width: 66px;
+  z-index: 1;
+}
+.item-info {
+  padding: 10px 0 3px 5px;
+  height: 28px;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  color: #eee;
+  font-size: 12px;
+  background: rgba(0,0,0,.3);;
+  background: url(/static/images/common/gradient.png) 0 0 repeat-x;
+  background: -webkit-linear-gradient(transparent,rgba(0,0,0,0.1) 20%,rgba(0,0,0,0.2) 35%,rgba(0,0,0,0.4) 65%,rgba(0,0,0,0.6));
+  background: -o-linear-gradient(transparent,rgba(0,0,0,0.1) 20%,rgba(0,0,0,0.2) 35%,rgba(0,0,0,0.4) 65%,rgba(0,0,0,0.6));
+  background: -moz-linear-gradient(transparent,rgba(0,0,0,0.1) 20%,rgba(0,0,0,0.2) 35%,rgba(0,0,0,0.4) 65%,rgba(0,0,0,0.6));
+  background: linear-gradient(transparent,rgba(0,0,0,0.1) 20%,rgba(0,0,0,0.2) 35%,rgba(0,0,0,0.4) 65%,rgba(0,0,0,0.6));
+}
+
+.qq-not-release {
+  font-weight: normal;
+  color: #95a5a6!important;
+  background: transparent!important;
+  position: relative!important;
+}
+
+/***  RESPONSIVE  ***/
+
+@media (min-width: 1200px) {
+.col-md-24 {
+    width: 20%;
+  }
+  .da-thumbs li a img {
+    min-height: 217.58px;
+  }
+  .da-thumbs li a {
+    height:217.58px;
+  }
+
+}
+@media (max-width: 991px) {
+
+}
+@media (max-width: 767px) {
+  .da-thumbs > li {
+    padding: 4px;
+  }
+  
+  
+}
+@media (max-width: 434px) {
+  /*#left-part {
+    padding: 0;
+  }*/
+  .col-xs-12 {
+    padding: 0;
+  }
+  .msg-wrap, .list-group-item {
+    border: none;
+    padding: 0 5px;
+  }
+  .hot-ribbon {
+    width: 38px;
+    top: 2px;
+        width: 32px;
+    top: 3px;
+    right: 3px;
+  }
+  .t2-wrapper img {
+    height: 180px;
+  }
+  .t2-wrapper p {
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .da-thumbs > li {
+    padding: 4px;
+    height: 180px;
+  }
+  .header {
+    margin-bottom: 15px;
+  }
+  .da-thumbs li a .label:nth-child(2) {
+    left: 26px!important;
+  }
+  .da-thumbs li a .label {
+    padding: 0;
+  }
+  .da-thumbs li > span {
+    font-size: 12px;
+    overflow: hidden;
+  }
+  .da-thumbs li > a > div {
+    display: none!important;
+  }
+}
+@media (max-width: 374px) {
+  .da-thumbs > li {
+    padding: 4px;
+    height: 160px;
+  }
+  .da-thumbs li > span {
+    height: 60px;
+  }
+
+  
+}
+
+

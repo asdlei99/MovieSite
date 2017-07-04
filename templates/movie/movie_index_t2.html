@@ -1,0 +1,33 @@
+{% extends 'movie/movie_index_layout.html' %}
+  {% load my_tags %}
+
+            {% block switch %}
+              <span class="display-thumb" id="t1"><a class="fui-list-small-thumbnails" role="button" title="图片模式"></a></span>
+              <span class="display-thumb" id="t2"><a class="fui-list-thumbnailed active" role="button" title="图文模式"></a></span>
+              <span class="display-thumb" id="t3"><a class="fui-list-columned" role="button" title="列表模式"></a></span>
+            {% endblock %}
+              
+			{% block main_part %}
+			  <div class="t2-wrapper media-list">
+			    {% for item in show %}
+			    <div class="media list-group-item">
+			      <div class="media-left">
+				    <a href="/movie/{{item.id}}/"><img src="{{item.poster}}"></a>
+				  </div>
+				  <div class="media-body">
+				    <h4 class="media-heading"><a href="/movie/{{item.id}}/">{{item.ch_name}}</a></h4>
+				    &nbsp;&nbsp;{{item.foreign_name}}&nbsp;&nbsp;<span>({{item.year}})</span>
+				    <p><span>类型：</span>{{item.types}}</p>
+				    <p><span>国家地区：</span>{{item.region}}</p>
+				    {% if item.director %}<p><span>导演：</span>{{item.director|my_slice:1}}</p>{% endif %}
+				    {% if item.actor %}<p><span>演员：</span>{{item.actor|my_slice:3}}</p>{% endif %}
+				    <p><span>简介：</span>{% if item.intro|length > 80 %}{{item.intro|slice:"80"|safe}} ……{% else %}{{item.intro}}{% endif %}</p>
+				    
+				  </div>
+				  
+				</div>
+				{% endfor %}
+				<div class="clearfix"></div>
+              </div>
+          {% endblock %}
+			
