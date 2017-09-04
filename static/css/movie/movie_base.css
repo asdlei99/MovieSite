@@ -74,6 +74,19 @@
 #accordion1 .media-body p {
   margin: 0;
 }
+#accordion1 .panel-body.media > .media-body {
+  position: relative;
+}
+#accordion1 .panel-body.media > .media-body a {
+  bottom: 0;
+  position: absolute;
+  right: 0;
+  color: #16a085;
+}
+#accordion1 .panel-body.media > .media-body a:hover {
+  color: #1abc9c;
+}
+
 
 /* TAGS CLOUD */
 #tagscloud {

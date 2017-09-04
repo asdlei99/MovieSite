@@ -48,8 +48,8 @@ def showDetail(request, *args, **kwargs):
     
     down_list = []
     if show_obj.down_urls and not show_obj.down_urls == '无下载':
-        name_list = show_obj.down_names.split('\r\n')
-        url_list = show_obj.down_urls.split('\r\n')
+        name_list = show_obj.down_names.splitlines()
+        url_list = show_obj.down_urls.splitlines()
         for i in range(len(name_list)):
             if url_list[i]:
                 down_list.append([name_list[i],url_list[i]])

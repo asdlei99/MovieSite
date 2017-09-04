@@ -7,6 +7,7 @@ from random import randint
 from django.db.models import Q
 from django.template.context import RequestContext
 import json, re
+import datetime
 #from datetime import datetime, date
 from os import path
 from MovieSite.settings import BASE_DIR
@@ -50,11 +51,13 @@ def tvDetail(request, *args, **kwargs):
     
     down_list = []
     if tv_obj.down_urls and not tv_obj.down_urls == '无下载':
-        name_list = tv_obj.down_names.split('\r\n')
-        url_list = tv_obj.down_urls.split('\r\n')
+        name_list = tv_obj.down_names.splitlines()
+        url_list = tv_obj.down_urls.splitlines()
         for i in range(len(name_list)):
-            if url_list[i]:
+            try:
                 down_list.append([name_list[i],url_list[i]])
+            except IndexError:
+                break
 
         ret['urls'] = down_list 
         print down_list[0]
@@ -178,7 +181,7 @@ def tvIndex(request, *args, **kwargs):
 
     #focus
     if target_focus == 'af':
-        focus_result = region_result.filter(score__gt=0).order_by('-release_date')
+        focus_result = region_result.filter().order_by('-release_date')
     elif target_focus == 'guonei':
         focus_result = region_result.filter(release_date_show__contains = '中国').exclude(score=0).order_by('-release_date')
     elif target_focus == 'guowai':
@@ -188,7 +191,8 @@ def tvIndex(request, *args, **kwargs):
     elif target_focus == 'gengxin':
         focus_result = region_result.all().order_by('-create_date')
     elif target_focus == 'not_released':
-        focus_result = region_result.filter(score=0).order_by('release_date')
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        focus_result = region_result.filter(release_date__gt=today).order_by('release_date')
     if not 'focus_result' in dir():
         raise Http404
         return render_to_response('404.html')

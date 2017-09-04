@@ -41,6 +41,9 @@ class Movie(models.Model):
     video2 = models.TextField(max_length=2048, verbose_name='移动视频', default='无视频', blank=True)
 
     link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='N/A')
+    douban_sn = models.CharField(max_length=16, verbose_name='豆瓣编号', blank=True)
+    imdb_sn = models.CharField(max_length=16, verbose_name='IMDB地址', blank=True)
+    compare_way = models.CharField(max_length=16, verbose_name='添加匹配方式', blank=True)
     visit_count = models.IntegerField(verbose_name='页面访问量', default=0)
     week_visit_count = models.IntegerField(verbose_name='周访问量', default=0)
     month_visit_count = models.IntegerField(verbose_name = '月访问量', default=0)
@@ -119,6 +122,9 @@ class Tv(models.Model):
     down_names = models.TextField(max_length=12800, verbose_name='文件名')
     down_urls = models.TextField(max_length=65534, verbose_name='下载链接')
     link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='http://')
+    douban_sn = models.CharField(max_length=16, verbose_name='豆瓣编号', blank=True)
+    imdb_sn = models.CharField(max_length=16, verbose_name='IMDB地址', blank=True)
+    compare_way = models.CharField(max_length=16, verbose_name='添加匹配方式', blank=True)
     seq = models.IntegerField(verbose_name='第几段地址', default=1)
 
     visit_count = models.IntegerField(verbose_name='页面访问量', default=0)
@@ -232,6 +238,9 @@ class Anime(models.Model):
     down_names = models.TextField(max_length=12800, verbose_name='文件名')
     down_urls = models.TextField(max_length=65534, verbose_name='下载链接')
     link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='N/A')
+    douban_sn = models.CharField(max_length=16, verbose_name='豆瓣编号', blank=True)
+    imdb_sn = models.CharField(max_length=16, verbose_name='IMDB地址', blank=True)
+    compare_way = models.CharField(max_length=16, verbose_name='添加匹配方式', blank=True)
     seq = models.IntegerField(verbose_name='第几段地址', default=1)
 
     visit_count = models.IntegerField(verbose_name='页面访问量', default=0)
@@ -294,6 +303,9 @@ class Show(models.Model):
     down_names = models.TextField(max_length=12800, verbose_name='文件名')
     down_urls = models.TextField(max_length=65534, verbose_name='下载链接')
     link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='N/A')
+    douban_sn = models.CharField(max_length=16, verbose_name='豆瓣编号', blank=True)
+    imdb_sn = models.CharField(max_length=16, verbose_name='IMDB地址', blank=True)
+    compare_way = models.CharField(max_length=16, verbose_name='添加匹配方式', blank=True)
     seq = models.IntegerField(verbose_name='第几段地址', default=1)
 
     visit_count = models.IntegerField(verbose_name='页面访问量', default=0)

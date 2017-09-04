@@ -1,11 +1,12 @@
 {% extends 'layout.html' %}
+{% load my_tags %}
 {% block title %}综艺 - 比格电影{% endblock %}
 {% block description %}综艺资料、剧情简介、综艺下载、图片、预告片、论坛{% endblock %}
 {% block keywords %}综艺,剧情,图片,预告片,综艺下载{% endblock %}
 {% block meta_own %}{% endblock %}
     
 {% block css_own %}
-<link rel='stylesheet' href='/static/css/movie/movie_base.css'>
+<link rel='stylesheet' href='/static/css/movie/movie_base.css?v=170903.1'>
 <link rel='stylesheet' href='/static/css/movie/movie_index.css'>
 <!-- <link rel='stylesheet' href='/static/css/plugs/HoverEffect/style.css'> -->
 <script type="text/javascript" src='/static/js/plugs/HoverEffect/modernizr.custom.97074.js'></script>
@@ -157,7 +158,7 @@
 	          <div class="panel-heading" role="tab" id="heading0">
 	            <div class="panel-title">
 	              <a role="button" data-toggle="collapse" data-parent="#accordion1" href="#collapse0" aria-expanded="true" aria-controls="collapse0">
-		            {{billboard1.ch_name}} <span class="douban-color">{{billboard1.score}}</span>
+		            {{billboard1.ch_name}} <span class="douban-color">{% if billboard1.score %}{{billboard1.score}}{% else %}-{% endif %}</span>
 	              </a>
 	            </div>
 		      </div> <!-- panel-heading -->
@@ -166,31 +167,10 @@
 	              <!-- <div class='row'> -->
 		            <div class="media-left"><a href="/show/{{billboard1.id}}/"><img src="{{billboard1.poster}}"></a></div>
 		            <div class="media-body">
-		              <h4 class="media-heading"><a href="/show/{{billboard1.id}}/">{{billboard1.ch_name}}</a></h4>
-		              <p>{{billboard1.types}}</p>
-		              <p>{{billboard1.region}}</p>
-		              <p>{{billboard1.release_date}}</p>
-		              <p><span class="douban-color">{{billboard1.score}}</span></p>
-		              <p>{% ifnotequal item.video '无视频' %}
-					    {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-primary">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-info" style="left:40px;">下载</span>
-					      {% endifnotequal %}
-					    {% else %}
-					      {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-primary">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-info">下载</span>
-					      {% endifnotequal %}
-					    {% endifnotequal %}
-	                  </p>
+		              <p class="text-smaller">{{billboard1.types|my_slice:3}}</p>
+		              <p class="text-smaller">{{billboard1.region|my_slice:3}}</p>
+		              <p class="text-smaller">{{billboard1.release_date}}</p>
+		              <p class="text-smaller">{{billboard1.intro|slice:'40'}}...<a href="/show/{{billboard1.id}}/">[详情]</a></p>
 		            </div>
 	              <!-- </div> -->
 	            </div>
@@ -201,7 +181,7 @@
 	          <div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
 	            <div class="panel-title">
 	              <a role="button" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{forloop.counter}}" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
-		            {{ item.ch_name }} <span class="douban-color">{{item.score}}</span>
+		            {{ item.ch_name }} <span class="douban-color">{% if item.score %}{{item.score}}{% else %}-{% endif %}</span>
 	              </a>
 	            </div>
 		      </div> <!-- panel-heading -->
@@ -209,31 +189,10 @@
 	            <div class="panel-body media">
 		            <div class="media-left"><a href="/show/{{item.id}}/"><img src="{{item.poster}}"></a></div>
 		            <div class="media-body">
-		              <h4 class="media-heading"><a href="/show/{{item.id}}/">{{item.ch_name}}</a></h4>
-		              <p>{{item.types}}</p>
-		              <p>{{item.region}}</p>
-		              <p>{{item.release_date}}</p>
-		              <p><span class="douban-color">{{item.score}}</span></p>
-		              <p>{% ifnotequal item.video '无视频' %}
-					    {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-primary">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-info" style="left:40px;">下载</span>
-					      {% endifnotequal %}
-					    {% else %}
-					      {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-primary">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-info">下载</span>
-					      {% endifnotequal %}
-					    {% endifnotequal %}
-	                  </p>
+		              <p class="text-smaller">{{item.types|my_slice:3}}</p>
+		              <p class="text-smaller">{{item.region|my_slice:3}}</p>
+		              <p class="text-smaller">{{item.release_date}}</p>
+		              <p class="text-smaller">{{item.intro|slice:'40'}}...<a href="/show/{{item.id}}/">[详情]</a></p>
 		            </div>
 	            </div>
 	          </div>
@@ -260,6 +219,21 @@
 {% endblock %}
 
 {% block js_own %}
+<script>
+
+$(function() {
+        var daDict = {{da_dict|safe}};
+        var mnList = {{mn_list|safe}};
+        var word_array = []
+        $.each(daDict, function(k,v) {
+                word_array.push({text: k, weight: v, link: '/search/result/?keyword='+k, html: {title: k}})
+        });
+        $.each(mnList, function(i) {
+                word_array.push(mnList[i])
+        })
+    $("#tagscloud").jQCloud(word_array);
+});
+</script>
 <script type="text/javascript" src='/static/js/movie/movie_index.js'></script>
 <script type="text/javascript" src='/static/js/movie/movie_base.js'></script>
 <script type="text/javascript" src='/static/js/plugs/HoverEffect/jquery.hoverdir.js'></script>

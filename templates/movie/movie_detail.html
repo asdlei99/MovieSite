@@ -6,8 +6,8 @@
 {% block meta_own %}{% endblock %}
     
 {% block css_own %}
-<link rel='stylesheet' href='/static/css/movie/movie_base.css'>
-<link rel='stylesheet' href='/static/css/movie/movie_detail.css?v=161204.1'>
+<link rel='stylesheet' href='/static/css/movie/movie_base.css?v=170903.1'>
+<link rel='stylesheet' href='/static/css/movie/movie_detail.css?v=170311.1'>
 <link href="/static/css/plugs/sinaEmotion/jquery.sinaEmotion.css" rel="stylesheet">
 
 {% endblock %}
@@ -104,7 +104,7 @@
         {% ifnotequal detail.video '无视频' %} <!-- 如果有pc视频 -->
         <section>
           {% if not 'acfun' in detail.video %} {# 非acfun只显示一个pc/m通用 #}
-          <div class="panel info-block" {% if 'embed' in detail.video %}id="pc-video"{% endif %}>
+          <div class="panel info-block" {% if '<embed' in detail.video %}id="pc-video"{% endif %}>
             <div class="panel-heading">
               {% ifequal detail.video_type '预告片' %} <h2>{{detail.ch_name}}的预告片</h2> {% else %} <h2>{{detail.ch_name}}在线观看</h2> {% endifequal %}
             </div>
@@ -273,7 +273,7 @@
                 {% for item in related %}
                 <li class="col-lg-2 col-md-2 col-sm-2">
                   <div><a href="/movie/{{item.id}}/"><img style="width:100%" src="{{item.poster}}" alt="{{item.ch_name}}海报"></a></div>
-                  <div class="text-center" style="padding-top: 5px;"><h3><a href="/movie/{{item.id}}/">{{item.ch_name}}</a></h3>&nbsp;&nbsp;<span class="douban-color">{{item.score}}</span></div>
+                  <div class="text-center" style="padding-top: 5px;"><h3><a href="/movie/{{item.id}}/">{{item.ch_name}}</a></h3>{% if item.score > 0 %}&nbsp;&nbsp;<span class="douban-color">{{item.score}}</span>{% endif %}</div>
                 </li>
                 {% endfor %}
               </ul>
@@ -290,42 +290,19 @@
 	          <div class="panel-heading" role="tab" id="heading0">
 	            <div class="panel-title">
 	              <a role="button" data-toggle="collapse" data-parent="#accordion1" href="#collapse0" aria-expanded="true" aria-controls="collapse0">
-		            {{billboard1.ch_name}} <span class="douban-color">{{billboard1.score}}</span>
+		            {{billboard1.ch_name}} <span class="douban-color">{% if billboard1.score %}{{billboard1.score}}{% else %}-{% endif %}</span>
 	              </a>
 	            </div>
 		      </div> <!-- panel-heading -->
 	          <div id="collapse0" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading0">
-	            <div class="panel-body">
-	              <div class='row'>
-		            <div class="col-lg-6"><a href="/movie/{{billboard1.id}}/"><img src="{{billboard1.poster}}"></a></div>
-		            <div class="col-lg-6">
-		              <h4><a href="/movie/{{billboard1.id}}/">{{billboard1.ch_name}}</a></h4>
-		              <p>{{billboard1.types}}</p>
-		              <p>{{billboard1.region}}</p>
-		              <p>{{billboard1.release_date}}</p>
-		              <p><span class="douban-color">{{billboard1.score}}</span></p>
-		              <p>{% ifnotequal item.video '无视频' %}
-					    {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-success">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-primary" style="left:40px;">下载</span>
-					      {% endifnotequal %}
-					    {% else %}
-					      {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-success">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-primary">下载</span>
-					      {% endifnotequal %}
-					    {% endifnotequal %}
-	                  </p>
+	            <div class="panel-body media">
+		            <div class="media-left"><a href="/movie/{{billboard1.id}}/"><img src="{{billboard1.poster}}"></a></div>
+		            <div class="media-body">
+		              <p class="text-smaller">{{billboard1.types|my_slice:3}}</p>
+		              <p class="text-smaller">{{billboard1.region|my_slice:3}}</p>
+		              <p class="text-smaller">{{billboard1.release_date}}</p>
+		              <p class="text-smaller">{{billboard1.intro|slice:'40'}}...<a href="/movie/{{billboard1.id}}/">[详情]</a></p>
 		            </div>
-	              </div>
 	            </div>
 	          </div>
 	        </div>
@@ -334,42 +311,19 @@
 	          <div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
 	            <div class="panel-title">
 	              <a role="button" data-toggle="collapse" data-parent="#accordion1" href="#collapse{{forloop.counter}}" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
-		            {{ item.ch_name }} <span class="douban-color">{{item.score}}</span>
+		            {{ item.ch_name }} <span class="douban-color">{% if item.score %}{{item.score}}{% else %}-{% endif %}</span>
 	              </a>
 	            </div>
 		      </div> <!-- panel-heading -->
 	          <div id="collapse{{forloop.counter}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-	            <div class="panel-body">
-		          <div class='row'>
-		            <div class="col-lg-6"><a href="/movie/{{item.id}}/"><img src="{{item.poster}}"></a></div>
-		            <div class="col-lg-6">
-		              <h4><a href="/movie/{{item.id}}/">{{item.ch_name}}</a></h4>
-		              <p>{{item.types}}</p>
-		              <p>{{item.region}}</p>
-		              <p>{{item.release_date}}</p>
-		              <p><span class="douban-color">{{item.score}}</span></p>
-		              <p>{% ifnotequal item.video '无视频' %}
-					    {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-success">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-primary" style="left:40px;">下载</span>
-					      {% endifnotequal %}
-					    {% else %}
-					      {% ifequal item.video_type '预告片' %}
-					      <span class="label label-default">预告</span>
-					      {% else %}
-					      <span class="label label-success">在线</span>
-					      {% endifequal %}
-					      {% ifnotequal item.down_url '无下载' %}
-					      <span class="label label-primary">下载</span>
-					      {% endifnotequal %}
-					    {% endifnotequal %}
-	                  </p>
+	            <div class="panel-body media">
+		            <div class="media-left"><a href="/movie/{{item.id}}/"><img src="{{item.poster}}"></a></div>
+		            <div class="media-body">
+		              <p class="text-smaller">{{item.types|my_slice:3}}</p>
+		              <p class="text-smaller">{{item.region|my_slice:3}}</p>
+		              <p class="text-smaller">{{item.release_date}}</p>
+		              <p class="text-smaller">{{item.intro|slice:'40'}}...<a href="/movie/{{item.id}}/">[详情]</a></p>
 		            </div>
-	              </div>
 	            </div>
 	          </div>
 	        </div>
