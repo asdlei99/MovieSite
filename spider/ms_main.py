@@ -1,16 +1,18 @@
 # coding=utf-8
 from __future__ import division
+
 import random
-import time
-import jieba
+# import jieba
 import re
+import time
+from subprocess import check_output, CalledProcessError
 
 from ms_constants import *
+from ms_exceptions import Warn, Fatal
 from ms_utils import log
 from ms_utils.common import get_html_content, get_webdriver, format_lol_name
 from ms_utils.db_helper import connect_db
 from ms_utils.html_helper import Douban, TextHandler, Lol
-from ms_exceptions import Warn, Fatal
 
 LOG = log.Log()
 Douban = Douban()
@@ -175,7 +177,8 @@ class Movie(Media):
             time.sleep(round(random.uniform(3, 5), 1))
             # 首先判断对应性：1.IMDb链接 || 2.前两个演员
             imdb_match = Douban.compare_imdb(l_content, d_content)
-            actor_match = Douban.compare_actor(l_content, d_content)
+            actor_match = Douban.compare_actor(l_content, d_content, l_name,
+                                               cate_eng)
             if imdb_match or actor_match:
                 if imdb_match:
                     compare_way = 'imdb'
@@ -332,7 +335,8 @@ class Series(Media):
                 # time.sleep(round(random.uniform(3, 5), 1))
                 # 首先判断对应性：1.IMDb链接 || 2.前两个演员（·替换为·） || 3.简介的前几个字
                 imdb = Douban.compare_imdb(l_content, d_content)
-                actor = Douban.compare_actor(l_content, d_content)
+                actor = Douban.compare_actor(l_content, d_content, l_name,
+                                             cate_eng)
                 if imdb:
                     if imdb:
                         compare_way = 'imdb'
@@ -533,6 +537,13 @@ class Main(object):
         :return:
         """
         try:
+            check_output('ps -ef | grep ms_main.py', shell=True)
+        except CalledProcessError as e:
+            LOG.error(str(e))
+            pass
+        else:
+            pass
+        try:
             LOG.info('Fetching lol index page ...')
             l_index_content = get_html_content(
                 'http://www.loldytt.com/', url_log=False).decode(
@@ -567,18 +578,13 @@ class Main(object):
                 if latest_name_url:
                     LOG.write_latest_url(latest_name_url[1], cate_eng)
         except KeyboardInterrupt as e:
-            if self.driver:
-                self.driver.close()
-                self.driver.quit()
-            LOG.debug('Keyboard interrupt')
+            LOG.debug(str(e))
         except Exception as e:
-            if self.driver:
-                self.driver.close()
-                self.driver.quit()
             LOG.debug('Unexpected exit: %s' % str(e))
             raise e
         else:
             LOG.info('更新结束')
+        finally:
             if self.driver:
                 self.driver.close()
                 self.driver.quit()

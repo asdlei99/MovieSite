@@ -1,15 +1,15 @@
 # coding=utf-8
+import random
 import re
 import socket
 import time
-import random
 import urllib2
 
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from ms_constants import WEB_DRIVER_CHROME, WEB_DRIVER_PHANTOMJS, PHANTOMJS, \
-    CHROME, HEADER_CHROME_1, HEADER_FF_1, HEADER_IE_1, HEADERS
+    CHROME, HEADER_CHROME_1, HEADERS
 from ms_exceptions import *
 from ms_utils import log
 

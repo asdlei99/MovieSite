@@ -520,7 +520,8 @@ class Douban(object):
                 LOG.info('无类型信息，默认设为-未知')
         return _type
 
-    def get_douban_text_info(self, content, cate_eng, cate_chn, enable_log=True):
+    def get_douban_text_info(self, content, cate_eng, cate_chn='',
+                             enable_log=True):
         """
         Common info
         :param content:
@@ -942,14 +943,13 @@ class Douban(object):
 
         for item in l_actor.split():
             if item.strip() in d_actor:
-                LOG.info('Actor matches!')
                 actor_matches = True
                 break
 
+        _matches = False
         if actor_matches:
             # TODO: 可能会在同一系列电视剧匹配错误，如果带“第X季”，需要再匹配
             # 一边有第一季，另一边没有
-            _matches = False
             name1, _ = self.get_douban_name_info(d_content, cate_eng,
                                                  enable_log=False)
             pattern = re.compile('^.*?第(.*?)季$', re.S)
@@ -961,6 +961,7 @@ class Douban(object):
                 d_name_s = name1.split()
                 # 1. 都有第X季，必须相同
                 if l_season and d_season:
+                    LOG.debug('Both with season')
                     if len(l_name_s) >= 2 and len(d_name_s) >= 2:
                         # xxxx 第x季 ...
                         contrast_d = {'1': '一', '2': '二', '3': '三', '4': '四',
@@ -977,20 +978,28 @@ class Douban(object):
                                 d_sn = v
                         if l_name_s[0] == d_name_s[0] and l_sn == d_sn:
                             _matches = True
+
                 # 2. 一边有第X季，另一边没有，有可能豆瓣没有，lol有第一季
                 elif l_season and not d_season:
+                    LOG.debug('Lol with season')
                     if l_season[0] in ('一', '1') and l_name_s[0] == d_name_s[0]:
                         _matches = True
                 elif d_season and not l_season:
+                    LOG.debug('Douban with season')
                     if d_season[0] in ('一', '1') and l_name_s[0] == d_name_s[0]:
                         _matches = True
                 else:
                     # 两边都没
+                    LOG.debug('No season for both')
                     _matches = True
-
-                return _matches
+                if _matches:
+                    break
+                else:
+                    LOG.debug('Actor matched, but name not')
+                    continue
         else:
-            return False
+            pass
+        return _matches
 
 
 class Lol(object):
