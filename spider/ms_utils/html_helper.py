@@ -8,7 +8,7 @@ import time
 import urllib
 from random import uniform
 
-from common import get_html_content, get_douban_sn, get_webdriver
+from common import get_html_content, get_douban_sn, format_lol_name
 from ms_constants import DOWNLOAD_IMAGE_PATH, WEB_IMAGE_PATH, MOVIE_NAME_ENG, \
     MOVIE_NAME_CH, NEW_LINE
 from ms_exceptions import *
@@ -910,24 +910,23 @@ class Douban(object):
         else:
             return False
 
-    @staticmethod
-    def compare_actor(content_l, content_d):
+    def compare_actor(self, l_content, d_content, l_name, cate_eng):
         actor_matches = False
         pattern_d_actor = re.compile('>主演.*?: (.*?)<br', re.S)
         pattern1 = '<.*?>'
         try:
-            d_actor = re.findall(pattern_d_actor, content_d)[0]
+            d_actor = re.findall(pattern_d_actor, d_content)[0]
             d_actor = re.sub(pattern1, '', d_actor)
             # d_actor = unicode(d_actor, 'utf-8')
         except IndexError:
             # 豆瓣无主演直接返回
             return False
         try:
-            l_actor = re.findall('<br>主演: (.*?)\/', content_l, re.S)[0]
+            l_actor = re.findall('<br>主演: (.*?)\/', l_content, re.S)[0]
         except IndexError:
             # 尝试另一种匹配
             l_actor = re.findall('<li>主.*?演.*?：(.*?)</li>',
-                                 content_l, re.S)
+                                 l_content, re.S)
             if l_actor:
                 l_actor = l_actor[0]
             else:
@@ -949,7 +948,47 @@ class Douban(object):
 
         if actor_matches:
             # TODO: 可能会在同一系列电视剧匹配错误，如果带“第X季”，需要再匹配
-            pass
+            # 一边有第一季，另一边没有
+            _matches = False
+            name1, _ = self.get_douban_name_info(d_content, cate_eng,
+                                                 enable_log=False)
+            pattern = re.compile('^.*?第(.*?)季$', re.S)
+            for item in l_name.split(r'/'):
+                item = format_lol_name(item)
+                l_season = re.findall(pattern, item)
+                d_season = re.findall(pattern, name1)
+                l_name_s = l_name.split()
+                d_name_s = name1.split()
+                # 1. 都有第X季，必须相同
+                if l_season and d_season:
+                    if len(l_name_s) >= 2 and len(d_name_s) >= 2:
+                        # xxxx 第x季 ...
+                        contrast_d = {'1': '一', '2': '二', '3': '三', '4': '四',
+                                      '5': '五', '6': '六', '7': '七', '8': '八',
+                                      '9': '九', '10': '十', '11': '十一', '12': '十二',
+                                      '13': '十三', '14': '十四', '15': '十五'}
+                        l_sn = l_season[0]
+                        d_sn = d_season[0]
+                        LOG.debug('l_sn: %s, d_sn: %s' % (l_sn, d_sn))
+                        for k, v in contrast_d.items():
+                            if l_sn == k:
+                                l_sn = v
+                            if d_sn == k:
+                                d_sn = v
+                        if l_name_s[0] == d_name_s[0] and l_sn == d_sn:
+                            _matches = True
+                # 2. 一边有第X季，另一边没有，有可能豆瓣没有，lol有第一季
+                elif l_season and not d_season:
+                    if l_season[0] in ('一', '1') and l_name_s[0] == d_name_s[0]:
+                        _matches = True
+                elif d_season and not l_season:
+                    if d_season[0] in ('一', '1') and l_name_s[0] == d_name_s[0]:
+                        _matches = True
+                else:
+                    # 两边都没
+                    _matches = True
+
+                return _matches
         else:
             return False
 

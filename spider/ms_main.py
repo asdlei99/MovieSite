@@ -7,7 +7,7 @@ import re
 
 from ms_constants import *
 from ms_utils import log
-from ms_utils.common import get_html_content, get_webdriver
+from ms_utils.common import get_html_content, get_webdriver, format_lol_name
 from ms_utils.db_helper import connect_db
 from ms_utils.html_helper import Douban, TextHandler, Lol
 from ms_exceptions import Warn, Fatal
@@ -255,24 +255,6 @@ class Series(Media):
             self.ENG_NAME = info[1]
             self.DB_NAME = info[2]
 
-    @staticmethod
-    def _select_name(lol_name):
-        # name_list = lol_name.split('/')
-        # name = ''
-        # if len(name_list) == 1:
-        #     name = lol_name.strip().replace('第', '%20第')
-        # else:
-        #     for item in name_list:
-        #         if '第' in item and '季' in item:
-        #             name = item.strip().replace('第', '%20第')
-        #             break
-        #     if not name:
-        #         name = name_list[1].strip().replace('第', '%20第')
-        # return name
-        lol_name = re.sub('^(.*)\(.*?\)$', r'\1', lol_name)
-        lol_name = re.sub(r'^([^\s]+)(第.*?季.*)$', r'\1 \2', lol_name)
-        return lol_name
-
     def update(self, down_names, down_urls, updated_eps, seq,
                l_url, conn):
         sql_update = ("UPDATE %s" % self.DB_NAME +
@@ -300,7 +282,7 @@ class Series(Media):
 
     def add(self, l_region, l_url, l_name, l_content, conn, driver, cate_eng):
         # 处理lolname
-        search_name = self._select_name(l_name)  # 豆瓣搜索用
+        search_name = format_lol_name(l_name)  # 豆瓣搜索用
         '''
         **Get douban search list**
         '''
@@ -356,7 +338,6 @@ class Series(Media):
                         compare_way = 'imdb'
                     elif actor:
                         compare_way = 'actor'
-
 
                     # 拿到lol页面中一组迅雷url
                     (filename_str,
@@ -591,10 +572,16 @@ class Main(object):
                 self.driver.quit()
             LOG.debug('Keyboard interrupt')
         except Exception as e:
+            if self.driver:
+                self.driver.close()
+                self.driver.quit()
             LOG.debug('Unexpected exit: %s' % str(e))
             raise e
         else:
             LOG.info('更新结束')
+            if self.driver:
+                self.driver.close()
+                self.driver.quit()
             # TODO: send mail
 
 

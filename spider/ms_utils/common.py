@@ -100,6 +100,12 @@ def get_douban_url(sn):
     return 'https://movie.douban.com/subject/%s/' % sn
 
 
+def format_lol_name(name):
+    name = re.sub('^(.*)\(.*?\)$', r'\1', name)
+    name = re.sub(r'^([^\s]+)(第.*?季.*)$', r'\1 \2', name)
+    return name
+
+
 if __name__ == '__main__':
 
     def get_lol_index():
