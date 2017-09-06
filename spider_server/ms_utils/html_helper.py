@@ -41,7 +41,7 @@ class Douban(object):
         self.pattern_intro = re.compile('<span.*?"v:summary".*?>(.*?)</span>',
                                         re.S)
         self.Lol = Lol()
-        
+
         self.current_date = self.get_current_date()
 
     @staticmethod
@@ -357,7 +357,7 @@ class Douban(object):
                             ss = self._get_screenshot_url(cate_eng, filename)
                             ss_list.append(ss)
                             LOG.info('正在保存第%d张截图...' % (saved_num + 1))
-                            with open(os.path.join(download_path, filename), 
+                            with open(os.path.join(download_path, filename),
                                       'wb') as f:
                                 f.write(data)
                             web_path = self._get_image_web_path(cate_eng,

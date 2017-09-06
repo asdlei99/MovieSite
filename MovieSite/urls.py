@@ -10,6 +10,7 @@ from news import views as news_views
 from search import views as search_views
 from bbs import views as bbs_views
 from topic import views as topic_views
+from spider import views as spider_views
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -43,6 +44,7 @@ urlpatterns = [
     url(r'^sitemap2\.xml$', TemplateView.as_view(template_name='sitemap2.xml', content_type='application/xml')),
     url(r'^sitemap3\.xml$', TemplateView.as_view(template_name='sitemap3.xml', content_type='application/xml')),
     url(r'^rss\.xml$', TemplateView.as_view(template_name='rss.xml', content_type='application/xml')),
+    url(r'^crawl/$', spider_views.crawl),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

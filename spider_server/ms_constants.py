@@ -21,12 +21,12 @@ NEW_LINE = '\n'
 
 """ path """
 # need change to the directory where you place the spider in
-WORKSPACE_PATH = r'E:\PycharmProjects\MovieSpider'
+WORKSPACE_PATH = r'E:\PycharmProjects\MovieSite\spider_server'
 LOG_PATH = os.path.join(WORKSPACE_PATH, 'logs')
 DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'images')
 
 # change this to the site's directory .../static/images
-WEB_IMAGE_PATH = r'E:\Eclipse Workspace\MovieSite\static\images'
+WEB_IMAGE_PATH = r'E:\PycharmProjects\MovieSite\static\images'
 
 NEW_PATHS = (WORKSPACE_PATH, DOWNLOAD_IMAGE_PATH)
 
@@ -52,7 +52,7 @@ S_WIDTH = 430
 DB_HOST = '192.168.100.11'
 DB_PORT = 3306
 DB_USER = 'root'
-DB_PASS = 'abcdefg'
+DB_PASS = 'kevin123'
 DB_NAME = 'MovieSite'
 MOVIE_TABLE = 'movie_movie'
 TV_TABLE = 'movie_tv'

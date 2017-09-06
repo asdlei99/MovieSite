@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from ms_constants import WEB_DRIVER_CHROME, WEB_DRIVER_PHANTOMJS, PHANTOMJS, \
-    CHROME, HEADER_CHROME_1, HEADERS, PROXY_HOST, PROXY_PORT, HEADER_FF_1, HEADER_IE_1
+    CHROME, HEADER_CHROME_1, HEADERS
 from ms_exceptions import *
 from ms_utils import log
 
@@ -20,14 +20,14 @@ DEFAULT_TIMEOUT = 180
 
 
 def get_html_content(url, url_log=True):
-    if isinstance(PROXY_HOST, str) and isinstance(PROXY_PORT, int):
-        proxy_info = {'host': PROXY_HOST, 'port': PROXY_PORT}
-        print proxy_info
-        proxy_support = urllib2.ProxyHandler(
-            {'http': 'http://%(host)s:%(port)d' % proxy_info})
-        print {'http': 'http://%(host)s:%(port)d' % proxy_info}
-        opener = urllib2.build_opener(proxy_support)
-        urllib2.install_opener(opener)
+    # if isinstance(PROXY_HOST, str) and isinstance(PROXY_PORT, int):
+    #     proxy_info = {'host': PROXY_HOST, 'port': PROXY_PORT}
+    #     print proxy_info
+    #     proxy_support = urllib2.ProxyHandler(
+    #         {'http': 'http://%(host)s:%(port)d' % proxy_info})
+    #     print {'http': 'http://%(host)s:%(port)d' % proxy_info}
+    #     opener = urllib2.build_opener(proxy_support)
+    #     urllib2.install_opener(opener)
     url = str(url).strip()
     timer = 1
     while True:
@@ -80,23 +80,25 @@ def get_webdriver(set_headers=False, disable_load_image=False, set_proxy=False):
     if PHANTOMJS or CHROME:
         try:
             if PHANTOMJS:
+                print 'PHANTOMJS'
                 if set_headers:
                     dcap["phantomjs.page.settings.userAgent"] = (
                     random.choice(HEADERS))
                 if disable_load_image:
                     dcap["phantomjs.page.settings.loadImages"] = False
-                if set_proxy:
-                    proxy_info = {'host': PROXY_HOST, 'port': PROXY_PORT}
-                    service_args = [
-                        '--proxy=%(host)s:%(port)d' % proxy_info,
-                        '--proxy-type=http',
-                    ]
+                # if set_proxy:
+                #     proxy_info = {'host': PROXY_HOST, 'port': PROXY_PORT}
+                #     service_args = [
+                #         '--proxy=%(host)s:%(port)d' % proxy_info,
+                #         '--proxy-type=http',
+                #     ]
                     # proxy = webdriver.Proxy()
                     # proxy.proxy_type = ProxyType.MANUAL
                     # proxy.http_proxy = random.choice(ips)
                     # proxy.add_to_capabilities(dcap)
-                else:
-                    service_args = None
+                # else:
+                #     service_args = None
+                service_args = None
                 driver = webdriver.PhantomJS(WEB_DRIVER_PHANTOMJS,
                                              desired_capabilities=dcap,
                                              service_args=service_args)
