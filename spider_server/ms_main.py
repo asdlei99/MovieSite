@@ -7,6 +7,9 @@ import re
 import time
 from subprocess import check_output, CalledProcessError
 
+import sys
+sys.path.append('/var/www/html/MovieSite/spider_server')
+
 from ms_constants import *
 from ms_exceptions import Warn, Fatal
 from ms_utils import log
@@ -474,19 +477,16 @@ class Main(object):
         cur.close()
         return num
 
-    def update(self, l_tag, l_url, l_name, cate_eng):
+    def update(self, l_tag, l_url, l_name, l_content, cate_eng):
         """
 
         :param l_tag: l_tag is type of movie or region of tv
         :param l_url:
         :param l_name:
+        :param l_content:
         :param cate_eng:
         :return:
         """
-        l_content = get_html_content(l_url, url_log=False).decode(
-            'gbk', 'ignore').encode('utf8', 'ignore')
-        l_content = str(l_content)
-
         cate_chn = CATES_ENG_CH.get(cate_eng)
         LOG.debug(l_url)
         if cate_eng == MOVIE_NAME_ENG:

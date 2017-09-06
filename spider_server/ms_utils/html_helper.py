@@ -177,6 +177,7 @@ class Douban(object):
                 poster_pattern2 = '"nbgnbg".*?href.*?"(.*?)"'
                 poster_url = re.findall(poster_pattern2, content)[0]
                 filename = re.search(r'.*/(.*)', poster_url).group(1)
+                filename = filename.replace('.webp', '.jpg')
                 # 数据库中海报的url
                 poster = self._get_poster_url(cate_eng, filename)
                 LOG.info('正在保存海报 ...')

@@ -8,7 +8,6 @@ from spider_server.ms_main import Main
 def crawl(request):
     if request.method == 'POST':
         secret = '5826f119-c0bc-4ad7-9017-30369eb75b75'
-        print '123'
         if request.POST.get('secret') == secret:
             l_content = request.POST.get('content', '')
             l_tag = request.POST.get('tag')
@@ -25,5 +24,3 @@ def crawl(request):
                     return HttpResponse('GOOD')
             else:
                 return HttpResponse('BAD')
-    elif request.method == 'GET':
-        print '123'

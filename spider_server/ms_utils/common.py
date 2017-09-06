@@ -101,7 +101,8 @@ def get_webdriver(set_headers=False, disable_load_image=False, set_proxy=False):
                 service_args = None
                 driver = webdriver.PhantomJS(WEB_DRIVER_PHANTOMJS,
                                              desired_capabilities=dcap,
-                                             service_args=service_args)
+                                             service_args=service_args,
+                                             service_log_path=r'E:\\')
                 driver.set_page_load_timeout(DEFAULT_TIMEOUT)
             elif CHROME:
                 driver = webdriver.Chrome(WEB_DRIVER_CHROME)

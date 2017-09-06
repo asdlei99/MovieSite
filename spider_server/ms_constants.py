@@ -21,12 +21,12 @@ NEW_LINE = '\n'
 
 """ path """
 # need change to the directory where you place the spider in
-WORKSPACE_PATH = r'E:\PycharmProjects\MovieSite\spider_server'
+WORKSPACE_PATH = r'G:\PyCharmWorkspace\MovieSite\spider_server'
 LOG_PATH = os.path.join(WORKSPACE_PATH, 'logs')
 DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'images')
 
 # change this to the site's directory .../static/images
-WEB_IMAGE_PATH = r'E:\PycharmProjects\MovieSite\static\images'
+WEB_IMAGE_PATH = r'G:\PyCharmWorkspace\MovieSite\static\images'
 
 NEW_PATHS = (WORKSPACE_PATH, DOWNLOAD_IMAGE_PATH)
 
@@ -40,8 +40,8 @@ PHANTOMJS = True
 CHROME = False
 
 # modify driver's path
-WEB_DRIVER_PHANTOMJS = r'D:\phantomjs-2.1.1-windows\bin\phantomjs.exe'
-WEB_DRIVER_CHROME = r'D:\chromedriver.exe'
+WEB_DRIVER_PHANTOMJS = r'E:\phantomjs.exe'
+WEB_DRIVER_CHROME = r'E:\chromedriver.exe'
 
 """ images """
 P_HEIGHT = 284
@@ -84,7 +84,7 @@ HEADER_IE_1 = {
 }
 
 HEADERS = (HEADER_CHROME_1, HEADER_FF_1, HEADER_IE_1)
-PROXY_HOST = '116.196.101.221'
-PROXY_PORT = 8088
+PROXY_HOST = None
+PROXY_PORT = None
 # PROXY_HOST = '123.57.216.98'
 # PROXY_PORT = 8080

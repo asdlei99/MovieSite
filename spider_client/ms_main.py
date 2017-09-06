@@ -86,7 +86,8 @@ class Main(object):
                                 'secret': '5826f119-c0bc-4ad7-9017-30369eb75b75',
                                 'tag': l_type,
                                 'cate_eng': cate_eng}
-                        r = requests.post('http://127.0.0.1:8000/crawl/',
+                        print 'Request'
+                        r = requests.post('http://www.bigedianying.com/crawl/',
                                           data=data)
                         print 'Response: %s' % r.content
                     except Exception as e:
