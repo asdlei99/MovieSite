@@ -38,6 +38,7 @@ LOG_DEBUG = False
 # only one can be enabled
 PHANTOMJS = True
 CHROME = False
+
 # modify driver's path
 WEB_DRIVER_PHANTOMJS = r'D:\phantomjs-2.1.1-windows\bin\phantomjs.exe'
 WEB_DRIVER_CHROME = r'D:\chromedriver.exe'
