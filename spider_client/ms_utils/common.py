@@ -3,6 +3,7 @@ import re
 import socket
 import time
 import urllib2
+import random
 
 from ms_constants import HEADER_CHROME_1, HEADER_FF_1, HEADER_IE_1, HEADERS
 from ms_exceptions import *
@@ -33,19 +34,19 @@ def get_html_content(url, url_log=True):
             LOG.error('%s：HTTPError %s' % (url, e.code))
             if str(e.code) == '404':
                 raise Http404
-            time.sleep(10)
+            time.sleep(random.uniform(5, 10))
             timer += 1
         except urllib2.URLError as e:
             LOG.error('%s：URLError %s' % (url, e.reason))
-            time.sleep(10)
+            time.sleep(random.uniform(5, 10))
             timer += 1
         except socket.timeout as e:
             LOG.error('%s：%s' % (url, str(e)))
-            time.sleep(10)
+            time.sleep(random.uniform(2, 10))
             timer += 1
         except socket.error as e:
             LOG.error('%s：%s' % (url, str(e)))
-            time.sleep(2)
+            time.sleep(2, 5)
             timer += 1
 
     # for special case

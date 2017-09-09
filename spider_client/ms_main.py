@@ -1,6 +1,7 @@
 # coding=utf-8
 import requests
 import time
+import random
 
 from ms_constants import *
 from ms_exceptions import *
@@ -68,9 +69,10 @@ class Main(object):
                 cate_eng = cate[0]
                 cate_chn = cate[1]
                 all_type_url_name_list = Lol.get_new_urls(l_index_content, cate_chn)
+                LOG.debug('All %ss: %d' % (cate_eng, len(all_type_url_name_list)))
                 to_do_list = self._get_to_do_name_urls(all_type_url_name_list,
                                                        cate_eng)
-
+                LOG.debug('To Do %ss: %d' % (cate_eng, len(all_type_url_name_list)))
                 for index, (l_type, l_url, l_name) in enumerate(to_do_list):
 
                     try:
@@ -86,12 +88,11 @@ class Main(object):
                                 'secret': '5826f119-c0bc-4ad7-9017-30369eb75b75',
                                 'tag': l_type,
                                 'cate_eng': cate_eng}
-                        print 'Request'
+                        print 'Requesting...'
                         r = requests.post('http://www.bigedianying.com/crawl/',
                                           data=data)
                         print 'Response: %s' % r.content
                     except Exception as e:
-                        time.sleep(100)
                         if isinstance(e, Warn):
                             continue
                         elif isinstance(e, Fatal):
@@ -100,7 +101,7 @@ class Main(object):
                             LOG.error('Update failed: %s' % str(e))
                             continue
                     finally:
-                        time.sleep(1.5)
+                        time.sleep(random.uniform(5, 15))
                 # 记录
                 latest_name_url = to_do_list[0] if to_do_list else None
                 if latest_name_url:
@@ -111,7 +112,7 @@ class Main(object):
             LOG.debug('Unexpected exit: %s' % str(e))
             raise e
         else:
-            LOG.info('更新结束')
+            LOG.info('Update End')
         # finally:
         #     if self.driver:
         #         self.driver.close()
