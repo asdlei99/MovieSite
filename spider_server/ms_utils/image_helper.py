@@ -2,7 +2,7 @@
 from __future__ import division
 from PIL import Image
 from ms_constants import P_HEIGHT, P_WIDTH, S_HEIGHT, S_WIDTH
-from ms_utils import log
+import log
 import os
 
 LOG = log.Log()

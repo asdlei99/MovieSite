@@ -2,7 +2,7 @@
 import MySQLdb
 
 from ms_constants import DB_PASS, DB_NAME, DB_PORT, DB_USER, DB_HOST
-from ms_utils import log
+import log
 
 Log = log.Log()
 

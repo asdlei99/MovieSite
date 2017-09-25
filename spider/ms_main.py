@@ -41,7 +41,6 @@ class Media(object):
         LOG.debug('d_type: %s, l_type: %s' % (d_type, l_type))
         return True if l_type in d_type else False
 
-
     @staticmethod
     def region_matches(d_region, l_region):
         """

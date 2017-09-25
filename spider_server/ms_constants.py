@@ -21,27 +21,27 @@ NEW_LINE = '\n'
 
 """ path """
 # need change to the directory where you place the spider in
-WORKSPACE_PATH = r'G:\PyCharmWorkspace\MovieSite\spider_server'
+WORKSPACE_PATH = 'E:\PycharmProjects\MovieSite\spider'
 LOG_PATH = os.path.join(WORKSPACE_PATH, 'logs')
 DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'images')
 
 # change this to the site's directory .../static/images
-WEB_IMAGE_PATH = r'G:\PyCharmWorkspace\MovieSite\static\images'
+WEB_IMAGE_PATH = 'E:\PycharmProjects\MovieSite\spider\web_images'
 
 NEW_PATHS = (WORKSPACE_PATH, DOWNLOAD_IMAGE_PATH)
 
 """ log """
 LOL_LINK_FILE = os.path.join(LOG_PATH, 'lol_%s_link.log')
 UPDATE_SCORE_PATH = os.path.join('logs', 'update_score')
-LOG_DEBUG = False
+LOG_DEBUG = True
 
 # only one can be enabled
 PHANTOMJS = True
 CHROME = False
-
 # modify driver's path
-WEB_DRIVER_PHANTOMJS = r'E:\phantomjs.exe'
-WEB_DRIVER_CHROME = r'E:\chromedriver.exe'
+WEB_DRIVER_PHANTOMJS = r'D:\phantomjs-2.1.1-windows\bin\phantomjs.exe'
+PHANTOMJS_LOG = r'D:\phantomjs-2.1.1-windows\ghostdriver.log'
+WEB_DRIVER_CHROME = r'D:\chromedriver.exe'
 
 """ images """
 P_HEIGHT = 284
