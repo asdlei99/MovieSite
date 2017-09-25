@@ -9,9 +9,10 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from ms_constants import WEB_DRIVER_CHROME, WEB_DRIVER_PHANTOMJS, PHANTOMJS, \
-    CHROME, HEADER_CHROME_1, HEADERS
+    CHROME, HEADER_CHROME_1, HEADERS, PHANTOMJS_LOG
 from ms_exceptions import *
-from ms_utils import log
+import log
+
 
 LOG = log.Log()
 
@@ -80,7 +81,7 @@ def get_webdriver(set_headers=False, disable_load_image=False, set_proxy=False):
     if PHANTOMJS or CHROME:
         try:
             if PHANTOMJS:
-                print 'PHANTOMJS'
+                service_args = None
                 if set_headers:
                     dcap["phantomjs.page.settings.userAgent"] = (
                     random.choice(HEADERS))
@@ -96,13 +97,10 @@ def get_webdriver(set_headers=False, disable_load_image=False, set_proxy=False):
                     # proxy.proxy_type = ProxyType.MANUAL
                     # proxy.http_proxy = random.choice(ips)
                     # proxy.add_to_capabilities(dcap)
-                # else:
-                #     service_args = None
-                service_args = None
                 driver = webdriver.PhantomJS(WEB_DRIVER_PHANTOMJS,
                                              desired_capabilities=dcap,
-                                             service_args=service_args,
-                                             service_log_path=r'E:\\')
+                                             service_log_path=PHANTOMJS_LOG,
+                                             service_args=service_args)
                 driver.set_page_load_timeout(DEFAULT_TIMEOUT)
             elif CHROME:
                 driver = webdriver.Chrome(WEB_DRIVER_CHROME)
@@ -125,12 +123,6 @@ def get_douban_sn(d_url):
 
 def get_douban_url(sn):
     return 'https://movie.douban.com/subject/%s/' % sn
-
-
-def format_lol_name(name):
-    name = re.sub('^(.*)\(.*?\)$', r'\1', name)
-    name = re.sub(r'^([^\s]+)(第.*?季.*)$', r'\1 \2', name)
-    return name
 
 
 if __name__ == '__main__':

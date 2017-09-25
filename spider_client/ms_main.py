@@ -2,12 +2,14 @@
 import requests
 import time
 import random
+import re
 
 from ms_constants import *
 from ms_exceptions import *
 from ms_utils.common import get_html_content
 from ms_utils.html_helper import Lol
 from ms_utils.log import Log
+from spider.ms_main import Main as Server_Main
 
 Lol = Lol()
 LOG = Log()
@@ -29,6 +31,12 @@ class Main(object):
         # get driver
         # LOG.info('Initializing drivers ...')
         # self.driver = get_webdriver()
+
+    @staticmethod
+    def _format_lol_name(name):
+        name = re.sub('^(.*)\(.*?\)$', r'\1', name, re.U)
+        name = re.sub('^(.*?)(第.*?季.*)$', r'\1 \2', name, re.U)
+        return name
 
     @staticmethod
     def _get_to_do_name_urls(all_type_url_name_list, cate_eng):
@@ -69,19 +77,23 @@ class Main(object):
                 cate_eng = cate[0]
                 cate_chn = cate[1]
                 all_type_url_name_list = Lol.get_new_urls(l_index_content, cate_chn)
-                LOG.debug('All %ss: %d' % (cate_eng, len(all_type_url_name_list)))
+                print 'All %ss: %d' % (cate_eng, len(all_type_url_name_list))
                 to_do_list = self._get_to_do_name_urls(all_type_url_name_list,
                                                        cate_eng)
-                LOG.debug('To Do %ss: %d' % (cate_eng, len(all_type_url_name_list)))
+                print 'To Do %ss: %d' % (cate_eng, len(all_type_url_name_list))
                 for index, (l_type, l_url, l_name) in enumerate(to_do_list):
-
                     try:
                         # start update
                         LOG.split_line(index+1)
                         # start job
                         l_content = get_html_content(l_url).decode(
                             'gbk', 'ignore').encode('utf8', 'ignore')
+                        l_name = self._format_lol_name(l_name)
 
+                        # #
+                        # Server_Main().update(l_type, l_url, l_name, l_content, cate_eng)
+
+                        #
                         data = {'name': l_name,
                                 'url': l_url,
                                 'content': l_content,

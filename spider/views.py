@@ -1,6 +1,6 @@
 from django.shortcuts import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from spider_server.ms_main import Main
+from ms_main import Main
 # Create your views here.
 
 
@@ -24,3 +24,6 @@ def crawl(request):
                     return HttpResponse('GOOD')
             else:
                 return HttpResponse('BAD')
+
+
+    

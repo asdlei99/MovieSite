@@ -5,17 +5,15 @@ import random
 # import jieba
 import re
 import time
-from subprocess import check_output, CalledProcessError
+# from subprocess import check_output, CalledProcessError
 
-import sys
-sys.path.append('/var/www/html/MovieSite/spider_server')
 
 from ms_constants import *
 from ms_exceptions import Warn, Fatal
-from ms_utils import log
-from ms_utils.common import get_html_content, get_webdriver, format_lol_name
-from ms_utils.db_helper import connect_db
-from ms_utils.html_helper import Douban, TextHandler, Lol
+import log
+from common import get_html_content, get_webdriver
+from db_helper import connect_db
+from html_helper import Douban, TextHandler, Lol
 
 LOG = log.Log()
 Douban = Douban()
@@ -288,7 +286,8 @@ class Series(Media):
 
     def add(self, l_region, l_url, l_name, l_content, conn, driver, cate_eng):
         # 处理lolname
-        search_name = format_lol_name(l_name)  # 豆瓣搜索用
+        # search_name = format_lol_name(l_name)  # 豆瓣搜索用
+        search_name = l_name
         '''
         **Get douban search list**
         '''
@@ -296,7 +295,6 @@ class Series(Media):
         db_value = ()
         douban_name_url_list = list()
         try:
-
             douban_name_url_list = Douban.get_douban_search_result(
                 search_name, driver)
             if not douban_name_url_list and '第一季' in search_name:
@@ -325,6 +323,7 @@ class Series(Media):
         '''
         # 对series进行循环，判断正确性
         if not not_match:
+            LOG.debug('douban_name_url_list length: %s' % len(douban_name_url_list))
             LOG.info('正在匹配 ...')
             cate_chn = CATES_ENG_CH.get(cate_eng)
             filename_str = str()
@@ -332,19 +331,29 @@ class Series(Media):
             eps_num = 0
             seq = 0
             compare_way = ''
+            LOG.debug('douban_name_url_list: %s' % str(douban_name_url_list))
             for d_url in douban_name_url_list:  # 对搜索结果的电影进行逐一判断
+                LOG.debug('豆瓣详情页: %s' % str(d_url))
                 db_value = None
-                d_content = get_html_content(d_url, url_log=False)
+                try:
+                    d_content = get_html_content(d_url, url_log=False)
+                    LOG.debug('详情页长度为：%d' % len(d_content))
+                except Exception as e:
+                    LOG.debug('matching exception: %s' % str(e))
+                    raise
                 # time.sleep(round(random.uniform(3, 5), 1))
                 # 首先判断对应性：1.IMDb链接 || 2.前两个演员（·替换为·） || 3.简介的前几个字
                 imdb = Douban.compare_imdb(l_content, d_content)
-                actor = Douban.compare_actor(l_content, d_content, l_name,
-                                             cate_eng)
-                if imdb:
+                actor = Douban.compare_actor(l_content, d_content, l_name)
+                LOG.info('IMDB: %s' % imdb)
+                LOG.info('ACTOR: %s' % actor)
+                if imdb or actor:
                     if imdb:
                         compare_way = 'imdb'
+                        LOG.info('IMDB matching')
                     elif actor:
                         compare_way = 'actor'
+                        LOG.info('actor matching')
 
                     # 拿到lol页面中一组迅雷url
                     (filename_str,
@@ -355,16 +364,19 @@ class Series(Media):
                                                       cate_chn, thunder_str,
                                                       filename_str, eps_num, seq,
                                                       compare_way)
+
                 elif Douban.compare_name(search_name, d_content, cate_eng):
                     (filename_str,
                      thunder_str,
                      eps_num, seq) = Lol.series_get_down_urls(l_content)
                     compare_way = 'name'
+                    LOG.info('name matching')
                     db_value = Douban.get_series_info(d_url, d_content, conn,
                                                       l_url, cate_eng,
                                                       cate_chn, thunder_str,
                                                       filename_str, eps_num, seq,
                                                       compare_way)
+
                 else:
                     # d_name, _ = Douban.get_douban_name_info(d_content, cate_eng,
                     #                                         enable_log=False)
@@ -378,11 +390,13 @@ class Series(Media):
                     #                                       seq)
                     # else:
                     #     continue
+                    LOG.info('Not matching')
                     continue
 
                 if db_value and db_value == 'continue':
                     continue
                 else:
+                    LOG.debug('dbvalue is not "continue"')
                     break
 
             if db_value == '%s_exists' % self.ENG_NAME:
@@ -489,7 +503,6 @@ class Main(object):
         """
         try:
             cate_chn = CATES_ENG_CH.get(cate_eng)
-            LOG.debug(l_url)
             if cate_eng == MOVIE_NAME_ENG:
                 # for movie
                 movie = Movie()
@@ -526,9 +539,10 @@ class Main(object):
             self.new_operation.append(self.operation(op_type, result, l_url,
                                                      l_name, cate_eng, cate_chn))
         except Exception as e:
+            LOG.debug('Update Exception: %s' % str(e))
             self.driver.close()
             self.driver.quit()
-            LOG.debug('Exception: %s' % str(e))
+            raise e
         else:
             self.driver.close()
             self.driver.quit()
@@ -544,13 +558,13 @@ class Main(object):
         Spider Entrance
         :return:
         """
-        try:
-            check_output('ps -ef | grep ms_main.py', shell=True)
-        except CalledProcessError as e:
-            LOG.error(str(e))
-            pass
-        else:
-            pass
+        # try:
+        #     check_output('ps -ef | grep ms_main.py', shell=True)
+        # except CalledProcessError as e:
+        #     LOG.error(str(e))
+        #     pass
+        # else:
+        #     pass
         try:
             LOG.info('Fetching lol index page ...')
             l_index_content = get_html_content(
@@ -568,10 +582,17 @@ class Main(object):
                 for index, (l_type, l_url, l_name) in enumerate(to_do_list):
                     # 需要更新时间使目录名一致
                     Douban.update_current_date()
+                    l_content = get_html_content(
+                        url=l_url, url_log=False).decode(
+                        'gbk', 'ignore').encode('utf8', 'ignore')
                     try:
                         # start update
                         LOG.split_line(index+1)
-                        self.update(l_type, l_url, l_name, cate_eng)
+                        self.update(l_tag=l_type,
+                                    l_url=l_url,
+                                    l_name=l_name,
+                                    l_content=l_content,
+                                    cate_eng=cate_eng)
                         time.sleep(1.5)
                     except Exception as e:
                         if isinstance(e, Warn):
