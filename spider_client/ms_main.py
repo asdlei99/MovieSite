@@ -81,7 +81,7 @@ class Main(object):
                 print 'All %ss: %d' % (cate_eng, len(all_type_url_name_list))
                 to_do_list = self._get_to_do_name_urls(all_type_url_name_list,
                                                        cate_eng)
-                print 'To Do %ss: %d' % (cate_eng, len(all_type_url_name_list))
+                print 'To Do %ss: %d' % (cate_eng, len(to_do_list))
                 for index, (l_type, l_url, l_name) in enumerate(to_do_list):
                     try:
                         # start update

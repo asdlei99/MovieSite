@@ -67,61 +67,6 @@ class Media(object):
             LOG.debug('region match 2')
             return True
 
-    """
-    def name_matches(self, d_name, l_name):
-        # pre process
-        l_name = self.clean_lol_name(l_name)
-        l_name1, l_name2 = None, None
-        for item in ('/', '\\'):
-            if item in l_name:
-                res = l_name.split(item)
-                if len(res) == 2:
-                    l_name1, l_name2 = res
-                    break
-                else:
-                    pass
-
-        if l_name1 and l_name2:
-            l_names = [l_name1, l_name2]
-        else:
-            l_names = [l_name]
-        for l_name in l_names:
-            # jieba
-            l_cut = [item for item in jieba.cut(l_name)]
-            d_cut = [item for item in jieba.cut(d_name)]
-            # 移除特殊字符
-            sy_list = (u':', u'：', u'.', u'。', u',', u'，', u'(', u'（', u')',
-                       u'）', u'[', u'【', u']', u'】', u'-', u'——')
-            for item in (d_cut, l_cut):
-                for s in sy_list:
-                    if s in item:
-                        item.remove(s)
-            # 计算匹配率
-            # TODO，有第X季，及1,2,3等不准
-            is_in = 0
-            is_not_in = 0
-            for item in l_cut:
-                if item in d_cut:
-                    is_in += 1
-                else:
-                    is_not_in += 1
-            for item in d_cut:
-                if item in l_cut:
-                    is_in += 1
-                else:
-                    is_not_in += 1
-
-            rate = is_in / (is_in + is_not_in)
-            res = True if rate > 0.8 else False
-            LOG.info('名字匹配%s 匹配度%.2f%%' % (res, round(rate, 4) * 100))
-            if res:
-                return res
-            else:
-                continue
-        res = False
-        return res
-    """
-
 
 class Movie(Media):
     """
@@ -153,7 +98,8 @@ class Movie(Media):
             cur.execute(sqli, db_value)
             conn.commit()
             cur.close()
-        except Exception:
+        except Exception as e:
+            LOG.error(str(e))
             return False
         else:
             return True
@@ -186,41 +132,18 @@ class Movie(Media):
                 # 可能会由于电影存在而进行link_addr更新
                 db_value = Douban.get_movie_info(d_url, d_content, l_url,
                                                  l_content, compare_way, conn)
-                if db_value == 'continue':
-                    continue
-                else:
-                    break  # 找到后跳出对搜索列表的循环
             elif Douban.compare_name(l_name, d_content, cate_eng):
-                # d_type = Douban.get_type(d_content, enable_log=False)
-                # if self.type_matches(d_type, l_type) or len(l_name) > 3:
-                #     db_value = Douban.get_movie_info(d_url, d_content, l_url,
-                #                                      l_content, conn)
-                #     if db_value == 'continue':
-                #         continue
-                #     else:
-                #         break  # 找到后跳出对搜索列表的循环
-                # else:
-                #     continue
                 compare_way = 'name'
                 db_value = Douban.get_movie_info(d_url, d_content, l_url,
                                                  l_content, compare_way, conn)
-                if db_value == 'continue':
-                    continue
-                else:
-                    break  # 找到后跳出对搜索列表的循环
             else:
-                # d_name, _ = Douban.get_douban_name_info(d_content, cate_eng,
-                #                                         enable_log=False)
-                # d_type = Douban.get_type(d_content, enable_log=False)
-                # if self.name_matches(d_name, l_name) and self.type_matches(
-                #         d_type, l_type):
-                #     db_value = Douban.get_movie_info(d_url, d_content, l_url,
-                #                                      l_content, conn)
-                #     if db_value == 'movie_exists':
-                #         return db_value
-                #     elif db_value == 'continue':
-                #         continue
-                pass
+                LOG.debug('Not matching')
+                continue
+
+            if db_value == 'continue':
+                continue
+            else:
+                break  # 找到后跳出对搜索列表的循环
 
         sqli = ("INSERT INTO " + MOVIE_TABLE + " (ch_name,foreign_name,year,"
                                                "director,"
@@ -230,10 +153,13 @@ class Movie(Media):
                 "link_addr,douban_sn,imdb_sn,compare_way,visit_count,week_visit_count,"
                                                "month_visit_count,"
                 "create_date,update_date,cate) VALUES(%s" + ",%s" * 35 + ")")
-        if db_value:
+        if db_value and isinstance(db_value, tuple):
             cur = conn.cursor()
             cur.execute(sqli, db_value)
             conn.commit()
+            return True
+        elif db_value == 'movie_exists':
+            # updated already
             return True
         else:
             LOG.debug('db_value: %s' % str(db_value))
@@ -260,8 +186,8 @@ class Series(Media):
     def update(self, down_names, down_urls, updated_eps, seq,
                l_url, conn):
         sql_update = ("UPDATE %s" % self.DB_NAME +
-                " SET down_names=%s,down_urls=%s,updated_eps=%s," +
-                "seq=%s WHERE link_addr=%s")
+                      " SET down_names=%s,down_urls=%s,updated_eps=%s," +
+                      "seq=%s WHERE link_addr=%s")
         sql1 = "SELECT down_names FROM %s " % self.DB_NAME + "WHERE link_addr=%s"
         cur = conn.cursor()
         cur.execute(sql1, (l_url,))
@@ -275,7 +201,8 @@ class Series(Media):
                 cur.execute(sql_update, db_value)
                 conn.commit()
                 cur.close()
-            except Exception:
+            except Exception as e:
+                LOG.error(str(e))
                 return False
             else:
                 return True
@@ -313,7 +240,7 @@ class Series(Media):
                 LOG.info_record(l_name, l_url)
         except Exception as e:
             not_match = True
-            LOG.info('Querying Failed')
+            LOG.info('Querying Failed: %s' % str(e))
             LOG.info_record(l_name, l_url)
 
         '''
@@ -376,18 +303,6 @@ class Series(Media):
                                                       compare_way)
 
                 else:
-                    # d_name, _ = Douban.get_douban_name_info(d_content, cate_eng,
-                    #                                         enable_log=False)
-                    # d_region = Douban.get_region(d_content, enable_log=False)
-                    # if self.name_matches(d_name, l_name) and self.region_matches(
-                    #         d_region, l_region):
-                    #     db_value = Douban.get_series_info(d_url, d_content, conn,
-                    #                                       l_url, cate_eng,
-                    #                                       cate_chn, thunder_str,
-                    #                                       filename_str, eps_num,
-                    #                                       seq)
-                    # else:
-                    #     continue
                     LOG.info('Not matching')
                     continue
 
@@ -549,7 +464,7 @@ class Main(object):
     @staticmethod
     def operation(op_type, state, l_url, l_name, cate_eng, cate_chn):
         assert op_type in ('添加', '更新')
-        return {'type': op_type, 'state': state, 'l_url':l_url, 'l_name': l_name,
+        return {'type': op_type, 'state': state, 'l_url': l_url, 'l_name': l_name,
                 'cate_eng': cate_eng, 'cate_chn': cate_chn}
 
     def start(self):

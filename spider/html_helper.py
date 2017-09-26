@@ -288,6 +288,7 @@ class Douban(object):
                                              r'\1photo\2jpg', ss_thumb_url)
                     filename = re.search('.*\/(.*)', ss_instance_url).group(1)
                     if filename not in filename_list:
+                        LOG.debug('ss_instance_url: %s' % ss_instance_url)
                         try:
                             u = urllib.urlopen(ss_instance_url)
                             data = u.read()
@@ -296,17 +297,20 @@ class Douban(object):
 
                         filename_list.append(filename)
                         ss = self._get_screenshot_url(cate_eng, filename)
-                        ss_list.append(ss)
 
                         LOG.info('正在保存第%d张截图...' % (saved_num + 1))
-                        with open(os.path.join(download_path,
-                                               filename), 'wb') as f:
-                            f.write(data)
-
-                        # edit image
-                        web_path = self._get_image_web_path(cate_eng, image_type)
-                        IP.edit_screenshot(download_path, filename, web_path)
-                        saved_num += 1
+                        try:
+                            with open(os.path.join(download_path,
+                                                   filename), 'wb') as f:
+                                f.write(data)
+                            # edit image
+                            web_path = self._get_image_web_path(cate_eng, image_type)
+                            IP.edit_screenshot(download_path, filename, web_path)
+                        except Exception as e:
+                            LOG.error('Edit image failed: %s' % str(e))
+                        else:
+                            ss_list.append(ss)
+                            saved_num += 1
                         time.sleep(1)
                         if saved_num == 4:
                             ss_not_found = False
@@ -351,6 +355,7 @@ class Douban(object):
                             r'\1photo\2jpg', ss_thumb_url)
                         filename = re.search('.*\/(.*)', ss_instance_url).group(1)
                         if filename not in filename_list:
+                            LOG.debug('ss_instance_url: %s' % ss_instance_url)
                             try:
                                 u = urllib.urlopen(ss_instance_url)
                                 data = u.read()
@@ -359,15 +364,20 @@ class Douban(object):
 
                             filename_list.append(filename)
                             ss = self._get_screenshot_url(cate_eng, filename)
-                            ss_list.append(ss)
+
                             LOG.info('正在保存第%d张截图...' % (saved_num + 1))
-                            with open(os.path.join(download_path, filename),
-                                      'wb') as f:
-                                f.write(data)
-                            web_path = self._get_image_web_path(cate_eng,
-                                                                image_type)
-                            IP.edit_screenshot(download_path, filename, web_path)
-                            saved_num += 1
+                            try:
+                                with open(os.path.join(download_path,
+                                                       filename), 'wb') as f:
+                                    f.write(data)
+                                # edit image
+                                web_path = self._get_image_web_path(cate_eng, image_type)
+                                IP.edit_screenshot(download_path, filename, web_path)
+                            except Exception as e:
+                                LOG.error('Edit image failed: %s' % str(e))
+                            else:
+                                saved_num += 1
+                                ss_list.append(ss)
                             time.sleep(1)
                             if saved_num == 4:
                                 ss_not_found = False
@@ -404,6 +414,7 @@ class Douban(object):
                                              r'\1photo\2jpg', ss_thumb_url)
                     filename = re.search('.*\/(.*)', ss_instance_url).group(1)
                     if filename not in filename_list:
+                        LOG.debug('ss_instance_url: %s' % ss_instance_url)
                         try:
                             u = urllib.urlopen(ss_instance_url)
                             data = u.read()
@@ -412,14 +423,20 @@ class Douban(object):
 
                         filename_list.append(filename)
                         ss = self._get_screenshot_url(cate_eng, filename)
-                        ss_list.append(ss)
+
                         LOG.info('正在保存第%d张截图...' % (saved_num + 1))
-                        with open(os.path.join(
-                                download_path, filename), 'wb') as f:
-                            f.write(data)
-                        web_path = self._get_image_web_path(cate_eng, image_type)
-                        IP.edit_screenshot(download_path, filename, web_path)
-                        saved_num += 1
+                        try:
+                            with open(os.path.join(download_path,
+                                                   filename), 'wb') as f:
+                                f.write(data)
+                            # edit image
+                            web_path = self._get_image_web_path(cate_eng, image_type)
+                            IP.edit_screenshot(download_path, filename, web_path)
+                        except Exception as e:
+                            LOG.error('Edit image failed: %s' % str(e))
+                        else:
+                            saved_num += 1
+                            ss_list.append(ss)
                         time.sleep(1)
                         if saved_num == 4:
                             ss_not_found = False
@@ -717,26 +734,30 @@ class Douban(object):
     def get_movie_info(self, d_url, d_content, l_url, l_content, compare_way, conn):
 
         text_info = self.get_douban_text_info(d_content, MOVIE_NAME_ENG,
-                                             MOVIE_NAME_CH)
+                                              MOVIE_NAME_CH)
         if not isinstance(text_info, tuple):
             return text_info
         (name1, name2, year, director, screenwriter, actor, mtype,
          region, date_show, date, running_time, score, othername, imdb,
          intro) = text_info
-        director_condition = None
-        actor_condition = None
         cur = conn.cursor()
+        _id = None
         if director:
+            # 中文英文名相同，且导演相同
             sql_director = ('SELECT id FROM movie_movie WHERE ch_name="%s" '
                              'and foreign_name="%s" and director="%s"'
                              % (name1, name2, director))
-            director_condition = cur.execute(sql_director)
+            cur.execute(sql_director)
+            res = cur.fetchone()
+            _id = res[0] if res else None
         elif actor:
             # 一般不可能同一个演员出演多部名字相同的电影
             sql_actor = ('SELECT id FROM movie_movie WHERE ch_name="%s" '
                          'and foreign_name="%s" and actor LIKE "%%%s%%"'
                          % (name1, name2, actor.split('/')[0]))
-            actor_condition = cur.execute(sql_actor)
+            cur.execute(sql_actor)
+            res = cur.fetchone()
+            _id = res[0] if res else None
 
         # urls
         args = self.Lol.get_movie_down_urls(l_content)
@@ -745,21 +766,15 @@ class Douban(object):
         down_name2 = args[2]
         down_url2 = args[3]
 
-        if director_condition or actor_condition:
-            _id = None
-            if director_condition:
-                _id = director_condition.fetchone()[0]
-            elif actor_condition:
-                _id = actor_condition.fetchone()[0]
-            if _id:
-                sql_u = ('UPDATE movie_movie SET down_url=%s,down_name=%s,'
-                        'down_url2=%s,down_name2=%s,link_addr=%s WHERE id="%s"')
-                cur.execute(sql_u,
-                            (down_url1, down_name1, down_url2, down_name2,
-                             l_url, name1, name2, _id))
-                conn.commit()
-                LOG.info('《%s》更新成功' % name1)
-                return 'movie_exists'
+        if _id:
+            sql_u = ('UPDATE movie_movie SET down_url=%s,down_name=%s,'
+                    'down_url2=%s,down_name2=%s,link_addr=%s WHERE id="%s"')
+            cur.execute(sql_u,
+                        (down_url1, down_name1, down_url2, down_name2,
+                         l_url, _id))
+            conn.commit()
+            LOG.info('《%s》更新成功' % name1)
+            return 'movie_exists'
         cur.close()
 
         # 海报
@@ -866,14 +881,27 @@ class Douban(object):
         d_name_list = filter(lambda x: x, d_name_list)
         LOG.debug('d_name_list: %s' % str(d_name_list))
         for d_name in d_name_list:
-            l_name_tmp = []
             if len(l_name.split(r'/')) > 1:
-
+                season_str = str()
                 for _name in l_name.split(r'/'):
-                    if re.findall(r'.*?第.*?季$', _name, re.S):
-                        l_name_tmp = [_name.strip()]
+                    res = re.findall(r'.*?(第.*?季)$', _name, re.S)
+                    if res:
+                        season_str = res[0]
                         break
-
+                l_name_tmp = list()
+                if season_str:
+                    for _name in l_name.split(r'/'):
+                        # Get season info if any of titles associated with
+                        res = re.findall(r'.*?(第.*?季)$', _name, re.S)
+                        if res:
+                            l_name_tmp.append(_name.strip())
+                        else:
+                            l_name_tmp.append('%s %s' % (_name.strip(), season_str))
+                else:
+                    l_name_tmp = [item.strip() for item in l_name.split(r'/')]
+            else:
+                l_name_tmp = [l_name]
+            LOG.debug('l_name_tmp: %s' % str(l_name_tmp))
             for l_item in l_name_tmp:
                 # l_item = l_item.decode('gbk').encode('utf-8')
                 LOG.debug('-----------name comparing-----------')
@@ -987,60 +1015,6 @@ class Douban(object):
                 actor_matches = True
                 break
         return actor_matches
-        # _matches = False
-        # if actor_matches:
-        #     # TODO: 可能会在同一系列电视剧匹配错误，如果带“第X季”，需要再匹配
-        #     # 一边有第一季，另一边没有
-        #     name1, _ = self.get_douban_name_info(d_content, cate_eng,
-        #                                          enable_log=False)
-        #     pattern = re.compile('^.*?第(.*?)季$', re.S)
-        #     for item in l_name.split(r'/'):
-        #         # item = format_lol_name(item)
-        #         l_season = re.findall(pattern, item)
-        #         d_season = re.findall(pattern, name1)
-        #         l_name_s = l_name.split()
-        #         d_name_s = name1.split()
-        #         # 1. 都有第X季，必须相同
-        #         if l_season and d_season:
-        #             LOG.debug('Both with season')
-        #             if len(l_name_s) >= 2 and len(d_name_s) >= 2:
-        #                 # xxxx 第x季 ...
-        #                 contrast_d = {'1': '一', '2': '二', '3': '三', '4': '四',
-        #                               '5': '五', '6': '六', '7': '七', '8': '八',
-        #                               '9': '九', '10': '十', '11': '十一', '12': '十二',
-        #                               '13': '十三', '14': '十四', '15': '十五'}
-        #                 l_sn = l_season[0]
-        #                 d_sn = d_season[0]
-        #                 LOG.debug('l_sn: %s, d_sn: %s' % (l_sn, d_sn))
-        #                 for k, v in contrast_d.items():
-        #                     if l_sn == k:
-        #                         l_sn = v
-        #                     if d_sn == k:
-        #                         d_sn = v
-        #                 if l_name_s[0] == d_name_s[0] and l_sn == d_sn:
-        #                     _matches = True
-        #
-        #         # 2. 一边有第X季，另一边没有，有可能豆瓣没有，lol有第一季
-        #         elif l_season and not d_season:
-        #             LOG.debug('Lol with season')
-        #             if l_season[0] in ('一', '1') and l_name_s[0] == d_name_s[0]:
-        #                 _matches = True
-        #         elif d_season and not l_season:
-        #             LOG.debug('Douban with season')
-        #             if d_season[0] in ('一', '1') and l_name_s[0] == d_name_s[0]:
-        #                 _matches = True
-        #         else:
-        #             # 两边都没
-        #             LOG.debug('No season for both')
-        #             _matches = True
-        #         if _matches:
-        #             break
-        #         else:
-        #             LOG.debug('Actor matched, but name not')
-        #             continue
-        # else:
-        #     pass
-        # return _matches
 
 
 class Lol(object):
@@ -1411,8 +1385,4 @@ class TextHandler(object):
 
 
 if __name__ == '__main__':
-    l_content = get_html_content('http://www.loldytt.com/Anime/MWZWHTD/')
-    name_url_list, seq = Lol()._get_series_name_url_list(l_content)
-    for k,v in name_url_list:
-        print k
-        print v
+    pass
