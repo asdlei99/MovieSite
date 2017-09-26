@@ -47,7 +47,7 @@ class Log(object):
     def split_line(self, with_tip_center='',
                    enable_print=True, path=None, filename='main.log'):
         _ = '-'*20
-        content = '%s%s%s' % (_, with_tip_center, _)
+        content = '%s%s%s' % (_, str(with_tip_center), _)
         assert isinstance(content, (str, unicode))
         _path = path if path else LOG_PATH
         if enable_print:

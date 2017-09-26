@@ -3,14 +3,13 @@ import requests
 import time
 import random
 import re
-import chardet
 
 from ms_constants import *
 from ms_exceptions import *
 from ms_utils.common import get_html_content
 from ms_utils.html_helper import Lol
 from ms_utils.log import Log
-from spider.ms_main import Main as Server_Main
+
 
 Lol = Lol()
 LOG = Log()
@@ -78,14 +77,12 @@ class Main(object):
                 cate_eng = cate[0]
                 cate_chn = cate[1]
                 all_type_url_name_list = Lol.get_new_urls(l_index_content, cate_chn)
-                print 'All %ss: %d' % (cate_eng, len(all_type_url_name_list))
                 to_do_list = self._get_to_do_name_urls(all_type_url_name_list,
                                                        cate_eng)
-                print 'To Do %ss: %d' % (cate_eng, len(to_do_list))
                 for index, (l_type, l_url, l_name) in enumerate(to_do_list):
                     try:
                         # start update
-                        LOG.split_line(index+1)
+                        LOG.split_line('%s %s/%s' % (cate_chn, index+1, len(to_do_list)))
                         # start job
                         l_content = get_html_content(l_url).decode(
                             'gbk', 'ignore').encode('utf-8')

@@ -814,6 +814,7 @@ class Douban(object):
         # common info
         text_info = self.get_douban_text_info(content, cate_eng, cate_chn)
         if not isinstance(text_info, tuple):
+
             return text_info
         (name1, name2, year, director, screenwriter, actor, mtype,
          region, date_show, date, running_time, score, othername, imdb,

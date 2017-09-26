@@ -308,12 +308,18 @@ class Series(Media):
 
                 if db_value == 'continue':
                     LOG.debug('dbvalue is "continue"')
+                    # In some cases, anime may be a movie, so add it
+                    if cate_eng == 'anime':
+                        LOG.info('这部动画可能是电影，添加电影……')
+                        Movie().add(l_region, l_url, l_name, l_content,
+                                    conn, driver, cate_eng)
                     continue
                 else:
                     LOG.debug('dbvalue is not "continue", dbvalue: %s' % str(db_value))
                     break
 
             if db_value == '%s_exists' % self.ENG_NAME:
+                LOG.debug('start updating')
                 self.update(down_names=filename_str,
                             down_urls=thunder_str,
                             updated_eps=eps_num,
