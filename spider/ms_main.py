@@ -391,10 +391,11 @@ class Series(Media):
                     LOG.info('Not matching')
                     continue
 
-                if db_value and db_value == 'continue':
+                if db_value == 'continue':
+                    LOG.debug('dbvalue is "continue"')
                     continue
                 else:
-                    LOG.debug('dbvalue is not "continue", dbvalue: %s' % db_value)
+                    LOG.debug('dbvalue is not "continue", dbvalue: %s' % str(db_value))
                     break
 
             if db_value == '%s_exists' % self.ENG_NAME:

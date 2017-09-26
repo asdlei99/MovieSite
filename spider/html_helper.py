@@ -497,7 +497,7 @@ class Douban(object):
             name1 = self.text_handler.replace_symbol(name1)
             name2 = self.text_handler.replace_symbol(name2)
             if enable_log:
-                LOG.info('%s：《%s》' % (cate_chn, name1))
+                LOG.info('douban name - %s：《%s》' % (cate_chn, name1))
         return name1, name2
 
     def get_region(self, content, enable_log=True):
@@ -866,7 +866,15 @@ class Douban(object):
         d_name_list = filter(lambda x: x, d_name_list)
         LOG.debug('d_name_list: %s' % str(d_name_list))
         for d_name in d_name_list:
-            for l_item in l_name.split(r'/'):
+            l_name_tmp = []
+            if len(l_name.split(r'/')) > 1:
+
+                for _name in l_name.split(r'/'):
+                    if re.findall(r'.*?第.*?季$', _name, re.S):
+                        l_name_tmp = [_name.strip()]
+                        break
+
+            for l_item in l_name_tmp:
                 # l_item = l_item.decode('gbk').encode('utf-8')
                 LOG.debug('-----------name comparing-----------')
                 LOG.debug('l_name: %s , d_name: %s' % (l_item, d_name))
