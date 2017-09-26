@@ -3,6 +3,7 @@ import requests
 import time
 import random
 import re
+import chardet
 
 from ms_constants import *
 from ms_exceptions import *
@@ -87,8 +88,9 @@ class Main(object):
                         LOG.split_line(index+1)
                         # start job
                         l_content = get_html_content(l_url).decode(
-                            'gbk', 'ignore').encode('utf8', 'ignore')
+                            'gbk', 'ignore').encode('utf-8')
                         l_name = self._format_lol_name(l_name)
+                        pass
 
                         # #
                         # Server_Main().update(l_type, l_url, l_name, l_content, cate_eng)

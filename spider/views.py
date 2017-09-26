@@ -1,6 +1,7 @@
 from django.shortcuts import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from ms_main import Main
+import chardet
 # Create your views here.
 
 
@@ -17,7 +18,14 @@ def crawl(request):
             if all((l_content, l_tag, l_url, l_name, cate_eng)):
                 m = Main()
                 try:
-                    m.update(l_tag, l_url, l_name, l_content, cate_eng)
+                    # l_type1 = type(l_content.encode('utf-8'))
+                    # l_type2 = chardet.detect(l_content.encode('utf-8'))
+                    # return HttpResponse('%s ,%s' % (l_type1, l_type2))
+                    m.update(l_tag.encode('utf-8'),
+                             l_url,
+                             l_name.encode('utf-8'),
+                             l_content.encode('utf-8'),
+                             cate_eng)
                 except Exception as e:
                     return HttpResponse('Exception: %s' % str(e))
                 else:

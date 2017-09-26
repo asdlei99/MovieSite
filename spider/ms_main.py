@@ -177,8 +177,7 @@ class Movie(Media):
             time.sleep(round(random.uniform(3, 5), 1))
             # 首先判断对应性：1.IMDb链接 || 2.前两个演员
             imdb_match = Douban.compare_imdb(l_content, d_content)
-            actor_match = Douban.compare_actor(l_content, d_content, l_name,
-                                               cate_eng)
+            actor_match = Douban.compare_actor(l_content, d_content, l_name)
             if imdb_match or actor_match:
                 if imdb_match:
                     compare_way = 'imdb'
@@ -395,7 +394,7 @@ class Series(Media):
                 if db_value and db_value == 'continue':
                     continue
                 else:
-                    LOG.debug('dbvalue is not "continue"')
+                    LOG.debug('dbvalue is not "continue", dbvalue: %s' % db_value)
                     break
 
             if db_value == '%s_exists' % self.ENG_NAME:

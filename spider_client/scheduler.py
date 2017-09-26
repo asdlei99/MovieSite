@@ -4,7 +4,7 @@ import time
 from ms_main import Main
 
 INTERVAL = 60
-START_POINT = (10, 14, 18, 22)
+START_POINT = (10, 18, 22)
 
 
 def get_hour():

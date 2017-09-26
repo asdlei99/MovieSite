@@ -3,7 +3,10 @@ import random
 import re
 import socket
 import time
-import urllib2
+try:
+    import urllib2
+except Exception:
+    urllib2 = None
 
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -65,7 +68,6 @@ def get_html_content(url, url_log=True):
 
     # for special case
     if len(content) < 500 and 'loldytt' in url:
-        print content
         res = re.findall(r'window.location=(.*?)[;|<]', content, re.S)
         if len(res) == 1:
             location = 'http://www.loldytt.com' + res[0].replace('"',
@@ -76,7 +78,7 @@ def get_html_content(url, url_log=True):
     return content
 
 
-def get_webdriver(set_headers=False, disable_load_image=False, set_proxy=False):
+def get_webdriver(set_headers=False, disable_load_image=False):
     driver = None
     if PHANTOMJS or CHROME:
         try:
@@ -84,7 +86,7 @@ def get_webdriver(set_headers=False, disable_load_image=False, set_proxy=False):
                 service_args = None
                 if set_headers:
                     dcap["phantomjs.page.settings.userAgent"] = (
-                    random.choice(HEADERS))
+                        random.choice(HEADERS))
                 if disable_load_image:
                     dcap["phantomjs.page.settings.loadImages"] = False
                 # if set_proxy:
@@ -126,12 +128,13 @@ def get_douban_url(sn):
 
 
 if __name__ == '__main__':
-    import requests
+    # import requests
 
     # s = requests.Session()
     # r = s.get('http://www.baidu.com',
     #           headers={
-    #               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+    #               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+    # AppleWebKit/537.36 '
     #           '(KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
     #               'Connection': 'keep-alive'
     #           },
@@ -139,9 +142,9 @@ if __name__ == '__main__':
     # print r.content
 
     r = get_html_content('http://www.loldytt.com', url_log=False)
-    print r
 
-    # driver = get_webdriver(set_headers=True, disable_load_image=True, set_proxy=True)
+    # driver = get_webdriver(set_headers=True, disable_load_image=True,
+    # set_proxy=True)
     # print driver
     # driver.get('http://www.loldytt.com')
     # print driver.page_source

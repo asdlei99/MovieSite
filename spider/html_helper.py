@@ -6,6 +6,7 @@ import os
 import re
 import time
 import urllib
+import chardet
 from random import uniform
 
 from common import get_html_content, get_douban_sn
@@ -60,7 +61,8 @@ class Douban(object):
         cur_date = self.current_date
         return '/static/images/%s/s/%s/%s' % (cate_eng, cur_date, filename)
 
-    def get_douban_search_result(self, keyword, driver=None):
+    @staticmethod
+    def get_douban_search_result(keyword, driver=None):
         """
         Search result based on movie name
         :param keyword: movie name
@@ -852,9 +854,12 @@ class Douban(object):
                 create_date, create_date, cate_eng)
 
     def compare_name(self, l_name, d_content, cate_eng):
+        text_result = self.get_douban_text_info(d_content, cate_eng)
+        if isinstance(text_result, (str, unicode)) and text_result == 'continue':
+            return False
         (name1, name2, year, director, screenwriter, actor, mtype, region,
          date_show, date, running_time, score,
-         other_name, imdb, intro) = self.get_douban_text_info(d_content, cate_eng)
+         other_name, imdb, intro) = text_result
         d_name_list = [name1]
         for item in other_name.split('/'):
             d_name_list.append(item.strip())
@@ -936,7 +941,8 @@ class Douban(object):
         else:
             return False
 
-    def compare_actor(self, l_content, d_content, l_name):
+    @staticmethod
+    def compare_actor(l_content, d_content, l_name):
         if re.match(r'.*?第.*?季$', l_name, re.S):
             return False
         actor_matches = False
