@@ -21,12 +21,12 @@ NEW_LINE = '\n'
 
 """ path """
 # need change to the directory where you place the spider in
-WORKSPACE_PATH = 'E:\PycharmProjects\MovieSite\spider'
+WORKSPACE_PATH = '/var/www/html/MovieSite/spider'
 LOG_PATH = os.path.join(WORKSPACE_PATH, 'logs')
 DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'images')
 
 # change this to the site's directory .../static/images
-WEB_IMAGE_PATH = 'E:\PycharmProjects\MovieSite\spider\web_images'
+WEB_IMAGE_PATH = '/var/www/html/MovieSite/static/images'
 
 NEW_PATHS = (WORKSPACE_PATH, DOWNLOAD_IMAGE_PATH)
 
@@ -39,8 +39,8 @@ LOG_DEBUG = True
 PHANTOMJS = True
 CHROME = False
 # modify driver's path
-WEB_DRIVER_PHANTOMJS = r'D:\phantomjs-2.1.1-windows\bin\phantomjs.exe'
-PHANTOMJS_LOG = r'D:\phantomjs-2.1.1-windows\ghostdriver.log'
+WEB_DRIVER_PHANTOMJS = '/var/www/html/MovieSite/spider/phantomjs'
+PHANTOMJS_LOG = '/var/log/phantomjs/ghostdriver.log'
 WEB_DRIVER_CHROME = r'D:\chromedriver.exe'
 
 """ images """
@@ -50,7 +50,7 @@ S_HEIGHT = 242
 S_WIDTH = 430
 
 """ db """
-DB_HOST = '192.168.100.11'
+DB_HOST = '127.0.0.1'
 DB_PORT = 3306
 DB_USER = 'root'
 DB_PASS = 'kevin123'

@@ -34,8 +34,8 @@ class Main(object):
 
     @staticmethod
     def _format_lol_name(name):
-        name = re.sub('^(.*)\(.*?\)$', r'\1', name, re.U)
-        name = re.sub('^(.*?)(第.*?季.*)$', r'\1 \2', name, re.U)
+        name = re.sub('^(.*)\(.*?\)$', r'\1', name, re.S)
+        name = re.sub('^(.*?)(第.*?季.*)$', r'\1 \2', name, re.S)
         return name
 
     @staticmethod
@@ -59,6 +59,64 @@ class Main(object):
         assert op_type in ('添加', '更新')
         return {'type': op_type, 'state': state, 'l_url':l_url, 'l_name': l_name,
                 'cate_eng': cate_eng, 'cate_chn': cate_chn}
+
+    def add(self):
+        d_url = None
+        l_url = None
+        l_name = l_content = tag = cate_eng = ''
+        while not d_url or 'douban' not in d_url:
+            d_url = raw_input('Douban URL: ')
+
+        while not l_url or 'loldytt' not in l_url:
+            l_url = raw_input('Lol URL: ')
+            if l_url == '':
+                break
+        # it will skip comparing if d_url is not None
+        l_url = l_url.strip()
+        d_url = d_url.strip()
+        if l_url:
+            l_content = get_html_content(l_url).decode(
+                'gbk', 'ignore').encode('utf-8')
+            title = re.findall(r'<h1>(.*?)<a.*?>(.*?)</a>', l_content, re.S)[0]
+            if len(title) != 2:
+                raise ValueError
+            info = title[0].replace('&gt;', '').strip()
+            if '电影' in info:
+                cate_eng = 'movie'
+                tag = info.replace('电影', '')
+            elif '电视剧' in info:
+                cate_eng = 'tv'
+                tag = info.replace('电视剧', '')
+            elif '动漫' in info:
+                cate_eng = 'anime'
+                tag = info.replace('动漫', '')
+            elif '综艺' in info:
+                cate_eng = 'show'
+                tag = info.replace('综艺', '')
+            else:
+                raise ValueError
+
+            l_name = self._format_lol_name(title[1])
+        else:
+            while not cate_eng:
+                cate_eng = raw_input('cate_eng(default is movie): ')
+                if cate_eng == '':
+                    cate_eng = 'movie'
+                    break
+                if cate_eng not in ('movie', 'tv', 'anime', 'show'):
+                    cate_eng = None
+
+        data = {'name': l_name,
+                'url': l_url,
+                'content': l_content,
+                'secret': '5826f119-c0bc-4ad7-9017-30369eb75b75',
+                'tag': tag,
+                'cate_eng': cate_eng,
+                'd_url': d_url}
+        print 'Requesting...'
+        r = requests.post('http://www.bigedianying.com/spider/crawl/',
+                          data=data)
+        print 'Response: %s' % r.content
 
     def start(self):
         """
@@ -100,7 +158,7 @@ class Main(object):
                                 'tag': l_type,
                                 'cate_eng': cate_eng}
                         print 'Requesting...'
-                        r = requests.post('http://www.bigedianying.com/crawl/',
+                        r = requests.post('http://www.bigedianying.com/spider/crawl/',
                                           data=data)
                         print 'Response: %s' % r.content
                     except Exception as e:
@@ -132,4 +190,4 @@ class Main(object):
 
 
 if __name__ == '__main__':
-    Main().start()
+    Main().add()

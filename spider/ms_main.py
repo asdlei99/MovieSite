@@ -30,6 +30,9 @@ class Media(object):
     def clean_lol_name(lol_name):
         return re.sub(r'^(.*?)\(.*?\)$', r'\1', lol_name)
 
+    def add(self, l_type, l_url, l_name, l_content,  conn, driver, cate_eng, d_url):
+        pass
+
     @staticmethod
     def type_matches(d_type, l_type):
         """
@@ -67,6 +70,15 @@ class Media(object):
             LOG.debug('region match 2')
             return True
 
+    def format_lol_name(self, lol_name):
+        result = None
+        for item in lol_name.split(r'/'):
+            if re.findall(r'.*?第.*?季$', item.strip(), re.S):
+                result = item.strip()
+                break
+        if not result:
+            result = lol_name.split(r'/')[0].strip()
+        return result
 
 class Movie(Media):
     """
@@ -109,54 +121,64 @@ class Movie(Media):
         lol_name = re.sub('^(.*)\(.*?\)$', r'\1', lol_name)
         return lol_name
 
-    def add(self, l_type, l_url, l_name, l_content,  conn, driver, cate_eng):
-        search_name = self._select_name(l_name)
-        douban_name_url_list = Douban.get_douban_search_result(
-            search_name, driver)
-
-        # 对列表电影进行循环，判断正确性
-        LOG.info('正在匹配%s……' % cate_eng)
-        db_value = ()
-        compare_way = ''
-        for d_url in douban_name_url_list:  # 对搜索结果的电影进行逐一判断
-            d_content = get_html_content(d_url, url_log=False)
-            time.sleep(round(random.uniform(3, 5), 1))
-            # 首先判断对应性：1.IMDb链接 || 2.前两个演员
-            imdb_match = Douban.compare_imdb(l_content, d_content)
-            actor_match = Douban.compare_actor(l_content, d_content, l_name)
-            if imdb_match or actor_match:
-                if imdb_match:
-                    compare_way = 'imdb'
-                elif actor_match:
-                    compare_way = 'actor'
-                # 可能会由于电影存在而进行link_addr更新
-                db_value = Douban.get_movie_info(d_url, d_content, l_url,
-                                                 l_content, compare_way, conn)
-            elif Douban.compare_name(l_name, d_content, cate_eng):
-                compare_way = 'name'
-                db_value = Douban.get_movie_info(d_url, d_content, l_url,
-                                                 l_content, compare_way, conn)
-            else:
-                LOG.debug('Not matching')
-                continue
-
-            if db_value == 'continue':
-                continue
-            else:
-                break  # 找到后跳出对搜索列表的循环
-
-        sqli = ("INSERT INTO " + MOVIE_TABLE + " (ch_name,foreign_name,year,"
-                                               "director,"
+    def _insert_db(self, db_value, conn):
+        sqli = ("INSERT INTO " +
+                MOVIE_TABLE +
+                " (ch_name,foreign_name,year,"
+                "director,"
                 "screenwriter, actor,types,region,release_date_show,release_date,"
                 "running_time,other_name,score,intro,poster,ss1,ss2,ss3,ss4,"
                 "down_name,down_url,down_name2,down_url2,video_type,video,video2,"
                 "link_addr,douban_sn,imdb_sn,compare_way,visit_count,week_visit_count,"
-                                               "month_visit_count,"
+                "month_visit_count,"
                 "create_date,update_date,cate) VALUES(%s" + ",%s" * 35 + ")")
+        cur = conn.cursor()
+        cur.execute(sqli, db_value)
+        conn.commit()
+
+    def add(self, l_type, l_url, l_name, l_content,  conn, driver, cate_eng, d_url):
+        if d_url:
+            d_content = get_html_content(d_url, url_log=False)
+            db_value = Douban.get_movie_info(d_url, d_content, l_url,
+                                             l_content, 'manual', conn)
+        else:
+            search_name = self._select_name(l_name)
+            douban_name_url_list = Douban.get_douban_search_result(
+                search_name, driver)
+
+            # 对列表电影进行循环，判断正确性
+            LOG.info('正在匹配%s……' % cate_eng)
+            db_value = ()
+            compare_way = ''
+            for _d_url in douban_name_url_list:  # 对搜索结果的电影进行逐一判断
+                d_content = get_html_content(_d_url, url_log=False)
+                time.sleep(round(random.uniform(3, 5), 1))
+                # 首先判断对应性：1.IMDb链接 || 2.前两个演员
+                imdb_match = Douban.compare_imdb(l_content, d_content)
+                actor_match = Douban.compare_actor(l_content, d_content, l_name)
+                if imdb_match or actor_match:
+                    if imdb_match:
+                        compare_way = 'imdb'
+                    elif actor_match:
+                        compare_way = 'actor'
+                    # 可能会由于电影存在而进行link_addr更新
+                    db_value = Douban.get_movie_info(_d_url, d_content, l_url,
+                                                     l_content, compare_way, conn)
+                elif Douban.compare_name(l_name, d_content, cate_eng):
+                    compare_way = 'name'
+                    db_value = Douban.get_movie_info(_d_url, d_content, l_url,
+                                                     l_content, compare_way, conn)
+                else:
+                    LOG.debug('Not matching')
+                    continue
+
+                if db_value == 'continue':
+                    continue
+                else:
+                    break  # 找到后跳出对搜索列表的循环
+
         if db_value and isinstance(db_value, tuple):
-            cur = conn.cursor()
-            cur.execute(sqli, db_value)
-            conn.commit()
+            self._insert_db(db_value, conn)
             return True
         elif db_value == 'movie_exists':
             # updated already
@@ -209,65 +231,73 @@ class Series(Media):
         else:
             return False
 
-    def add(self, l_region, l_url, l_name, l_content, conn, driver, cate_eng):
-        # 处理lolname
-        # search_name = format_lol_name(l_name)  # 豆瓣搜索用
-        search_name = l_name
-        '''
-        **Get douban search list**
-        '''
-        not_match = False
-        db_value = ()
-        douban_name_url_list = list()
-        try:
-            douban_name_url_list = Douban.get_douban_search_result(
-                search_name, driver)
-            if not douban_name_url_list and '第一季' in search_name:
-                # not_match = True
-                time.sleep(1)
-                search_name = search_name.replace('第一季', '').strip()
+    def add(self, l_region, l_url, l_name, l_content, conn, driver, cate_eng, d_url):
+        cate_chn = CATES_ENG_CH.get(cate_eng)
+        if d_url:
+            d_content = get_html_content(d_url, url_log=False)
+            (filename_str,
+             thunder_str,
+             eps_num, seq) = Lol.series_get_down_urls(l_content)
+            db_value = Douban.get_series_info(d_url, d_content, conn,
+                                              l_url, cate_eng,
+                                              cate_chn, thunder_str,
+                                              filename_str, eps_num, seq,
+                                              'manual')
+        else:
+            # search_name = format_lol_name(l_name)  # 豆瓣搜索用
+            search_name = l_name
+            '''
+            **Get douban search list**
+            '''
+            db_value = ()
+
+            try:
                 douban_name_url_list = Douban.get_douban_search_result(
                     search_name, driver)
-                if not douban_name_url_list:
-                    not_match = True
+                if not douban_name_url_list and '第一季' in search_name:
+                    # not_match = True
+                    time.sleep(1)
+                    search_name = search_name.replace('第一季', '').strip()
+                    douban_name_url_list = Douban.get_douban_search_result(
+                        search_name, driver)
+                    if not douban_name_url_list:
+                        # 若未匹配到，也记录
+                        LOG.info('无搜索结果1')
+                        LOG.info_record(l_name, l_url)
+                        return False
+                elif not douban_name_url_list:
                     # 若未匹配到，也记录
-                    LOG.info('无搜索结果1')
+                    LOG.info('无搜索结果2')
                     LOG.info_record(l_name, l_url)
-            elif not douban_name_url_list:
-                not_match = True
-                # 若未匹配到，也记录
-                LOG.info('无搜索结果2')
+                    return False
+            except Exception as e:
+                LOG.info('Querying Failed: %s' % str(e))
                 LOG.info_record(l_name, l_url)
-        except Exception as e:
-            not_match = True
-            LOG.info('Querying Failed: %s' % str(e))
-            LOG.info_record(l_name, l_url)
+                return False
 
-        '''
-        ** Match series **
-        '''
-        # 对series进行循环，判断正确性
-        if not not_match:
+            '''
+            ** Match series **
+            '''
+            # 对series进行循环，判断正确性
+
             LOG.debug('douban_name_url_list length: %s' % len(douban_name_url_list))
             LOG.info('正在匹配 ...')
-            cate_chn = CATES_ENG_CH.get(cate_eng)
             filename_str = str()
             thunder_str = str()
             eps_num = 0
             seq = 0
             compare_way = ''
             LOG.debug('douban_name_url_list: %s' % str(douban_name_url_list))
-            for d_url in douban_name_url_list:  # 对搜索结果的电影进行逐一判断
-                LOG.debug('豆瓣详情页: %s' % str(d_url))
+            for _d_url in douban_name_url_list:  # 对搜索结果的电影进行逐一判断
+                LOG.debug('豆瓣详情页: %s' % str(_d_url))
                 db_value = None
                 try:
-                    d_content = get_html_content(d_url, url_log=False)
+                    d_content = get_html_content(_d_url, url_log=False)
                     LOG.debug('详情页长度为：%d' % len(d_content))
                 except Exception as e:
                     LOG.debug('matching exception: %s' % str(e))
                     raise
                 # time.sleep(round(random.uniform(3, 5), 1))
-                # 首先判断对应性：1.IMDb链接 || 2.前两个演员（·替换为·） || 3.简介的前几个字
                 imdb = Douban.compare_imdb(l_content, d_content)
                 actor = Douban.compare_actor(l_content, d_content, l_name)
                 LOG.info('IMDB: %s' % imdb)
@@ -284,7 +314,7 @@ class Series(Media):
                     (filename_str,
                      thunder_str,
                      eps_num, seq) = Lol.series_get_down_urls(l_content)
-                    db_value = Douban.get_series_info(d_url, d_content, conn,
+                    db_value = Douban.get_series_info(_d_url, d_content, conn,
                                                       l_url, cate_eng,
                                                       cate_chn, thunder_str,
                                                       filename_str, eps_num, seq,
@@ -296,7 +326,7 @@ class Series(Media):
                      eps_num, seq) = Lol.series_get_down_urls(l_content)
                     compare_way = 'name'
                     LOG.info('name matching')
-                    db_value = Douban.get_series_info(d_url, d_content, conn,
+                    db_value = Douban.get_series_info(_d_url, d_content, conn,
                                                       l_url, cate_eng,
                                                       cate_chn, thunder_str,
                                                       filename_str, eps_num, seq,
@@ -312,28 +342,28 @@ class Series(Media):
                     if cate_eng == 'anime':
                         LOG.info('这部动画可能是电影，添加电影……')
                         Movie().add(l_region, l_url, l_name, l_content,
-                                    conn, driver, cate_eng)
+                                    conn, driver, cate_eng, d_url=_d_url)
                     continue
                 else:
                     LOG.debug('dbvalue is not "continue", dbvalue: %s' % str(db_value))
                     break
 
-            if db_value == '%s_exists' % self.ENG_NAME:
-                LOG.debug('start updating')
-                self.update(down_names=filename_str,
-                            down_urls=thunder_str,
-                            updated_eps=eps_num,
-                            seq=seq,
-                            l_url=l_url,
-                            conn=conn)
-                return True
-            elif db_value and isinstance(db_value, tuple):
-                self._insert_db(db_value, conn)
-                return True
-            else:
-                LOG.debug('db_value: %s' % str(db_value))
-                LOG.debug('Add %s failed' % cate_eng)
-                return False
+        if db_value == '%s_exists' % self.ENG_NAME:
+            LOG.debug('start updating')
+            self.update(down_names=filename_str,
+                        down_urls=thunder_str,
+                        updated_eps=eps_num,
+                        seq=seq,
+                        l_url=l_url,
+                        conn=conn)
+            return True
+        elif db_value and isinstance(db_value, tuple):
+            self._insert_db(db_value, conn)
+            return True
+        else:
+            LOG.debug('db_value: %s' % str(db_value))
+            LOG.debug('Add %s failed' % cate_eng)
+            return False
 
     def _insert_db(self, db_value, conn):
         dbkey = (
@@ -402,6 +432,8 @@ class Main(object):
         return to_do_name_urls
 
     def _item_exists(self, url, cate_eng):
+        if not url:
+            return 0
         _TABLE_NAME = 'movie_%s' % cate_eng
         # Check if item exists
         sql = ('SELECT * FROM %s' % _TABLE_NAME + ' WHERE link_addr=%s')
@@ -411,7 +443,7 @@ class Main(object):
         cur.close()
         return num
 
-    def update(self, l_tag, l_url, l_name, l_content, cate_eng):
+    def update(self, l_tag, l_url, l_name, l_content, cate_eng, d_url=None):
         """
 
         :param l_tag: l_tag is type of movie or region of tv
@@ -419,6 +451,7 @@ class Main(object):
         :param l_name:
         :param l_content:
         :param cate_eng:
+        :param d_url: manually add if this is True
         :return:
         """
         try:
@@ -437,7 +470,7 @@ class Main(object):
                     op_type = '添加'
                     LOG.info('%s%s《%s》' % (op_type, cate_chn, l_name))
                     result = movie.add(l_tag, l_url, l_name, l_content, self.conn,
-                                       self.driver, cate_eng)
+                                       self.driver, cate_eng, d_url)
             else:
                 # for tv, anime and show
                 series = Series(cate_eng)
@@ -453,7 +486,7 @@ class Main(object):
                     op_type = '添加'
                     LOG.info('%s%s《%s》' % (op_type, cate_chn, l_name))
                     result = series.add(l_tag, l_url, l_name, l_content, self.conn,
-                                        self.driver, cate_eng)
+                                        self.driver, cate_eng, d_url)
             result = '成功' if result else '失败'
             LOG.info('%s%s' % (op_type, result))
             self.new_operation.append(self.operation(op_type, result, l_url,
@@ -472,6 +505,10 @@ class Main(object):
         assert op_type in ('添加', '更新')
         return {'type': op_type, 'state': state, 'l_url': l_url, 'l_name': l_name,
                 'cate_eng': cate_eng, 'cate_chn': cate_chn}
+
+    def add_manually(self, l_content, d_url):
+        pass
+
 
     def start(self):
         """

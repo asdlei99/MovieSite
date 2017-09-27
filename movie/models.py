@@ -40,7 +40,7 @@ class Movie(models.Model):
     video = models.TextField(max_length=2048, verbose_name='PC视频', default='无视频', blank=True)
     video2 = models.TextField(max_length=2048, verbose_name='移动视频', default='无视频', blank=True)
 
-    link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='N/A')
+    link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='')
     douban_sn = models.CharField(max_length=16, verbose_name='豆瓣编号', blank=True)
     imdb_sn = models.CharField(max_length=16, verbose_name='IMDB地址', blank=True)
     compare_way = models.CharField(max_length=16, verbose_name='添加匹配方式', blank=True)
@@ -121,7 +121,7 @@ class Tv(models.Model):
     updated_eps = models.IntegerField(default=0, verbose_name='更新至')
     down_names = models.TextField(max_length=12800, verbose_name='文件名')
     down_urls = models.TextField(max_length=65534, verbose_name='下载链接')
-    link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='http://')
+    link_addr = models.CharField(max_length=128, verbose_name='lol地址', default='')
     douban_sn = models.CharField(max_length=16, verbose_name='豆瓣编号', blank=True)
     imdb_sn = models.CharField(max_length=16, verbose_name='IMDB地址', blank=True)
     compare_way = models.CharField(max_length=16, verbose_name='添加匹配方式', blank=True)
