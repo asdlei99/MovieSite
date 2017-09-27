@@ -9,7 +9,7 @@ Log = log.Log()
 
 def connect_db(db_host=DB_HOST):
     # 连接数据库
-    Log.info('Connecting to %s@%s:%s ...' % (DB_USER, db_host, DB_PORT))
+    # Log.info('Connecting to %s@%s:%s ...' % (DB_USER, db_host, DB_PORT))
     try:
 
         conn = MySQLdb.connect(host=db_host, port=DB_PORT, user=DB_USER,

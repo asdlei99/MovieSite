@@ -80,6 +80,7 @@ class Media(object):
             result = lol_name.split(r'/')[0].strip()
         return result
 
+
 class Movie(Media):
     """
     For movie
@@ -300,8 +301,8 @@ class Series(Media):
                 # time.sleep(round(random.uniform(3, 5), 1))
                 imdb = Douban.compare_imdb(l_content, d_content)
                 actor = Douban.compare_actor(l_content, d_content, l_name)
-                LOG.info('IMDB: %s' % imdb)
-                LOG.info('ACTOR: %s' % actor)
+                LOG.debug('IMDB: %s' % imdb)
+                LOG.debug('ACTOR: %s' % actor)
                 if imdb or actor:
                     if imdb:
                         compare_way = 'imdb'
@@ -343,6 +344,7 @@ class Series(Media):
                         LOG.info('这部动画可能是电影，添加电影……')
                         Movie().add(l_region, l_url, l_name, l_content,
                                     conn, driver, cate_eng, d_url=_d_url)
+                        break
                     continue
                 else:
                     LOG.debug('dbvalue is not "continue", dbvalue: %s' % str(db_value))
@@ -407,12 +409,12 @@ class Main(object):
                     break
                 timer += 1
         # initialize paths
-        LOG.info('Initializing paths ...')
+        # LOG.info('Initializing paths ...')
         for item in NEW_PATHS:
             if not os.path.exists(item):
                 os.makedirs(item)
         # get driver
-        LOG.info('Initializing drivers ...')
+        # LOG.info('Initializing drivers ...')
         self.driver = get_webdriver()
 
     @staticmethod
@@ -463,12 +465,12 @@ class Main(object):
                     (down_name1, down_url1, down_name2,
                      down_url2) = Lol.get_movie_down_urls(l_content)
                     op_type = '更新'
-                    LOG.info('%s%s《%s》' % (op_type, cate_chn, l_name))
+                    LOG.info('------ %s%s《%s》 ------' % (op_type, cate_chn, l_name))
                     result = movie.update(down_name1, down_url1, down_name2, down_url2,
                                           l_url, self.conn)
                 else:
                     op_type = '添加'
-                    LOG.info('%s%s《%s》' % (op_type, cate_chn, l_name))
+                    LOG.info('------ %s%s《%s》 ------' % (op_type, cate_chn, l_name))
                     result = movie.add(l_tag, l_url, l_name, l_content, self.conn,
                                        self.driver, cate_eng, d_url)
             else:
@@ -479,12 +481,12 @@ class Main(object):
                      down_urls,
                      updated_eps, seq) = Lol.series_get_down_urls(l_content)
                     op_type = '更新'
-                    LOG.info('%s%s《%s》' % (op_type, cate_chn, l_name))
+                    LOG.info('------ %s%s《%s》 ------' % (op_type, cate_chn, l_name))
                     result = series.update(down_names, down_urls, updated_eps, seq,
                                            l_url, self.conn)
                 else:
                     op_type = '添加'
-                    LOG.info('%s%s《%s》' % (op_type, cate_chn, l_name))
+                    LOG.info('------ %s%s《%s》 ------' % (op_type, cate_chn, l_name))
                     result = series.add(l_tag, l_url, l_name, l_content, self.conn,
                                         self.driver, cate_eng, d_url)
             result = '成功' if result else '失败'

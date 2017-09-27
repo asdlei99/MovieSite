@@ -514,7 +514,7 @@ class Douban(object):
             name1 = self.text_handler.replace_symbol(name1)
             name2 = self.text_handler.replace_symbol(name2)
             if enable_log:
-                LOG.info('douban name - %s：《%s》' % (cate_chn, name1))
+                LOG.info('douban name - %s：%s' % (cate_chn, name1))
         return name1, name2
 
     def get_region(self, content, enable_log=True):

@@ -17,6 +17,8 @@ LOG = Log()
 
 DEFAULT_TIMEOUT = 60
 
+SHOW_EXCEPTION = ('综艺大集合', )
+
 
 class Main(object):
 
@@ -114,9 +116,12 @@ class Main(object):
                 'cate_eng': cate_eng,
                 'd_url': d_url}
         print 'Requesting...'
-        r = requests.post('http://www.bigedianying.com/spider/crawl/',
-                          data=data)
-        print 'Response: %s' % r.content
+        try:
+            r = requests.post('http://www.bigedianying.com/spider/crawl/',
+                              data=data, timeout=300.0)
+            print 'Response: %s' % r.content
+        except Exception as e:
+            print str(e)
 
     def start(self):
         """
@@ -158,9 +163,13 @@ class Main(object):
                                 'tag': l_type,
                                 'cate_eng': cate_eng}
                         print 'Requesting...'
-                        r = requests.post('http://www.bigedianying.com/spider/crawl/',
-                                          data=data)
-                        print 'Response: %s' % r.content
+                        try:
+                            r = requests.post('http://www.bigedianying.com/spider/crawl/',
+                                              data=data, timeout=300.0)
+                        except Exception as e:
+                            print str(e)
+                        else:
+                            print 'Response: %s' % r.content
                     except Exception as e:
                         if isinstance(e, Warn):
                             continue

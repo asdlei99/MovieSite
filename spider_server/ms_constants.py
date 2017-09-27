@@ -21,12 +21,12 @@ NEW_LINE = '\n'
 
 """ path """
 # need change to the directory where you place the spider in
-WORKSPACE_PATH = 'E:\PycharmProjects\MovieSite\spider'
+WORKSPACE_PATH = 'C:\MovieSpider'
 LOG_PATH = os.path.join(WORKSPACE_PATH, 'logs')
-DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'images')
+DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'tmp_images')
 
 # change this to the site's directory .../static/images
-WEB_IMAGE_PATH = 'E:\PycharmProjects\MovieSite\spider\web_images'
+WEB_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'web_images')
 
 NEW_PATHS = (WORKSPACE_PATH, DOWNLOAD_IMAGE_PATH)
 
