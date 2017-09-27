@@ -3,4 +3,9 @@
 from ms_main import Main
 
 if __name__ == '__main__':
-    Main().add()
+    while True:
+        try:
+            Main().add()
+        except KeyboardInterrupt:
+            print 'Bye'
+            break

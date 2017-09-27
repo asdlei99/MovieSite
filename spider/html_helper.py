@@ -86,6 +86,7 @@ class Douban(object):
                 else:
                     continue
             except Exception as e:
+                LOG.error(str(e))
                 return urls
             else:
                 return urls
@@ -138,44 +139,63 @@ class Douban(object):
         image_type = 'p'
         download_path = self._get_image_download_path(cate_eng, image_type)
         # 海报
-        try:
-            # 海报列表页内容
-            posts_content = get_html_content("%sphotos?type=R" % url,
-                                             url_log=False)
-            # 拿到某海报页
-            _p = ('<div.*?class="cover">.*?<a.*?"(.*?)".*?>.*?'
-                  '<div.*?class="prop">\s*(.*?)\s*<')
-            _p_item = re.compile(
-                '<a.*?class="mainphoto".*?<img.*?"(.*?)".*?/>', re.S)
-            poster_index = re.findall(_p, posts_content, re.S)
-            poster_got = False
-            poster_url = ''
-            for p_url, px in poster_index:
-                width, height = px.split('x')[0], px.split('x')[1]
+
+        # 海报列表页内容
+        posts_content = get_html_content("%sphotos?type=R" % url,
+                                         url_log=False)
+        # 拿到某海报页
+        _p = ('<div.*?class="cover".*?>.*?<img.*?src="(.*?)"'
+              '.*?>.*?<div.*?class="prop">\s*(.*?)\s*<')
+        poster_index = re.findall(_p, posts_content, re.S)
+        poster_urls = []
+        for p_url, px in poster_index:
+            width, height = px.split('x')[0], px.split('x')[1]
+            try:
                 if int(height) / int(width) > 1.35 and int(height) / int(
                         width) < 1.49:
-                    content2 = get_html_content(p_url, url_log=False)
-                    item2 = re.findall(_p_item, content2)
-                    poster_url = item2[0]
-                    poster_got = True
+
+                    poster_urls.append({'url': p_url.replace('.webp', '.jpg'),
+                                        'weight': 2})
+                elif int(height) / int(width) > 1.22 and int(height) / int(
+                        width) < 1.62:
+                        poster_urls.append({'url': p_url.replace('.webp', '.jpg'),
+                                            'weight': 1})
+            except Exception:
+                continue
+        LOG.debug(str(poster_urls))
+        if not poster_urls:
+            try:
+                _url = poster_index[0][0].strip()  # 第几张海报
+                poster_urls.append(_url)
+            except Exception:
+                pass
+
+        # SAVE
+        poster = ''
+        sorted_poster_urls = filter(lambda x: x.get('weight') == 2, poster_urls)
+        LOG.debug('sorted_poster_urls: %s' % str(sorted_poster_urls))
+        sorted_poster_urls.extend(filter(lambda x: x.get('weight') == 1, poster_urls))
+        LOG.debug('sorted_poster_urls: %s' % str(sorted_poster_urls))
+        for item in poster_urls:
+            # 海报图片名
+            filename = re.search('.*/(.*)', item.get('url')).group(1)
+            LOG.debug('filename: %s' % filename)
+            # 保存海报图片
+            result = self._save_poster(item.get('url'), download_path, filename)
+
+            # edit poster image
+            if result:
+                web_path = self._get_image_web_path(cate_eng, image_type)
+                try:
+                    IP.edit_poster(download_path, filename, web_path)
+                except Exception as e:
+                    LOG.error('Edit poster failed: %s' % str(e))
+                else:
+                    LOG.info('保存海报成功')
+                    poster = self._get_poster_url(cate_eng, filename)
                     break
-            if not poster_got:
-                for p_url, px in poster_index:
-                    width, height = px.split('x')[0], px.split('x')[1]
-                    if int(height) / int(width) > 1.22 and int(height) / int(
-                            width) < 1.62:
-                        content2 = get_html_content(p_url, url_log=False)
-                        item2 = re.findall(_p_item, content2)
-                        poster_url = item2[0]
-                        poster_got = True
-                        break
-            if not poster_got:
-                post_url = poster_index[0][0].strip()  # 第几张海报
-                # print post_url
-                content2 = get_html_content(post_url, url_log=False)
-                item2 = re.findall(_p_item, content2)
-                poster_url = item2[0]
-        except IndexError:
+
+        if not poster:
             try:
                 poster_pattern2 = '"nbgnbg".*?href.*?"(.*?)"'
                 poster_url = re.findall(poster_pattern2, content)[0]
@@ -192,24 +212,7 @@ class Douban(object):
                     poster = ''
             except Exception:
                 LOG.info('保存海报失败')
-                poster = ''
-        else:
-            # 海报图片名
-            filename = re.search('.*\/(.*)', poster_url).group(1)
-            # 数据库中海报的url
-            poster = self._get_poster_url(cate_eng, filename)
-            # 保存海报图片
 
-            result = self._save_poster(poster_url, download_path, filename)
-
-            # edit poster image
-            if result:
-                web_path = self._get_image_web_path(cate_eng, image_type)
-                IP.edit_poster(download_path, filename, web_path)
-                LOG.info('保存海报成功')
-            else:
-                poster = ''
-                LOG.info('保存海报失败')
         return poster
 
     def _get_screenshot(self, url, cate_eng):
@@ -262,7 +265,8 @@ class Douban(object):
                 item_num) + '&sortby=size&size=a&subtype=c'
             try:
                 ss_index = get_html_content(ss_url, url_log=False)
-            except Exception:
+            except Exception as e:
+                LOG.error(str(e))
                 break
 
             # 缩略图列表页的url和图片像素
@@ -275,24 +279,18 @@ class Douban(object):
                 except ValueError:
                     continue
                 if 1.75 < width / height < 1.87:
-                    # ss_content = get_html_content(ss_url, url_log=False)
-                    # time.sleep(round(uniform(2, 4), 1))
-                    # ss_pattern2 = re.compile(
-                    #     '<a.*?class="mainphoto".*?<img.*?src="(.*?)".*?/>', re.S)
-                    # try:
-                    #     ss_instance_url = re.findall(ss_pattern2, ss_content)[0]
-                    # except IndexError:
-                    #     continue
                     # 根据thumb url得到大图url
                     ss_instance_url = re.sub(ss_instance_pattern,
                                              r'\1photo\2jpg', ss_thumb_url)
-                    filename = re.search('.*\/(.*)', ss_instance_url).group(1)
+                    filename = re.search('.*/(.*)', ss_instance_url).group(1)
+                    filename = filename.replace('.webp', '.jpg')
                     if filename not in filename_list:
                         LOG.debug('ss_instance_url: %s' % ss_instance_url)
                         try:
                             u = urllib.urlopen(ss_instance_url)
                             data = u.read()
                         except Exception as e:
+                            LOG.error('Save pic error: %s' % str(e))
                             continue
 
                         filename_list.append(filename)
@@ -345,15 +343,11 @@ class Douban(object):
                     except ValueError:
                         continue
                     if 1.778 < width / height < 2.5:
-                        # ss_content2 = get_html_content(ss_url, url_log=False)
-                        # time.sleep(round(uniform(2, 4), 2))
-                        # ss_pattern2 = re.compile(
-                        #     '<a.*?class="mainphoto".*?<img.*?"(.*?)".*?/>', re.S)
-                        # ss_instance_url = re.findall(ss_pattern2, ss_content2)[0]
                         # 根据thumb url得到大图url
                         ss_instance_url = re.sub(ss_instance_pattern,
-                            r'\1photo\2jpg', ss_thumb_url)
-                        filename = re.search('.*\/(.*)', ss_instance_url).group(1)
+                                                 r'\1photo\2jpg', ss_thumb_url)
+                        filename = re.search('.*/(.*)', ss_instance_url).group(1)
+                        filename = filename.replace('.webp', '.jpg')
                         if filename not in filename_list:
                             LOG.debug('ss_instance_url: %s' % ss_instance_url)
                             try:
@@ -401,18 +395,10 @@ class Douban(object):
                 except ValueError:
                     continue
                 if 1.2 < width / height < 2.5:
-                    # ss_content2 = get_html_content(ss_url, url_log=False)
-                    # time.sleep(round(uniform(2, 4), 2))
-                    # ss_pattern2 = re.compile(
-                    #     '<a.*?class="mainphoto".*?<img.*?"(.*?)".*?/>', re.S)
-                    # ss_instance_url = re.findall(ss_pattern2, ss_content2)
-                    # if ss_instance_url:
-                    #     ss_instance_url = ss_instance_url[0]
-                    # else:
-                    #     continue
                     ss_instance_url = re.sub(ss_instance_pattern,
                                              r'\1photo\2jpg', ss_thumb_url)
-                    filename = re.search('.*\/(.*)', ss_instance_url).group(1)
+                    filename = re.search('.*/(.*)', ss_instance_url).group(1)
+                    filename = filename.replace('.webp', '.jpg')
                     if filename not in filename_list:
                         LOG.debug('ss_instance_url: %s' % ss_instance_url)
                         try:
@@ -642,7 +628,7 @@ class Douban(object):
                 if re.search('^(.*?)\(', date_show) and len(date) > 10:
                     date = re.search('^(.*?)/', date_show).group(1).strip()
             except AttributeError:
-                if re.search('^\d+\-\d+\-\d+$', date_show):
+                if re.search('^\d+-\d+-\d+$', date_show):
                     date = date_show
                 else:
                     date = ''
@@ -866,8 +852,8 @@ class Douban(object):
             douban_eps = re.findall(pattern_eps, content)[0]
             douban_eps = re.sub(self.pattern_tag, '', douban_eps).strip()
             douban_eps = int(douban_eps)
-        except Exception:
-            LOG.info('集数错误，设置为默认值999')
+        except Exception as e:
+            LOG.info('集数错误，设置为默认值999, %s' % str(e))
             douban_eps = 999
         douban_sn = get_douban_sn(d_url)
         return (name1, name2, year, director, screenwriter, actor, mtype, region,
@@ -922,7 +908,7 @@ class Douban(object):
                 # 1. 都有第X季，必须相同
                 if l_season and d_season:
                     LOG.debug('1. 都有第X季，必须相同')
-                    if len(l_name_s) >=2 and len(d_name_s) >=2:
+                    if len(l_name_s) >= 2 and len(d_name_s) >= 2:
                         # xxxx 第x季 ...
                         contrast_d = {'1': '一', '2': '二', '3': '三', '4': '四',
                                       '5': '五', '6': '六', '7': '七', '8': '八',
@@ -1000,7 +986,7 @@ class Douban(object):
             # 豆瓣无主演直接返回
             return False
         try:
-            l_actor = re.findall('<br>主演: (.*?)\/', l_content, re.S)[0]
+            l_actor = re.findall('<br>主演: (.*?)/', l_content, re.S)[0]
         except IndexError:
             # 尝试另一种匹配
             l_actor = re.findall('<li>主.*?演.*?：(.*?)</li>',
@@ -1046,11 +1032,11 @@ class Lol(object):
 
     def get_movie_down_urls(self, l_content):
         # l_content = l_content.decode('utf8')
-        p_down = '<li.*?id="li.*?"><a.*?href.*?"(.*?)".*?>(.*?)<' #.decode('utf8')
+        p_down = '<li.*?id="li.*?"><a.*?href.*?"(.*?)".*?>(.*?)<'
         downurl_tmp = re.findall(p_down, l_content, re.S)  # 包括了磁力链接
         downurl = []
         for item in downurl_tmp:
-            if not 'magnet:' in item[0]:
+            if 'magnet:' not in item[0]:
                 downurl.append(item)
         downurl_filter = []
         magnet_list = []
@@ -1160,7 +1146,8 @@ class Lol(object):
                 else:  # 没有第二个种子
                     down_name2 = 'N/A'
                     down_url2 = '无下载'
-            except Exception:  # 出错则匹配一个种子的情况
+            except Exception as e:  # 出错则匹配一个种子的情况
+                # LOG.error(str(e))
                 try:
                     p_down2 = 'id="bt".*?<a.*?href.*?"(.*?)".*?>(.*?)</a>'
                     bt_downurl2 = re.findall(p_down2, l_content, re.S)[0]
@@ -1393,5 +1380,17 @@ class TextHandler(object):
 
 
 if __name__ == '__main__':
-    content = get_html_content('https://movie.douban.com/subject/13936097/', url_log=False)
-    Douban().get_douban_name_info(content, 'tv', enable_log=False)
+    # ss_pattern = re.compile(
+    #     ('<div.*?class="cover">\s+<a.*?>\s+<img.*?src="(.*?)".*?>\s+</a>.*?'
+    #      '<div.*?class="prop">\s*(.*?)\s*<'), re.S)
+    # ss_instance_pattern = r'^(http.*/)thumb(/.*.)(webp|jpg|jpeg)$'
+    #
+    # ss_url = 'https://movie.douban.com/subject/26445216/photos?type=S&sortby=size&size=a&subtype=c'
+    # ss_index = get_html_content(ss_url, url_log=False)
+    #
+    # ss_page = re.findall(ss_pattern, ss_index)
+    # for ss_thumb_url, px in ss_page:
+    #     ss_instance_url = re.sub(ss_instance_pattern, r'\1photo\2jpg', ss_thumb_url)
+    #     filename = re.search('.*/(.*)', ss_instance_url).group(1)
+    #     print
+    pass

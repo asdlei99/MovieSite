@@ -24,9 +24,10 @@ class Main(object):
 
     def __init__(self):
         self.new_operation = list()
+        self.manual_list = list()
 
         # initialize paths
-        LOG.info('Initializing paths ...')
+        # LOG.info('Initializing paths ...')
         for item in NEW_PATHS:
             if not os.path.exists(item):
                 os.makedirs(item)
@@ -62,12 +63,47 @@ class Main(object):
         return {'type': op_type, 'state': state, 'l_url':l_url, 'l_name': l_name,
                 'cate_eng': cate_eng, 'cate_chn': cate_chn}
 
-    def add(self):
-        d_url = None
+    @staticmethod
+    def _add_new_movie(d_url):
+        data = {'name': '',
+                'url': '',
+                'content': '',
+                'secret': '5826f119-c0bc-4ad7-9017-30369eb75b75',
+                'tag': '',
+                'cate_eng': 'movie',
+                'd_url': d_url}
+        print 'Requesting...'
+        try:
+            time_start = time.time()
+            r = requests.post('http://www.bigedianying.com/spider/crawl/',
+                              data=data, timeout=300.0)
+            time_end = time.time()
+            print 'Response: %s, Cost: %f' % (r.content, time_end - time_start)
+        except Exception as e:
+            print str(e)
+
+    def add(self, d_url=None):
+
         l_url = None
         l_name = l_content = tag = cate_eng = ''
+
         while not d_url or 'douban' not in d_url:
             d_url = raw_input('Douban URL: ')
+            if d_url == 'start':
+                print 'Enter into multi-task'
+                self.manual_list = []
+                end = False
+                while not end:
+                    _d_url = raw_input('Douban URL: ')
+                    if _d_url and 'douban' in _d_url:
+                        self.manual_list.append(_d_url.strip())
+                    elif _d_url == 'end':
+                        print 'Multi-task start'
+                        break
+                for item in self.manual_list:
+                    self._add_new_movie(item)
+                print 'Multi-task end'
+                return
 
         while not l_url or 'loldytt' not in l_url:
             l_url = raw_input('Lol URL: ')
@@ -117,9 +153,11 @@ class Main(object):
                 'd_url': d_url}
         print 'Requesting...'
         try:
+            time_start = time.time()
             r = requests.post('http://www.bigedianying.com/spider/crawl/',
                               data=data, timeout=300.0)
-            print 'Response: %s' % r.content
+            time_end = time.time()
+            print 'Response: %s, Cost: %f' % (r.content, time_end - time_start)
         except Exception as e:
             print str(e)
 

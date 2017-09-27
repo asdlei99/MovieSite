@@ -21,7 +21,7 @@ NEW_LINE = '\n'
 
 """ path """
 # need change to the directory where you place the spider in
-WORKSPACE_PATH = 'C:\MovieSpider'
+WORKSPACE_PATH = os.getcwd()
 LOG_PATH = os.path.join(WORKSPACE_PATH, 'logs')
 DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'tmp_images')
 

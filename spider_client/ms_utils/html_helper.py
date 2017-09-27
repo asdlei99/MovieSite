@@ -2,15 +2,9 @@
 from __future__ import division
 
 import base64
-import os
 import re
-import time
-import urllib
-from random import uniform
 
-from common import get_html_content, get_douban_sn
-from ms_constants import DOWNLOAD_IMAGE_PATH, WEB_IMAGE_PATH, MOVIE_NAME_ENG, \
-    MOVIE_NAME_CH, NEW_LINE
+from ms_constants import NEW_LINE
 from ms_exceptions import *
 from ms_utils import log
 
@@ -37,12 +31,11 @@ class Lol(object):
         return latest_urls
 
     def get_movie_down_urls(self, l_content):
-        # l_content = l_content.decode('utf8')
-        p_down = '<li.*?id="li.*?"><a.*?href.*?"(.*?)".*?>(.*?)<' #.decode('utf8')
+        p_down = '<li.*?id="li.*?"><a.*?href.*?"(.*?)".*?>(.*?)<'
         downurl_tmp = re.findall(p_down, l_content, re.S)  # 包括了磁力链接
         downurl = []
         for item in downurl_tmp:
-            if not 'magnet:' in item[0]:
+            if 'magnet:' not in item[0]:
                 downurl.append(item)
         downurl_filter = []
         magnet_list = []
@@ -152,7 +145,8 @@ class Lol(object):
                 else:  # 没有第二个种子
                     down_name2 = 'N/A'
                     down_url2 = '无下载'
-            except Exception:  # 出错则匹配一个种子的情况
+            except Exception as e:  # 出错则匹配一个种子的情况
+                LOG.error(str(e))
                 try:
                     p_down2 = 'id="bt".*?<a.*?href.*?"(.*?)".*?>(.*?)</a>'
                     bt_downurl2 = re.findall(p_down2, l_content, re.S)[0]
@@ -385,8 +379,4 @@ class TextHandler(object):
 
 
 if __name__ == '__main__':
-    l_content = get_html_content('http://www.loldytt.com/Anime/MWZWHTD/')
-    name_url_list, seq = Lol()._get_series_name_url_list(l_content)
-    for k,v in name_url_list:
-        print k
-        print v
+    pass
