@@ -467,55 +467,62 @@ class Douban(object):
                              enable_log=True):
         pattern_name = re.compile('<h1>.*?<span.*?"v:itemreviewed">(.*?)</span>',
                                   re.S)
-        # 名字
-        if cate_eng == MOVIE_NAME_ENG:
-            names = re.findall(pattern_name, content)[0]
-            if len(names.split()) == 2:
-                name1 = names.split()[0]
-                name2 = names.split()[1]
-                name2 = name2.replace("&#39;", "'").replace("&amp;", "&").replace(
-                    "&#34", '"')
-            else:
-                name1 = names.split()[0]
-                name2 = ' '.join(names.split()[1:])
-                name2 = name2.replace("&#39;", "'").replace("&amp;", "&").replace(
-                    "&#34", '"')
-        else:
-            names = re.findall(pattern_name, content)[0]. \
-                replace('&#39;', "'").replace('&amp;', "&").replace("&#34", '"')
-
-            tmp = names.split()
-            if len(tmp) == 2:
-                if '第' in tmp[1] and '季' in tmp[1]:
-                    name1 = self.text_handler.replace_symbol(
-                        tmp[0] + ' ' + tmp[1])
-                    name2 = ' '.join(tmp[2:])
-                elif not re.search(u"[\u4e00-\u9fa5]+", u"tmp[1]"):  # 第二段若不含中文
-                    name1 = self.text_handler.replace_symbol(tmp[0])
-                    name2 = self.text_handler.replace_symbol(tmp[1])
-                else:
-                    name1 = self.text_handler.replace_symbol(
-                        tmp[0] + ' ' + tmp[1])
-                    name2 = ''
-            elif len(tmp) == 1:
-                name1 = self.text_handler.replace_symbol(tmp[0])
-                name2 = ' '.join(tmp[1:])
-                name2 = self.text_handler.replace_symbol(name2)
-            else:  # 大于3
-                if '第' in tmp[1] and '季' in tmp[1]:
-                    name1 = tmp[0] + ' ' + tmp[1]
-                    name2 = ' '.join(tmp[2:])
-                elif not re.search(u"[\u4e00-\u9fa5]+", u"tmp[1]"):  # 第二段若不含中文
-                    name1 = tmp[0].strip()
-                    name2 = ' '.join(tmp[1:])
-                else:
-                    name1 = tmp[0].strip() + ' ' + tmp[1].strip()
-                    name2 = ' '.join(tmp[2:])
-            name1 = self.text_handler.replace_symbol(name1)
-            name2 = self.text_handler.replace_symbol(name2)
-            if enable_log:
-                LOG.info('douban name - %s：%s' % (cate_chn, name1))
-        return name1, name2
+        # 全部名
+        names = re.findall(pattern_name, content)[0]
+        names = self.text_handler.replace_symbol(names)
+        # 中文名
+        ch_name = re.findall(r'<title>\s?(.*?)\s?</title>', content, re.S)[0]
+        ch_name = ch_name.replace('(豆瓣)', '').strip()
+        # 外文名
+        foreign_name = names.replace(ch_name, '').strip()
+        # if cate_eng == MOVIE_NAME_ENG:
+        #     names = re.findall(pattern_name, content)[0]
+        #     if len(names.split()) == 2:
+        #         name1 = names.split()[0]
+        #         name2 = names.split()[1]
+        #         name2 = name2.replace("&#39;", "'").replace("&amp;", "&").replace(
+        #             "&#34", '"')
+        #     else:
+        #         name1 = names.split()[0]
+        #         name2 = ' '.join(names.split()[1:])
+        #         name2 = name2.replace("&#39;", "'").replace("&amp;", "&").replace(
+        #             "&#34", '"')
+        # else:
+        #     names = re.findall(pattern_name, content)[0]. \
+        #         replace('&#39;', "'").replace('&amp;', "&").replace("&#34", '"')
+        #
+        #     tmp = names.split()
+        #     if len(tmp) == 2:
+        #         if '第' in tmp[1] and '季' in tmp[1]:
+        #             name1 = self.text_handler.replace_symbol(
+        #                 tmp[0] + ' ' + tmp[1])
+        #             name2 = ' '.join(tmp[2:])
+        #         elif not re.search(u"[\u4e00-\u9fa5]+", u"tmp[1]"):  # 第二段若不含中文
+        #             name1 = self.text_handler.replace_symbol(tmp[0])
+        #             name2 = self.text_handler.replace_symbol(tmp[1])
+        #         else:
+        #             name1 = self.text_handler.replace_symbol(
+        #                 tmp[0] + ' ' + tmp[1])
+        #             name2 = ''
+        #     elif len(tmp) == 1:
+        #         name1 = self.text_handler.replace_symbol(tmp[0])
+        #         name2 = ' '.join(tmp[1:])
+        #         name2 = self.text_handler.replace_symbol(name2)
+        #     else:  # 大于3
+        #         if '第' in tmp[1] and '季' in tmp[1]:
+        #             name1 = tmp[0] + ' ' + tmp[1]
+        #             name2 = ' '.join(tmp[2:])
+        #         elif not re.search(u"[\u4e00-\u9fa5]+", u"tmp[1]"):  # 第二段若不含中文
+        #             name1 = tmp[0].strip()
+        #             name2 = ' '.join(tmp[1:])
+        #         else:
+        #             name1 = tmp[0].strip() + ' ' + tmp[1].strip()
+        #             name2 = ' '.join(tmp[2:])
+        #     name1 = self.text_handler.replace_symbol(name1)
+        #     name2 = self.text_handler.replace_symbol(name2)
+        #     if enable_log:
+        #         LOG.info('douban name - %s：%s' % (cate_chn, name1))
+        return ch_name, foreign_name
 
     def get_region(self, content, enable_log=True):
         try:
@@ -1386,4 +1393,5 @@ class TextHandler(object):
 
 
 if __name__ == '__main__':
-    pass
+    content = get_html_content('https://movie.douban.com/subject/13936097/', url_log=False)
+    Douban().get_douban_name_info(content, 'tv', enable_log=False)

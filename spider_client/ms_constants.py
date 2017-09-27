@@ -21,14 +21,11 @@ NEW_LINE = '\n'
 
 """ path """
 # need change to the directory where you place the spider in
-WORKSPACE_PATH = r'C:\MovieSpider'
+WORKSPACE_PATH = os.getcwd()
 LOG_PATH = os.path.join(WORKSPACE_PATH, 'logs')
 DOWNLOAD_IMAGE_PATH = os.path.join(WORKSPACE_PATH, 'images')
 
-# change this to the site's directory .../static/images
-WEB_IMAGE_PATH = r'E:\Eclipse Workspace\MovieSite\static\images'
-
-NEW_PATHS = (WORKSPACE_PATH, DOWNLOAD_IMAGE_PATH)
+NEW_PATHS = (WORKSPACE_PATH, DOWNLOAD_IMAGE_PATH, LOG_PATH)
 
 """ log """
 LOL_LINK_FILE = os.path.join(LOG_PATH, 'lol_%s_link.log')
