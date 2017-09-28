@@ -347,7 +347,6 @@ class Series(Media):
                         break
                     continue
                 else:
-                    LOG.debug('dbvalue is not "continue", dbvalue: %s' % str(db_value))
                     break
 
         if db_value == '%s_exists' % self.ENG_NAME:

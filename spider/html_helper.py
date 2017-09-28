@@ -162,7 +162,7 @@ class Douban(object):
                                             'weight': 1})
             except Exception:
                 continue
-        LOG.debug(str(poster_urls))
+        # LOG.debug(str(poster_urls))
         if not poster_urls:
             try:
                 _url = poster_index[0][0].strip()  # 第几张海报
@@ -173,27 +173,34 @@ class Douban(object):
         # SAVE
         poster = ''
         sorted_poster_urls = filter(lambda x: x.get('weight') == 2, poster_urls)
-        LOG.debug('sorted_poster_urls: %s' % str(sorted_poster_urls))
+        # LOG.debug('sorted_poster_urls: %s' % str(sorted_poster_urls))
         sorted_poster_urls.extend(filter(lambda x: x.get('weight') == 1, poster_urls))
-        LOG.debug('sorted_poster_urls: %s' % str(sorted_poster_urls))
+        # LOG.debug('sorted_poster_urls: %s' % str(sorted_poster_urls))
+        save_success = False
         for item in poster_urls:
-            # 海报图片名
-            filename = re.search('.*/(.*)', item.get('url')).group(1)
-            LOG.debug('filename: %s' % filename)
-            # 保存海报图片
-            result = self._save_poster(item.get('url'), download_path, filename)
+            if save_success:
+                break
 
-            # edit poster image
-            if result:
-                web_path = self._get_image_web_path(cate_eng, image_type)
-                try:
-                    IP.edit_poster(download_path, filename, web_path)
-                except Exception as e:
-                    LOG.error('Edit poster failed: %s' % str(e))
-                else:
-                    LOG.info('保存海报成功')
-                    poster = self._get_poster_url(cate_eng, filename)
-                    break
+            # 海报图片名
+            tried_times = 0
+            while tried_times < 3:
+                filename = re.search('.*/(.*)', item.get('url')).group(1)
+                # 保存海报图片
+                result = self._save_poster(item.get('url'), download_path,
+                                           filename)
+                # edit poster image
+                if result:
+                    web_path = self._get_image_web_path(cate_eng, image_type)
+                    try:
+                        IP.edit_poster(download_path, filename, web_path)
+                    except Exception as e:
+                        LOG.error('Edit poster failed: %s' % str(e))
+                        tried_times += 1
+                    else:
+                        LOG.info('保存海报成功')
+                        poster = self._get_poster_url(cate_eng, filename)
+                        save_success = True
+                        break
 
         if not poster:
             try:
@@ -254,7 +261,7 @@ class Douban(object):
         ss_pattern = re.compile(
             ('<div.*?class="cover">\s+<a.*?>\s+<img.*?src="(.*?)".*?>\s+</a>.*?'
              '<div.*?class="prop">\s*(.*?)\s*<'), re.S)
-        ss_instance_pattern = r'^(http.*/)thumb(/.*.)(webp|jpg|jpeg)$'
+        # ss_instance_pattern = r'^(http.*/)m(/.*.)(webp|jpg|jpeg)$'
         while ss_not_found:
             current_page += 1
             if current_page > capture_page:
@@ -280,14 +287,13 @@ class Douban(object):
                     continue
                 if 1.75 < width / height < 1.87:
                     # 根据thumb url得到大图url
-                    ss_instance_url = re.sub(ss_instance_pattern,
-                                             r'\1photo\2jpg', ss_thumb_url)
-                    filename = re.search('.*/(.*)', ss_instance_url).group(1)
+                    # ss_instance_url = re.sub(ss_instance_pattern,
+                    #                          r'\1photo\2jpg', ss_thumb_url)
+                    filename = re.search('.*/(.*)', ss_thumb_url).group(1)
                     filename = filename.replace('.webp', '.jpg')
                     if filename not in filename_list:
-                        LOG.debug('ss_instance_url: %s' % ss_instance_url)
                         try:
-                            u = urllib.urlopen(ss_instance_url)
+                            u = urllib.urlopen(ss_thumb_url)
                             data = u.read()
                         except Exception as e:
                             LOG.error('Save pic error: %s' % str(e))
@@ -344,14 +350,13 @@ class Douban(object):
                         continue
                     if 1.778 < width / height < 2.5:
                         # 根据thumb url得到大图url
-                        ss_instance_url = re.sub(ss_instance_pattern,
-                                                 r'\1photo\2jpg', ss_thumb_url)
-                        filename = re.search('.*/(.*)', ss_instance_url).group(1)
+                        # ss_instance_url = re.sub(ss_instance_pattern,
+                        #                          r'\1photo\2jpg', ss_thumb_url)
+                        filename = re.search('.*/(.*)', ss_thumb_url).group(1)
                         filename = filename.replace('.webp', '.jpg')
                         if filename not in filename_list:
-                            LOG.debug('ss_instance_url: %s' % ss_instance_url)
                             try:
-                                u = urllib.urlopen(ss_instance_url)
+                                u = urllib.urlopen(ss_thumb_url)
                                 data = u.read()
                             except Exception as e:
                                 continue
@@ -395,14 +400,13 @@ class Douban(object):
                 except ValueError:
                     continue
                 if 1.2 < width / height < 2.5:
-                    ss_instance_url = re.sub(ss_instance_pattern,
-                                             r'\1photo\2jpg', ss_thumb_url)
-                    filename = re.search('.*/(.*)', ss_instance_url).group(1)
+                    # ss_instance_url = re.sub(ss_instance_pattern,
+                    #                          r'\1photo\2jpg', ss_thumb_url)
+                    filename = re.search('.*/(.*)', ss_thumb_url).group(1)
                     filename = filename.replace('.webp', '.jpg')
                     if filename not in filename_list:
-                        LOG.debug('ss_instance_url: %s' % ss_instance_url)
                         try:
-                            u = urllib.urlopen(ss_instance_url)
+                            u = urllib.urlopen(ss_thumb_url)
                             data = u.read()
                         except Exception:
                             continue
@@ -873,7 +877,7 @@ class Douban(object):
         for item in other_name.split('/'):
             d_name_list.append(item.strip())
         d_name_list = filter(lambda x: x, d_name_list)
-        LOG.debug('d_name_list: %s' % str(d_name_list))
+        # LOG.debug('d_name_list: %s' % str(d_name_list))
         for d_name in d_name_list:
             if len(l_name.split(r'/')) > 1:
                 season_str = str()
@@ -895,7 +899,7 @@ class Douban(object):
                     l_name_tmp = [item.strip() for item in l_name.split(r'/')]
             else:
                 l_name_tmp = [l_name]
-            LOG.debug('l_name_tmp: %s' % str(l_name_tmp))
+            # LOG.debug('l_name_tmp: %s' % str(l_name_tmp))
             for l_item in l_name_tmp:
                 # l_item = l_item.decode('gbk').encode('utf-8')
                 LOG.debug('-----------name comparing-----------')
@@ -1380,17 +1384,5 @@ class TextHandler(object):
 
 
 if __name__ == '__main__':
-    # ss_pattern = re.compile(
-    #     ('<div.*?class="cover">\s+<a.*?>\s+<img.*?src="(.*?)".*?>\s+</a>.*?'
-    #      '<div.*?class="prop">\s*(.*?)\s*<'), re.S)
-    # ss_instance_pattern = r'^(http.*/)thumb(/.*.)(webp|jpg|jpeg)$'
-    #
-    # ss_url = 'https://movie.douban.com/subject/26445216/photos?type=S&sortby=size&size=a&subtype=c'
-    # ss_index = get_html_content(ss_url, url_log=False)
-    #
-    # ss_page = re.findall(ss_pattern, ss_index)
-    # for ss_thumb_url, px in ss_page:
-    #     ss_instance_url = re.sub(ss_instance_pattern, r'\1photo\2jpg', ss_thumb_url)
-    #     filename = re.search('.*/(.*)', ss_instance_url).group(1)
-    #     print
+    Douban()._get_screenshot('https://movie.douban.com/subject/26956054/', 'tv')
     pass

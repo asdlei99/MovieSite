@@ -57,7 +57,7 @@ def index(request):
     ret['news_daily_top'] = models.News.objects.all().values('id', 'title').order_by('-day_visit_count', '-create_date')[:10]
     
     #anime
-    anime_new_obj = models.Anime.objects.filter(score__gt=0).order_by('-release_date')[:12]
+    anime_new_obj = models.Anime.objects.filter(release_date__lte=today_str).order_by('-release_date')[:12]
     ret['anime_new_release'] = replaceWrongImg(anime_new_obj, img_type='p')
     anime_recommend_obj = models.Movie_Recommend.objects.filter(cate=3).order_by('-create_date')[:4]
     ret['anime_recommend'] = []
@@ -72,7 +72,7 @@ def index(request):
     ret['anime_monthly_top'] = models.Anime.objects.values('id', 'ch_name', 'score').order_by('-month_visit_count', '-release_date')[:10]
     
     #show
-    show_new_obj = models.Show.objects.filter(score__gt=0).order_by('-release_date')[:12]
+    show_new_obj = models.Show.objects.filter(release_date__lte=today_str).order_by('-release_date')[:12]
     ret['show_new_release'] = replaceWrongImg(show_new_obj, img_type='p')
     show_recommend_obj = models.Movie_Recommend.objects.filter(cate=4).order_by('-create_date')[:4]
     ret['show_recommend'] = []
