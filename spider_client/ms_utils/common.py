@@ -22,6 +22,7 @@ def get_html_content(url, url_log=True):
         #     LOG.error('Tried %d times constantly, take a break' % timer)
         #     timer = 1
         #     time.sleep(60)
+        response = None
         try:
             if url_log:
                 LOG.info(url)
@@ -34,19 +35,27 @@ def get_html_content(url, url_log=True):
             LOG.error('%s：HTTPError %s' % (url, e.code))
             if str(e.code) == '404':
                 raise Http404
+            if response:
+                response.close()
             time.sleep(random.uniform(5, 10))
             timer += 1
         except urllib2.URLError as e:
             LOG.error('%s：URLError %s' % (url, e.reason))
+            if response:
+                response.close()
             time.sleep(random.uniform(5, 10))
             timer += 1
         except socket.timeout as e:
             LOG.error('%s：%s' % (url, str(e)))
+            if response:
+                response.close()
             time.sleep(random.uniform(2, 10))
             timer += 1
         except socket.error as e:
             LOG.error('%s：%s' % (url, str(e)))
-            time.sleep(2, 5)
+            if response:
+                response.close()
+            time.sleep(random.uniform(2, 5))
             timer += 1
 
     # for special case

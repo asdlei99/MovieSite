@@ -490,6 +490,7 @@ class Main(object):
                                         self.driver, cate_eng, d_url)
             result = '成功' if result else '失败'
             LOG.info('%s%s' % (op_type, result))
+            LOG.info_record(l_name, l_url)
             self.new_operation.append(self.operation(op_type, result, l_url,
                                                      l_name, cate_eng, cate_chn))
         except Exception as e:

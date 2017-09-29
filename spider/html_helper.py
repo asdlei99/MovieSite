@@ -6,7 +6,6 @@ import os
 import re
 import time
 import urllib
-import chardet
 from random import uniform
 
 from common import get_html_content, get_douban_sn
