@@ -45,6 +45,16 @@ class Douban(object):
 
         self.current_date = self.get_current_date()
 
+    def get_url_from_sn(self, douban_sn):
+        return 'https://movie.douban.com/subject/%s/' % douban_sn
+
+    def get_sn_from_url(self, douban_url):
+        res = re.findall(r'http.*?subject/(.*?)/?$', douban_url)
+        if res:
+            return res[0]
+        else:
+            raise ValueError
+
     @staticmethod
     def get_current_date():
         return time.strftime('%y%m', time.localtime())
@@ -544,6 +554,7 @@ class Douban(object):
         :param content:
         :param cate_eng:
         :param cate_chn:
+        :param enable_log:
         :return:
         """
         name1, name2 = self.get_douban_name_info(content, cate_eng,
@@ -643,12 +654,17 @@ class Douban(object):
             except Exception:
                 pattern_shangying = re.compile('>上映日期.*?</span>(.*?)<br.*?>',
                                                re.S)
-                if re.findall(pattern_shangying, content):
+                shangying = re.findall(pattern_shangying, content)
+                if shangying:
                     # 没有上映且没有首播，设为空
                     if enable_log:
                         LOG.info('啊哦，这可能是一部电影...略过')
-                    time.sleep(round(uniform(2, 4), 1))
-                    return 'continue'
+                    if cate_eng == 'anime':
+                        date_show = shangying[0]
+                        date_show = re.sub(self.pattern_tag, '', date_show)
+                        LOG.debug('date_show: %s' % date_show)
+                    else:
+                        return 'continue'
                 else:
                     date_show = ''
             try:
@@ -658,6 +674,7 @@ class Douban(object):
                     date = re.search('^(.*?)\(', date_show).group(1).strip()
                     if re.search('^(.*?)\(', date_show) and len(date) > 10:
                         date = re.search('^(.*?)\/', date_show).group(1).strip()
+                    LOG.debug('date: %s' % date)
             except AttributeError:
                 if re.search('^\d+\-\d+\-\d+$', date_show):
                     date = date_show

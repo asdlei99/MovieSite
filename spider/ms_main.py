@@ -493,14 +493,15 @@ class Main(object):
             LOG.info_record(l_name, l_url)
             self.new_operation.append(self.operation(op_type, result, l_url,
                                                      l_name, cate_eng, cate_chn))
+            self.driver.close()
+            self.driver.quit()
+            return op_type, result
+
         except Exception as e:
             LOG.debug('Update Exception: %s' % str(e))
             self.driver.close()
             self.driver.quit()
             raise e
-        else:
-            self.driver.close()
-            self.driver.quit()
 
     @staticmethod
     def operation(op_type, state, l_url, l_name, cate_eng, cate_chn):
@@ -508,8 +509,35 @@ class Main(object):
         return {'type': op_type, 'state': state, 'l_url': l_url, 'l_name': l_name,
                 'cate_eng': cate_eng, 'cate_chn': cate_chn}
 
-    def add_manually(self, l_content, d_url):
-        pass
+    def update_score(self):
+        for item in ('movie', 'tv', 'anime', 'show'):
+            sql = ('SELECT id, ch_name, score, douban_sn FROM movie_%s WHERE score=0 '
+                   'AND douban_sn!=NULL' % item)
+            cur = self.conn.cursor()
+            obj = cur.execute(sql)  # 按link_addr查询
+            media = obj.fetchall()
+            cur.close()
+            for m in media:
+                d_content = get_html_content(Douban.get_url_from_sn(
+                    m.get('douban_sn')))
+                (name1, name2, year, director, screenwriter, actor, mtype, region,
+                 date_show, date, running_time, score, other_name, imdb, intro
+                 ) = Douban.get_douban_text_info(d_content, item, enable_log=False)
+                _sql = ('UPDATE movie_%s SET score=%s WHERE id=%s' %
+                        (item, score, m.get('id')))
+                _cur = None
+                try:
+                    _cur = self.conn.cursor()
+                    _cur.execute(_sql)
+                    _cur.close()
+                except Exception as e:
+                    LOG.error('Update %s %s score failed: %s' %
+                              (item, m.get('ch_name'), str(e)))
+                    if _cur:
+                        _cur.close()
+                else:
+                    LOG.info('Update %s %s score successfully')
+                time.sleep(1)
 
 
     def start(self):
