@@ -140,7 +140,7 @@
             </ul>
           </div>
           {% endif %}
-          {% if reply.post_layer_reply.all|length > 9%}<ul class="pagination-plain text-center">{{page_list}}</ul>{% endif %}
+          {% if post_counts > 9 %}<ul class="pagination-plain text-center">{{page_list}}</ul>{% endif %}
            
            <div id="publish-reply">
              <div id="summernote"></div>

@@ -117,9 +117,8 @@ def postDetail(request, pid):
         page = try_int(request.GET.get('p', 1), 1)
         ret['cur_page'] = page
         ret['layer_start'] = (page-1)*10 + 1  #需在模板中用forloop.counter0 
-        post_reply_counts = post_replies_obj.count()
-        ret['post_counts'] = post_reply_counts
-        pageObj = html_helper_search.PageInfo(page, post_reply_counts, 10, 9)  #加1为了使分页加上1楼计算
+        ret['post_counts'] = reply_counts
+        pageObj = html_helper_search.PageInfo(page, reply_counts, 10, 9)  #加1为了使分页加上1楼计算
         print pageObj.start, pageObj.end
         try:
             post_replies_obj = post_replies_obj[pageObj.start : pageObj.end]
@@ -381,7 +380,8 @@ def submitLayerReply(request):
         
         #更新帖子最后回复时间
         post_obj = models.Post.objects.filter(id=post_reply_obj[0].post.id)
-        post_obj.update(last_replied_date=new_post_lr.create_date,last_replied_user=user_obj[0])
+        post_obj.update(last_replied_date=new_post_lr.create_date,
+                                                                        last_replied_user=user_obj[0])
         #若target_user不是自己
         if not target_uid == uid:
             models.User_Notification_Check.objects.create(target_user=target_user_obj[0], bbs_r=1)
@@ -427,13 +427,12 @@ def deleteReply(request):
                             os.remove(os.path.join(BASE_DIR + img))
                         except Exception:
                             pass
-                #2 删除楼层
                 try:
+                    #2 删除楼层
                     reply_obj.delete()
                     ret['msg'] = 'success'
                 except Exception:
                     ret['msg'] = '101'  #操作失败
-
             else:
                 ret['msg'] = '921'  #无权限
         else:
