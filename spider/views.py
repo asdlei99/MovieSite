@@ -53,4 +53,8 @@ def crawl(request):
 @csrf_exempt
 def update_score(request):
     if request.method == 'POST' and request.POST.get('secret') == SECRET:
-        Main.update_score()
+        res = Main().update_score()
+        if res:
+            return HttpResponse('OK')
+        else:
+            return HttpResponse('BAD')

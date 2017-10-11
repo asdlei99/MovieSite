@@ -5,5 +5,5 @@ from spider import views
 
 urlpatterns = [
     url('crawl/$', views.crawl),
-
+    url('update_score/$', views.update_score)
 ]

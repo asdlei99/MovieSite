@@ -441,8 +441,19 @@ class Main(object):
         cur = self.conn.cursor()
         num = cur.execute(sql, (url,))  # 按link_addr查询
         # item_num = len(cur.fetchall())
+        if not num:
+            if cate_eng == 'anime':
+                sql = 'SELECT * FROM movie_tv WHERE link_addr=%s'
+                num = cur.execute(sql, (url,))
+                if num:
+                    cate_eng = 'anime'
+            elif cate_eng == 'tv':
+                sql = 'SELECT * FROM movie_anime WHERE link_addr=%s'
+                num = cur.execute(sql, (url,))
+                if num:
+                    cate_eng = 'tv'
         cur.close()
-        return num
+        return num, cate_eng
 
     def update(self, l_tag, l_url, l_name, l_content, cate_eng, d_url=None):
         """
@@ -475,7 +486,8 @@ class Main(object):
             else:
                 # for tv, anime and show
                 series = Series(cate_eng)
-                if self._item_exists(l_url, cate_eng):
+                num, cate_eng = self._item_exists(l_url, cate_eng)
+                if num:
                     (down_names,
                      down_urls,
                      updated_eps, seq) = Lol.series_get_down_urls(l_content)
@@ -511,34 +523,50 @@ class Main(object):
 
     def update_score(self):
         for item in ('movie', 'tv', 'anime', 'show'):
-            sql = ('SELECT id, ch_name, score, douban_sn FROM movie_%s WHERE score=0 '
-                   'AND douban_sn!=NULL' % item)
-            cur = self.conn.cursor()
-            obj = cur.execute(sql)  # 按link_addr查询
-            media = obj.fetchall()
-            cur.close()
-            for m in media:
-                d_content = get_html_content(Douban.get_url_from_sn(
-                    m.get('douban_sn')))
-                (name1, name2, year, director, screenwriter, actor, mtype, region,
-                 date_show, date, running_time, score, other_name, imdb, intro
-                 ) = Douban.get_douban_text_info(d_content, item, enable_log=False)
-                _sql = ('UPDATE movie_%s SET score=%s WHERE id=%s' %
-                        (item, score, m.get('id')))
-                _cur = None
-                try:
-                    _cur = self.conn.cursor()
-                    _cur.execute(_sql)
-                    _cur.close()
-                except Exception as e:
-                    LOG.error('Update %s %s score failed: %s' %
-                              (item, m.get('ch_name'), str(e)))
-                    if _cur:
-                        _cur.close()
-                else:
-                    LOG.info('Update %s %s score successfully')
-                time.sleep(1)
-
+            sql = ('SELECT id, ch_name, douban_sn FROM movie_%s WHERE score=0 '
+                   'AND douban_sn!=""' % item)
+            try:
+                cur = self.conn.cursor()
+                cur.execute(sql)  # 按link_addr查询
+                media = cur.fetchall()
+                cur.close()
+                LOG.info('Total counts: %s %s' % (len(media), item))
+                for m in media:
+                    _id, ch_name, douban_sn = m
+                    d_content = get_html_content(Douban.get_url_from_sn(
+                        douban_sn))
+                    (name1, name2, year, director, screenwriter, actor, mtype, region,
+                     date_show, date, running_time, score, other_name, imdb, intro
+                     ) = Douban.get_douban_text_info(d_content, item, enable_log=False)
+                    if not score == 0:
+                        _sql = ('UPDATE movie_%s SET ch_name="%s", foreign_name="%s",'
+                                ' year="%s", director="%s", screenwriter="%s", actor="%s",'
+                                ' types="%s", region="%s", release_date_show="%s",'
+                                ' release_date="%s", running_time="%s", score=%s,'
+                                ' other_name="%s", imdb_sn="%s", intro="%s"'
+                                ' WHERE id=%s' %
+                                (item, name1, name2, year, director, screenwriter,
+                                 actor, mtype, region, date_show, date,
+                                 running_time, score, other_name, imdb,
+                                 intro, _id))
+                        _cur = None
+                        try:
+                            _cur = self.conn.cursor()
+                            _cur.execute(_sql)
+                            self.conn.commit()
+                        except Exception as e:
+                            LOG.error('Update %s %s score failed: %s' %
+                                      (item, ch_name, str(e)))
+                            _cur.close()
+                        else:
+                            _cur.close()
+                            LOG.info('Update %s %s score successfully: %s' %
+                                     (item, ch_name, score))
+                    time.sleep(3)
+            except Exception as e:
+                LOG.error('Unexpected error: %s' % str(e))
+                return False
+        return True
 
     def start(self):
         """
