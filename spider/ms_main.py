@@ -350,7 +350,6 @@ class Series(Media):
                     break
 
         if db_value == '%s_exists' % self.ENG_NAME:
-            LOG.debug('start updating')
             self.update(down_names=filename_str,
                         down_urls=thunder_str,
                         updated_eps=eps_num,
@@ -434,24 +433,34 @@ class Main(object):
 
     def _item_exists(self, url, cate_eng):
         if not url:
-            return 0
+            return 0, cate_eng
         _TABLE_NAME = 'movie_%s' % cate_eng
         # Check if item exists
-        sql = ('SELECT * FROM %s' % _TABLE_NAME + ' WHERE link_addr=%s')
+        sql = ('SELECT * FROM %s' % _TABLE_NAME + ' WHERE link_addr="%s"')
         cur = self.conn.cursor()
         num = cur.execute(sql, (url,))  # 按link_addr查询
+        LOG.debug('SQL: %s, num: %d' % ((sql % url), num))
         # item_num = len(cur.fetchall())
         if not num:
             if cate_eng == 'anime':
-                sql = 'SELECT * FROM movie_tv WHERE link_addr=%s'
+                sql = 'SELECT * FROM movie_tv WHERE link_addr="%s"'
                 num = cur.execute(sql, (url,))
                 if num:
-                    cate_eng = 'anime'
-            elif cate_eng == 'tv':
-                sql = 'SELECT * FROM movie_anime WHERE link_addr=%s'
-                num = cur.execute(sql, (url,))
-                if num:
+                    LOG.info('cate is anime, but found in movie_tv')
                     cate_eng = 'tv'
+            elif cate_eng == 'tv':
+                sql = 'SELECT * FROM movie_anime WHERE link_addr="%s"'
+                num = cur.execute(sql, (url,))
+                if num:
+                    LOG.info('cate is tv, but found in movie_anime')
+                    cate_eng = 'anime'
+            elif cate_eng == 'show':
+                sql = 'SELECT * FROM movie_tv WHERE link_addr="%s"'
+                num = cur.execute(sql, (url,))
+                if num:
+                    LOG.info('cate is show, but found in movie_tv')
+                    cate_eng = 'tv'
+
         cur.close()
         return num, cate_eng
 
@@ -471,7 +480,8 @@ class Main(object):
             if cate_eng == MOVIE_NAME_ENG:
                 # for movie
                 movie = Movie()
-                if self._item_exists(l_url, cate_eng):
+                num, cate_eng = self._item_exists(l_url, cate_eng)
+                if num:
                     (down_name1, down_url1, down_name2,
                      down_url2) = Lol.get_movie_down_urls(l_content)
                     op_type = '更新'

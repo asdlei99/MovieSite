@@ -7,7 +7,7 @@
     
 {% block css_own %}
 <link rel='stylesheet' href='/static/css/movie/movie_base.css?v=170903.1'>
-<link rel='stylesheet' href='/static/css/movie/movie_detail.css?v=161204.1'>
+<link rel='stylesheet' href='/static/css/movie/movie_detail.css?v=171024.1'>
 <link href="/static/css/plugs/sinaEmotion/jquery.sinaEmotion.css" rel="stylesheet">
 
 {% endblock %}
@@ -70,6 +70,8 @@
               {% if not detail.eps == 999 %}<p>集数：{{detail.eps}}</p>{% endif %}
               {% if detail.running_time %}<p>单集片长：{{detail.running_time}}</p>{% endif %}
               {% if detail.other_name %}<p>又名：{{detail.other_name}}</p>{% endif %}
+              {% if detail.douban_sn %}<p>豆瓣：<a href="https://movie.douban.com/subject/{{ detail.douban_sn }}/" target="_blank">{{ detail.douban_sn }}</a></p>{% endif %}
+              {% if detail.imdb_sn %}<p>IMDB：<a href="http://www.imdb.com/title/{{ detail.imdb_sn }}/" target="_blank">{{ detail.imdb_sn }}</a></p>{% endif %}
             </div>
           </div>
         </div> <!-- info -->

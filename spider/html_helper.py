@@ -102,7 +102,6 @@ class Douban(object):
 
     def _get_image_download_path(self, cate_eng, image_type):
         """
-
         :param cate_eng:
         :param image_type: p (poster) or s (screenshoot)
         :return:
@@ -171,11 +170,12 @@ class Douban(object):
                                             'weight': 1})
             except Exception:
                 continue
-        # LOG.debug(str(poster_urls))
+
         if not poster_urls:
             try:
                 _url = poster_index[0][0].strip()  # 第几张海报
-                poster_urls.append(_url)
+                poster_urls.append({'url': _url.replace('.webp', '.jpg'),
+                                    'weight': 1})
             except Exception:
                 pass
 
