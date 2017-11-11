@@ -438,25 +438,24 @@ class Main(object):
         # Check if item exists
         sql = ('SELECT * FROM %s' % _TABLE_NAME + ' WHERE link_addr="%s"')
         cur = self.conn.cursor()
-        num = cur.execute(sql, (url,))  # 按link_addr查询
+        num = cur.execute(sql % url)  # 按link_addr查询
         LOG.debug('SQL: %s, num: %d' % ((sql % url), num))
-        # item_num = len(cur.fetchall())
         if not num:
             if cate_eng == 'anime':
                 sql = 'SELECT * FROM movie_tv WHERE link_addr="%s"'
-                num = cur.execute(sql, (url,))
+                num = cur.execute(sql % url)
                 if num:
                     LOG.info('cate is anime, but found in movie_tv')
                     cate_eng = 'tv'
             elif cate_eng == 'tv':
                 sql = 'SELECT * FROM movie_anime WHERE link_addr="%s"'
-                num = cur.execute(sql, (url,))
+                num = cur.execute(sql % url)
                 if num:
                     LOG.info('cate is tv, but found in movie_anime')
                     cate_eng = 'anime'
             elif cate_eng == 'show':
                 sql = 'SELECT * FROM movie_tv WHERE link_addr="%s"'
-                num = cur.execute(sql, (url,))
+                num = cur.execute(sql % url)
                 if num:
                     LOG.info('cate is show, but found in movie_tv')
                     cate_eng = 'tv'
@@ -646,6 +645,6 @@ class Main(object):
 
 
 if __name__ == '__main__':
-    m = Main()
-    m.start()
-
+    # m = Main()
+    # m.start()
+    Main()._item_exists('http://www.loldytt.com/Zuixinmeiju/JPLMDWJ/', 'tv')

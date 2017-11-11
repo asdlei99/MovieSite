@@ -96,11 +96,16 @@ class Main(object):
                 while not end:
                     _d_url = raw_input('Douban URL: ')
                     if _d_url and 'douban' in _d_url:
-                        self.manual_list.append(_d_url.strip())
+                        if ',' in _d_url:
+                            for u in _d_url.split(','):
+                                self.manual_list.append(u.strip())
+                        else:
+                            self.manual_list.append(_d_url.strip())
                     elif _d_url == 'end':
                         print 'Multi-task start'
                         break
-                for item in self.manual_list:
+                for index, item in enumerate(self.manual_list):
+                    print '%d/%d' % (index+1, len(self.manual_list))
                     self._add_new_movie(item)
                 print 'Multi-task end'
                 return
