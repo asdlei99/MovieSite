@@ -1,4 +1,5 @@
 #_*_coding:UTF-8_*_
+import json
 from django.shortcuts import render_to_response, HttpResponse
 from movie import models
 from django.template.context import RequestContext
@@ -99,3 +100,4 @@ def nav(request):
 def rss(request):
     #ret = {}
     return render_to_response('others/rss.html')
+

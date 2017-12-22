@@ -64,7 +64,7 @@ class Main(object):
                 'cate_eng': cate_eng, 'cate_chn': cate_chn}
 
     @staticmethod
-    def _add_new_movie(d_url):
+    def add_new_movie(d_url):
         data = {'name': '',
                 'url': '',
                 'content': '',
@@ -106,7 +106,7 @@ class Main(object):
                         break
                 for index, item in enumerate(self.manual_list):
                     print '%d/%d' % (index+1, len(self.manual_list))
-                    self._add_new_movie(item)
+                    self.add_new_movie(item)
                 print 'Multi-task end'
                 return
 

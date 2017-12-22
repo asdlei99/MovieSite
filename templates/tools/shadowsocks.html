@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+{% load my_tags %}
+{% block title %}ShadowSocks - 比格电影{% endblock %}
+{% block meta_own %}
+{% endblock %}
+    
+{% block css_own %}
+<link rel='stylesheet' href='/static/css/tools/shadowsocks.css'>
+{% endblock %}
+
+{% block main_content %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 breadcrumb hidden-xs hidden-sm">
+        <a class="btn btn-info btn-arrow-right" href="/">主页</a>
+        <h1><a class="btn btn-primary btn-arrow-right" href="/tools/shadowsocks/">ShadowSocks</a></h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <div class="alert alert-{% if ss_running %}success{% else %}warning{% endif %}">
+          {% if ss_running %}
+            <p>ShadowSocks service is running.</p>
+            <p><b>{{ server }}:{{ port }}</b></p>
+          {% else %}
+            <p>ShadowSocks service is not running. Please contact administrator.</p>
+          {% endif %}
+
+
+        </div>
+        <div id="ss-wrapper" class="p-20 text-center list-group-item">
+          <form id="ss-form" action="/tools/shadowsocks/see_world/" method="post">
+          {% csrf_token %}
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" id="answer-input"
+                       maxlength="30" autocomplete="off" placeholder="站长的名字" autofocus
+                {% if not ss_running %}disabled{% endif %}>
+                <span class="input-group-btn">
+                  <button class="btn btn-primary" type="submit">获取密码</button>
+                </span>
+              </div>
+            </div>
+            </form>
+
+        </div>
+      </div>
+    
+    </div>
+  
+  </div>
+
+
+{% endblock %}
+
+{% block js_own %}
+<script type="text/javascript" src='/static/js/tools/shadowsocks.js?v=1'></script>
+{% endblock %}

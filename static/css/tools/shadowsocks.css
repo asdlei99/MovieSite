@@ -1,0 +1,40 @@
+@CHARSET "UTF-8";
+
+#ss-wrapper {
+  max-height: 680px;
+  min-height: 460px;
+  position: relative;
+  background-image: url(/static/images/tools/connecting_world.jpg);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#ss-wrapper form {
+  position: absolute;
+  top: 48%;
+  margin: 0 20px;
+  left: 25px;
+  right: 25px;
+}
+
+/***  RESPONSIVE  ***/
+@media (max-width: 1199px) {  /* 992-1199 */
+
+}
+
+@media (max-width: 991px) {  /* 769-991 */
+
+}
+
+@media (max-width: 768px) {  /* 436-768 */
+
+}
+
+@media (max-width: 435px) {  /* 375 - 435 */
+
+}
+
+@media (max-width: 374px) {  /* 320 - 374 */
+
+}

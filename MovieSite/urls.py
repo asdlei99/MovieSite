@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^sitemap3\.xml$', TemplateView.as_view(template_name='sitemap3.xml', content_type='application/xml')),
     url(r'^rss\.xml$', TemplateView.as_view(template_name='rss.xml', content_type='application/xml')),
     url(r'^spider/', include('spider.urls')),
+    url(r'^tools/', include('tools.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
