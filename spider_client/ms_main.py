@@ -200,7 +200,7 @@ class Main(object):
 
                         #
                         data = {'name': l_name,
-                                'url': l_url,
+                                'url': l_url.replace('https', 'http'),
                                 'content': l_content,
                                 'secret': '5826f119-c0bc-4ad7-9017-30369eb75b75',
                                 'tag': l_type,

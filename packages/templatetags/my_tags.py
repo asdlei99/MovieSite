@@ -6,6 +6,7 @@ from django import template
 from movie import models
 register=template.Library()
 
+
 @register.filter(expects_localtime=True, is_safe=True)
 def my_datetrans(origin_date):
     cur_day = datetime.date.today()

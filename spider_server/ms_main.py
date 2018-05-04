@@ -483,7 +483,7 @@ class Main(object):
     def _item_exists(self, url, cate_eng):
         _TABLE_NAME = 'movie_%s' % cate_eng
         # Check if item exists
-        sql = ('SELECT * FROM %s' % _TABLE_NAME + ' WHERE link_addr=%s')
+        sql = ('SELECT id FROM %s' % _TABLE_NAME + ' WHERE link_addr=%s')
         cur = self.conn.cursor()
         num = cur.execute(sql, (url,))  # 按link_addr查询
         # item_num = len(cur.fetchall())
